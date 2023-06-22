@@ -1,0 +1,28 @@
+{
+  "name": "threadbase",
+  "version": "1.0.0",
+  "description": "Welcome to ThreadBase, an innovative tool designed to help teams create their knowledge base straight from their daily communications on Slack. Our mission is to enhance productivity without disrupting your workflow.",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "server": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FabioYyc/ThreadBase.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/FabioYyc/ThreadBase/issues"
+  },
+  "homepage": "https://github.com/FabioYyc/ThreadBase#readme",
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "octokit": "^2.1.0"
+  },
+  "devDependencies": {
+    "smee-client": "^1.2.3"
+  }
+}
