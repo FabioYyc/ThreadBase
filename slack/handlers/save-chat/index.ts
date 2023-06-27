@@ -1,6 +1,6 @@
 import { App, MessageShortcut } from "@slack/bolt"
 import {threadRepo} from "../../module/thread";
-import saveChatView from "./views";
+import saveChatView, { confirmationMessage } from "./views";
 import { viewInputReader } from "../../utils";
 
 
@@ -16,26 +16,23 @@ const saveChatHandler = (app: App) =>{
                 message_ts: messageShortcut.message_ts
             })
     
-            if(!messageShortcut.team?.id || !messageShortcut.team?.domain || !messageShortcut.user.id || !messageShortcut.message_ts) {
+            if(!messageShortcut.team?.id || !messageShortcut.team?.domain || !messageShortcut.user.id || !messageShortcut.message_ts || !messageShortcut.user.name) {
                 throw new Error('Missing required properties')
     
             }
+
+            console.log('user is ', messageShortcut.user)
+            //TODO: if thread already exist, update it
             const thread = await threadRepo.create({
                 userId: messageShortcut.user.id,
+                userName: messageShortcut.user.name,
                 threadId: messageShortcut.message_ts,
                 teamId: messageShortcut.team?.id,
                 domain: messageShortcut.team?.domain,
                 threadLink: threadPermalink.permalink as string,
+                channelId: messageShortcut.channel.id,
                 isSaved: false
             })
-            const returnTextBlocks = [{"type": "section", "text": {"type": "mrkdwn", "text": `Saved to your knowledge base with [link](${threadPermalink.permalink}) :tada:`}}]
-            // client.chat.postEphemeral({
-            //     channel: messageShortcut.channel.id,
-            //     blocks: returnTextBlocks,
-            //     thread_ts: messageShortcut.message_ts,
-            //     user: messageShortcut.user.id
-            // });
-            
             const returnView = saveChatView(thread.id)
             await client.views.open({
                 trigger_id: messageShortcut.trigger_id,
@@ -66,8 +63,9 @@ export const stringParser = (string: string|null|undefined) => {
 
 export const viewHandler = (app: App) => {
     return app.view('save-chat-view', async ({ ack, body, view, client }) => {
-        await ack();
+      
         try {
+            await ack();
             const values = viewInputReader(view);
             const threadDetails = {
                 title: stringParser(values.title),
@@ -78,11 +76,18 @@ export const viewHandler = (app: App) => {
             if(!view.external_id) {
                 throw new Error('Missing external id')
             }
-            await threadRepo.addDetailFields(threadDetails, view.external_id)
+            const thread = await threadRepo.addDetailFields(threadDetails, view.external_id)
+            if(!thread) {
+                throw new Error('Thread not found')
+            }
+            const returnTextBlocks = confirmationMessage
+            client.chat.postEphemeral({
+                channel: thread.channelId,
+                blocks: returnTextBlocks(thread.userName),
+                thread_ts: thread.threadId,
+                user: thread.userId
+            });
 
-            console.log('updated saved thread')
-
-            
         } catch (error) {
             throw new Error(`error in save chat: ${error}`)
         }

@@ -1,4 +1,4 @@
-import { View } from "@slack/bolt";
+import { Block, View } from "@slack/bolt";
 
 export const callId = 'save-chat-view'
 
@@ -95,4 +95,12 @@ const createView = (externalId: string): View => ({
 export default createView;
 
 
-export const returnTextBlocks = [{"type": "section", "text": {"type": "mrkdwn", "text": `Saved to your knowledge base :tada:`}}]
+export const confirmationMessage = (userName:string) => ([
+    {
+        "type": "section",
+        "text": {
+            "type": "mrkdwn",
+            "text": `@${userName}, Great work! You can now find the saved chat in the *ThreadBase* app's Home tab :rocket:`
+        }
+    }
+])

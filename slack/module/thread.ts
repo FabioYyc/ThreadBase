@@ -7,10 +7,12 @@ mongoose.connect(process.env.MONGO_DB_URL as string);
 
 const threadSchema = new mongoose.Schema({
     userId: String,
+    userName: String,
     threadId: String,
     teamId: String,
     domain: String,
     threadLink: String,
+    channelId: String,
     title: String,
     description: String,
     keywords: Array,
@@ -27,10 +29,12 @@ export interface ThreadDetails {
 
 export interface IThread{
     userId: string;
+    userName: string;
     threadId: string;
     teamId: string;
     domain: string;
     threadLink: string;
+    channelId: string;
     isSaved: boolean;
 }
 
@@ -42,6 +46,8 @@ export const threadRepo = {
     },
     addDetailFields: async (threadDetails:ThreadDetails, threadId:string ) => {
         await Thread.updateOne({ _id: new mongoose.Types.ObjectId(threadId) }, { $set: {...threadDetails, isSaved:true} });
+        //return the thread
+        return await Thread.findOne({ _id: new mongoose.Types.ObjectId(threadId) }) as IThread;
     }
 
 }
