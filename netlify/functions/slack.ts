@@ -1,7 +1,7 @@
 import type { Handler, HandlerEvent, HandlerContext } from "@netlify/functions";
 import { App, MessageShortcut, OptionsSource, ReceiverEvent, SlackAction, SlackActionMiddlewareArgs, SlackCommandMiddlewareArgs, SlackEventMiddlewareArgs, SlackOptionsMiddlewareArgs, SlackShortcutMiddlewareArgs } from "@slack/bolt";
 import { ExpressReceiver } from "@slack/bolt";
-import { registerEventListener } from "../../slack/handlers/event";
+import { registerHomeTabListener } from "../../slack/handlers/home";
 import { parseRequestBody } from "../../slack/utils";
 import { registerSaveChatHandler } from "../../slack/handlers/save-chat";
 
@@ -12,7 +12,7 @@ const app = new App({
     signingSecret: process.env.SLACK_SIGNING_SECRET as string,
   }),
 });
-  registerEventListener(app);
+  registerHomeTabListener(app);
   registerSaveChatHandler(app);
   app.command('/addbase', async ({ ack, payload, context }) => {
     // Acknowledge the command request

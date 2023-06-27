@@ -1,6 +1,6 @@
 import { App, MessageShortcut } from "@slack/bolt"
 import {threadRepo} from "../../module/thread";
-import saveChatView from "./save-chat-view";
+import saveChatView from "./views";
 import { viewInputReader } from "../../utils";
 
 
