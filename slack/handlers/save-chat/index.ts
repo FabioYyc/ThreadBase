@@ -80,10 +80,10 @@ export const viewHandler = (app: App) => {
             if(!thread) {
                 throw new Error('Thread not found')
             }
-            const returnTextBlocks = confirmationMessage
+            
             client.chat.postEphemeral({
                 channel: thread.channelId,
-                blocks: returnTextBlocks(thread.userName),
+                blocks: confirmationMessage(thread.userName),
                 thread_ts: thread.threadId,
                 user: thread.userId
             });

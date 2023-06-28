@@ -1,6 +1,6 @@
 //Mongodb typescrpit schema for thread, properties: userId, threadId, threadLink. Collection will be threads
 
-import mongoose from "mongoose";
+import mongoose, { Document, Mongoose } from "mongoose";
 
 /// connect to mongodb use env var MONGODB_URL
 mongoose.connect(process.env.MONGO_DB_URL as string);
@@ -38,6 +38,8 @@ export interface IThread{
     isSaved: boolean;
 }
 
+//Join thread and threadDetails as a new type
+export interface ISavedThread extends IThread, ThreadDetails, Document {}
 
 export const threadRepo = {
     create: async (thread: IThread) => {
@@ -48,6 +50,10 @@ export const threadRepo = {
         await Thread.updateOne({ _id: new mongoose.Types.ObjectId(threadId) }, { $set: {...threadDetails, isSaved:true} });
         //return the thread
         return await Thread.findOne({ _id: new mongoose.Types.ObjectId(threadId) }) as IThread;
+    },
+
+    getSavedThreadForUser: async (userId: string): Promise<ISavedThread[]> => {
+        return await Thread.find({ userId: userId, isSaved: true }) || [];
     }
 
 }

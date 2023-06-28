@@ -1,7 +1,7 @@
 import type { Handler, HandlerEvent, HandlerContext } from "@netlify/functions";
 import { App, MessageShortcut, OptionsSource, ReceiverEvent, SlackAction, SlackActionMiddlewareArgs, SlackCommandMiddlewareArgs, SlackEventMiddlewareArgs, SlackOptionsMiddlewareArgs, SlackShortcutMiddlewareArgs } from "@slack/bolt";
 import { ExpressReceiver } from "@slack/bolt";
-import { registerHomeTabListener } from "../../slack/handlers/home";
+import { registerHomeTabListener } from "../../slack/handlers/home/home";
 import { parseRequestBody } from "../../slack/utils";
 import { registerSaveChatHandler } from "../../slack/handlers/save-chat";
 
