@@ -58,6 +58,10 @@ export const threadRepo = {
 
     deleteSavedThread: async (threadId: string) => {
         await Thread.deleteOne({ _id: new mongoose.Types.ObjectId(threadId) });
-    } 
+    },
+
+    getThreadById: async (threadId: string) => {
+        return await Thread.findOne({ _id: new mongoose.Types.ObjectId(threadId) });
+    },
 
 }
