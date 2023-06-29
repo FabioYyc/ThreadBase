@@ -54,6 +54,10 @@ export const threadRepo = {
 
     getSavedThreadForUser: async (userId: string): Promise<ISavedThread[]> => {
         return await Thread.find({ userId: userId, isSaved: true }) || [];
-    }
+    },
+
+    deleteSavedThread: async (threadId: string) => {
+        await Thread.deleteOne({ _id: new mongoose.Types.ObjectId(threadId) });
+    } 
 
 }

@@ -1,5 +1,6 @@
 import { View } from "@slack/bolt";
-import { ISavedThread, IThread } from "../../module/thread";
+import { ISavedThread, IThread, threadRepo } from "../../module/thread";
+import { deleteChatActionId } from "./delete-chat";
 
 const homeViewBase: View = {
     type: "home",
@@ -51,7 +52,7 @@ const savedThreadBlock = (thread: ISavedThread): View['blocks'] => {
                         "emoji": true,
                         "text": ":pencil: Edit"
                     },
-                    "value": thread._id.toString(),
+                    "value": thread.id,
                     "action_id": "edit_saved_thread"
                 },
                 {
@@ -61,8 +62,8 @@ const savedThreadBlock = (thread: ISavedThread): View['blocks'] => {
                         "emoji": true,
                         "text": ":x: Delete"
                     },
-                    "value": thread._id.toString(),
-                    "action_id": "delete_saved_thread"
+                    "value": thread.id,
+                    "action_id": deleteChatActionId
                 },
             ]
         },
@@ -100,3 +101,10 @@ export const savedThreadExistsView = (Threads: ISavedThread[]): View => ({
     }
 })
         
+export const getSavedThreadViewByUser = async (userId:string) =>{
+    const Threads = await threadRepo.getSavedThreadForUser(userId);
+    if (Threads.length > 0) {
+        return savedThreadExistsView(Threads);
+    }
+    return noSavedThreadsView;
+}
