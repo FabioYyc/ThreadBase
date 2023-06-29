@@ -1,6 +1,7 @@
 import { View } from "@slack/bolt";
 import { ISavedThread, IThread, threadRepo } from "../../module/thread";
 import { deleteChatActionId } from "./delete-chat";
+import { editChatActionId } from "../save-chat";
 
 const homeViewBase: View = {
     type: "home",
@@ -53,7 +54,7 @@ const savedThreadBlock = (thread: ISavedThread): View['blocks'] => {
                         "text": ":pencil: Edit"
                     },
                     "value": thread.id,
-                    "action_id": "edit_saved_thread"
+                    "action_id": editChatActionId
                 },
                 {
                     "type": "button",
@@ -100,7 +101,8 @@ export const savedThreadExistsView = (Threads: ISavedThread[]): View => ({
         ]
     }
 })
-        
+  
+
 export const getSavedThreadViewByUser = async (userId:string) =>{
     const Threads = await threadRepo.getSavedThreadForUser(userId);
     if (Threads.length > 0) {

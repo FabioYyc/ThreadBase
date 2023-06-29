@@ -1,12 +1,15 @@
 import { App, MessageShortcut } from "@slack/bolt"
-import {threadRepo} from "../../module/thread";
-import saveChatView, { confirmationMessage } from "./views";
+import {ISavedThread, IThread, threadRepo} from "../../module/thread";
+import  { confirmationMessage, createChatView, editChatCallbackId, saveChatCallbackId } from "./views";
 import { viewInputReader } from "../../utils";
+import { saveFromSaveChatView } from "./operations";
+import { ButtonBlockAction } from "../../types";
+import { getSavedThreadViewByUser } from "../home/views";
 
 
+export const editChatActionId = 'edit_saved_chat'
 
-
-const saveChatHandler = (app: App) =>{
+const saveShortcutHandler = (app: App) =>{
     return app.shortcut('save-chat', async ({ shortcut, ack, client }) => {
         try {
             await ack();
@@ -32,8 +35,8 @@ const saveChatHandler = (app: App) =>{
                 threadLink: threadPermalink.permalink as string,
                 channelId: messageShortcut.channel.id,
                 isSaved: false
-            })
-            const returnView = saveChatView(thread.id)
+            });
+            const returnView = createChatView({externalId:thread.id as string, isEdit: false})
             await client.views.open({
                 trigger_id: messageShortcut.trigger_id,
                 view: returnView
@@ -45,41 +48,34 @@ const saveChatHandler = (app: App) =>{
     })
 }
 
-export const keywordsParser = (keywords: string|null|undefined) => {
-    if(!keywords) {
-        return []
-    }
-    return keywords.split(',')
+
+const editChatHandler = (app: App) => {
+
+    app.action(editChatActionId, async ({ ack, body, client }) => {
+        await ack();
+        const payload = body as any;
+        const actions = (payload.actions as ButtonBlockAction[]);
+        const threadId = actions[0].value;
+        if(!threadId) {
+            throw new Error('Missing thread id')
+        }
+        const thread = await threadRepo.getThreadById(threadId) as ISavedThread
+        const returnView = createChatView({externalId: threadId, isEdit: true, thread})
+        await client.views.open({
+            trigger_id: payload.trigger_id,
+            view: returnView
+        })
+
+    })
 }
 
-export const stringParser = (string: string|null|undefined) => {
-    if(!string) {
-        return ''
-    }
-    // replace all "+" with space
-    return string.replace(/\+/g, ' ')
 
-}
-
-export const viewHandler = (app: App) => {
-    return app.view('save-chat-view', async ({ ack, body, view, client }) => {
+export const saveViewHandler = (app: App) => {
+    return app.view(saveChatCallbackId, async ({ ack, body, view, client }) => {
       
         try {
             await ack();
-            const values = viewInputReader(view);
-            const threadDetails = {
-                title: stringParser(values.title),
-                keywords: keywordsParser(values.keywords),
-                description: stringParser(values.description)
-            }
-
-            if(!view.external_id) {
-                throw new Error('Missing external id')
-            }
-            const thread = await threadRepo.addDetailFields(threadDetails, view.external_id)
-            if(!thread) {
-                throw new Error('Thread not found')
-            }
+            const thread = await saveFromSaveChatView(view);
             
             client.chat.postEphemeral({
                 channel: thread.channelId,
@@ -94,8 +90,33 @@ export const viewHandler = (app: App) => {
     })
 }
 
+export const editConfirmHandler = (app: App) => {
+    return app.view(editChatCallbackId, async ({ ack, body, view, client }) => {
+      
+        try {
+            await ack();
+            await saveFromSaveChatView(view);
+            const userId = body.user.id;
+            const returnView = await getSavedThreadViewByUser(userId);
+
+            const result = await client.views.publish({
+      
+              /* the user that opened your app's app home */
+              user_id: userId,
+              /* the view object that appears in the app home*/
+              view: returnView,
+            });
+
+        } catch (error) {
+            throw new Error(`error in save chat: ${error}`)
+        }
+    })
+}
+
 export const registerSaveChatHandler = (app: App) => {
 
-    saveChatHandler(app)
-    viewHandler(app)
+    saveShortcutHandler(app)
+    saveViewHandler(app)
+    editChatHandler(app)
+    editConfirmHandler(app)
 }
