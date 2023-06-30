@@ -1,7 +1,7 @@
 import { App, View } from "@slack/bolt";
 import { ButtonBlockAction } from "../../types";
 import { threadRepo } from "../../module/thread";
-import { getSavedThreadViewByUser } from "./views";
+import { getSavedThreadViewByUser } from "./home-tab-view";
 
 export const deleteChatActionId = 'delete_saved_thread';
 export const deleteChatConfirmViewId = 'delete-chat-view';

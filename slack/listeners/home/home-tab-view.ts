@@ -1,12 +1,18 @@
 import { View } from "@slack/bolt";
 import { ISavedThread, IThread, threadRepo } from "../../module/thread";
 import { deleteChatActionId } from "./delete-chat";
-import { editChatActionId } from "../save-chat";
+import { editChatActionId } from "../save-chat-modal/handlers";
+import { homeTabActionRow } from "./create-team/views";
+import { savedThreadsViews } from "./chats";
 
 const homeViewBase: View = {
     type: "home",
     callback_id: "home_view",
     blocks: []}
+
+
+
+
 
 export const noSavedThreadsView: View = {
     ...homeViewBase,
@@ -20,6 +26,7 @@ export const noSavedThreadsView: View = {
                     "text": "Looks like you haven't stashed any chats yet! 👆"
                 }
             },
+            homeTabActionRow(),
             {
                 "type": "divider"
             },
@@ -34,53 +41,6 @@ export const noSavedThreadsView: View = {
     }
 }
 
-const savedThreadBlock = (thread: ISavedThread): View['blocks'] => {
-    return [
-        {
-            "type": "section",
-            "text": {
-                "type": "mrkdwn",
-                "text": `<${thread.threadLink}|*${thread.title}*> \n *${thread.keywords.join(', ')}* \n ${thread.description}`
-            },
-        },
-        {
-            "type": "actions",
-            "elements": [
-                {
-                    "type": "button",
-                    "text": {
-                        "type": "plain_text",
-                        "emoji": true,
-                        "text": ":pencil: Edit"
-                    },
-                    "value": thread.id,
-                    "action_id": editChatActionId
-                },
-                {
-                    "type": "button",
-                    "text": {
-                        "type": "plain_text",
-                        "emoji": true,
-                        "text": ":x: Delete"
-                    },
-                    "value": thread.id,
-                    "action_id": deleteChatActionId
-                },
-            ]
-        },
-        {
-            "type": "divider"
-        }
-    ]
-}
-
-const savedThreadsViews = (threads: ISavedThread[]) => {
-    const blocks = []
-    for (const thread of threads) {
-        blocks.push(...savedThreadBlock(thread))
-    }
-    return blocks;
-}
 
 export const savedThreadExistsView = (Threads: ISavedThread[]): View => ({
     ...homeViewBase,
@@ -94,6 +54,7 @@ export const savedThreadExistsView = (Threads: ISavedThread[]): View => ({
                     "text": "Here's your saved chats :speech_balloon:"
                 }
             },
+            homeTabActionRow(),
             {
                 "type": "divider"
             },
