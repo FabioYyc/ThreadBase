@@ -1,6 +1,6 @@
 import { View } from "@slack/bolt"
 import { ISavedThread } from "../../module/thread"
-import { editChatActionId } from "../save-chat-modal/handlers"
+import { editChatActionId } from "../save-chat/handlers"
 import { deleteChatActionId } from "./delete-chat"
 
 const savedThreadBlock = (thread: ISavedThread): View['blocks'] => {

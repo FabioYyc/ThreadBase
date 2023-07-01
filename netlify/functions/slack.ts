@@ -3,7 +3,7 @@ import { App, MessageShortcut, OptionsSource, ReceiverEvent, SlackAction, SlackA
 import { ExpressReceiver } from "@slack/bolt";
 import { registerHomeTabListeners } from "../../slack/listeners/home";
 import { parseRequestBody } from "../../slack/utils";
-import { registerSaveChatHandler } from "../../slack/listeners/save-chat-modal/handlers";
+import { registerSaveChatHandler } from "../../slack/listeners/save-chat/handlers";
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,

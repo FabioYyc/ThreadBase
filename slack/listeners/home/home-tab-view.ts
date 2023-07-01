@@ -1,8 +1,8 @@
 import { View } from "@slack/bolt";
 import { ISavedThread, IThread, threadRepo } from "../../module/thread";
 import { deleteChatActionId } from "./delete-chat";
-import { editChatActionId } from "../save-chat-modal/handlers";
-import { homeTabActionRow } from "./create-team/views";
+import { editChatActionId } from "../save-chat/handlers";
+import { homeTabActionRow, teamSelector } from "./teams/views";
 import { savedThreadsViews } from "./chats";
 
 const homeViewBase: View = {
@@ -27,6 +27,7 @@ export const noSavedThreadsView: View = {
                 }
             },
             homeTabActionRow(),
+            teamSelector(),
             {
                 "type": "divider"
             },

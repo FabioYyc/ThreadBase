@@ -30,7 +30,7 @@ const saveShortcutHandler = (app: App) =>{
                 userId: messageShortcut.user.id,
                 userName: messageShortcut.user.name,
                 threadId: messageShortcut.message_ts,
-                teamId: messageShortcut.team?.id,
+                orgId: messageShortcut.team?.id,
                 domain: messageShortcut.team?.domain,
                 threadLink: threadPermalink.permalink as string,
                 channelId: messageShortcut.channel.id,

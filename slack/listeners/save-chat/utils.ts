@@ -1,6 +1,6 @@
 import { ViewOutput } from "@slack/bolt";
 import { threadRepo } from "../../module/thread";
-import { viewInputReader } from "../../utils";
+import { stringInputParser, viewInputReader } from "../../utils";
 
 
 export const keywordsParser = (keywords: string|null|undefined) => {
@@ -10,21 +10,13 @@ export const keywordsParser = (keywords: string|null|undefined) => {
     return keywords.split(',')
 }
 
-export const stringParser = (string: string|null|undefined) => {
-    if(!string) {
-        return ''
-    }
-    // replace all "+" with space
-    return string.replace(/\+/g, ' ')
-
-}
 
 export const saveFromSaveChatView = async (view: ViewOutput) => {
     const values = viewInputReader(view);
     const threadDetails = {
-        title: stringParser(values.title),
+        title: stringInputParser(values.title),
         keywords: keywordsParser(values.keywords),
-        description: stringParser(values.description)
+        description: stringInputParser(values.description)
     }
 
     if(!view.external_id) {

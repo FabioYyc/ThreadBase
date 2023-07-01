@@ -32,7 +32,8 @@ const parseViewValues = (data: any) => {
   const result:any = {};
 
   Object.keys(data).forEach(key => {
-    result[key] = data[key][Object.keys(data[key])[0]].value;
+    const valueObject = data[key][Object.keys(data[key])[0]];
+    result[key] = (valueObject as Object).hasOwnProperty('value') ? valueObject['value'] : valueObject
   });
 
   return result;
@@ -40,4 +41,13 @@ const parseViewValues = (data: any) => {
 export const viewInputReader = (view: ViewOutput) =>{
   const values = view.state.values
   return parseViewValues(values)
+}
+
+export const stringInputParser = (string: string|null|undefined) => {
+  if(!string) {
+      return ''
+  }
+  // replace all "+" with space
+  return string.replace(/\+/g, ' ')
+
 }

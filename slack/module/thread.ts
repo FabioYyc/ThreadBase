@@ -9,7 +9,7 @@ const threadSchema = new mongoose.Schema({
     userId: String,
     userName: String,
     threadId: String,
-    teamId: String,
+    orgId: String,
     domain: String,
     threadLink: String,
     channelId: String,
@@ -31,7 +31,7 @@ export interface IThread{
     userId: string;
     userName: string;
     threadId: string;
-    teamId: string;
+    orgId: string;
     domain: string;
     threadLink: string;
     channelId: string;
