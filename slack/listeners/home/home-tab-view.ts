@@ -1,12 +1,11 @@
 import { View } from "@slack/bolt";
-import { ISavedThread, IThread, threadRepo } from "../../module/thread";
-import { deleteChatActionId } from "./delete-chat";
-import { editChatActionId } from "../save-chat/handlers";
-import { homeTabActionRow, teamSelector } from "./teams/views";
+import { ISavedThread, threadRepo } from "../../module/thread";
+import { homeTabActionRow, personalSpaceValue, teamSelector } from "./teams/views";
 import { savedThreadsViews } from "./chats";
-import { ISavedTeam, getTeamsForUser, teamRepo } from "../../module/team";
+import { ISavedTeam, getTeamsForUser } from "../../module/team";
 
 import { WebClient } from "@slack/web-api"
+import { getLatestTeamIdForUser, userUIRepo } from "../../module/userUI";
 
 const homeViewBase: View = {
     type: "home",
@@ -71,18 +70,20 @@ export const savedThreadExistsView = (Threads: ISavedThread[], teams: ISavedTeam
 
 export const getSavedThreadViewByUser = async (userId:string, selectedTeamId?:string) =>{
     const teams = await getTeamsForUser(userId);
+    const userLatestTeamId = await getLatestTeamIdForUser(userId);
+    const displayTeamId = selectedTeamId || userLatestTeamId;
     let threads: ISavedThread[];
-    if(!selectedTeamId) {
+    if(!displayTeamId || selectedTeamId === personalSpaceValue) {
         threads = await threadRepo.getPersonalSavedThreadForUser(userId)
     } else {
-        threads = await threadRepo.getSavedThreadForTeam(selectedTeamId)
+        threads = await threadRepo.getSavedThreadForTeam(displayTeamId)
     }
 
 
     if (threads.length > 0) {
-        return savedThreadExistsView(threads, teams, selectedTeamId);
+        return savedThreadExistsView(threads, teams, displayTeamId);
     }
-    return noSavedThreadsView(teams, selectedTeamId);
+    return noSavedThreadsView(teams, displayTeamId);
 }
 
 

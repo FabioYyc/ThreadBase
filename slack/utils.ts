@@ -3,14 +3,14 @@ import { ViewOutput } from "@slack/bolt";
 export function parseRequestBody(stringBody: string | null, contentType: string | undefined) {
 
     try {
-      let inputStringBody: string = stringBody ?? "";
-      let result: any = {};
+      const inputStringBody: string = stringBody ?? "";
+      const result: any = {};
       let payload
   
       if (contentType && contentType === 'application/x-www-form-urlencoded') {
-        var keyValuePairs = inputStringBody.split('&');
+        const keyValuePairs = inputStringBody.split('&');
         keyValuePairs.forEach(function(pair: string): void {
-          let individualKeyValuePair: string[] = pair.split('=');
+          const individualKeyValuePair: string[] = pair.split('=');
           result[individualKeyValuePair[0]] = decodeURIComponent(individualKeyValuePair[1] || '');
         });
         payload = JSON.parse(JSON.stringify(result));
@@ -33,7 +33,8 @@ const parseViewValues = (data: any) => {
 
   Object.keys(data).forEach(key => {
     const valueObject = data[key][Object.keys(data[key])[0]];
-    result[key] = (valueObject as Object).hasOwnProperty('value') ? valueObject['value'] : valueObject
+    // eslint-disable-next-line no-prototype-builtins
+    result[key] = (valueObject as object).hasOwnProperty('value') ? valueObject['value'] : valueObject
   });
 
   return result;
