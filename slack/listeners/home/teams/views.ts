@@ -1,4 +1,5 @@
 import { View } from "@slack/bolt"
+import { ISavedTeam, ITeam } from "../../../module/team"
 
 export const createTeamActionId = 'create_team'
 export const homeTabActionRow = () =>(
@@ -105,11 +106,26 @@ export const createTeamView = ({teamId, isEdit = false, }:{teamId?: string, isEd
     }
 )
 
-export const teamSelector = () => ({
+export const teamSelector = (teams: ISavedTeam[]) => {
+    const firstTeam = teams[0]
+    const getTeamOption = (team:ISavedTeam) =>{
+        return {
+            "text": {
+                "type": "plain_text",
+                "text": team.teamName,
+                "emoji": true
+            },
+            "value": team.id
+        }
+    }
+
+    const teamOptions = teams.map(getTeamOption)
+
+    return {
     "type": "section",
     "text": {
         "type": "mrkdwn",
-        "text": "*Team: Test Team 1*"
+        "text": `*Team: ${firstTeam.teamName}*`
     },
     "accessory": {
         "type": "static_select",
@@ -118,23 +134,6 @@ export const teamSelector = () => ({
             "text": "Select team",
             "emoji": true
         },
-        "options": [
-            {
-                "text": {
-                    "type": "plain_text",
-                    "text": "Test Team 1",
-                    "emoji": true
-                },
-                "value": "value-0"
-            },
-            {
-                "text": {
-                    "type": "plain_text",
-                    "text": "Test Team 2",
-                    "emoji": true
-                },
-                "value": "value-1"
-            }
-        ]
+        "options": teamOptions
     }
-})
+}}

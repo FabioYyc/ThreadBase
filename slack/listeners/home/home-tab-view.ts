@@ -4,6 +4,9 @@ import { deleteChatActionId } from "./delete-chat";
 import { editChatActionId } from "../save-chat/handlers";
 import { homeTabActionRow, teamSelector } from "./teams/views";
 import { savedThreadsViews } from "./chats";
+import { ISavedTeam, getTeamsForUser, teamRepo } from "../../module/team";
+
+import { WebClient } from "@slack/web-api"
 
 const homeViewBase: View = {
     type: "home",
@@ -14,7 +17,7 @@ const homeViewBase: View = {
 
 
 
-export const noSavedThreadsView: View = {
+export const noSavedThreadsView = (teams: ISavedTeam[]):View => ({
     ...homeViewBase,
     ...{
         "type": "home",
@@ -27,7 +30,7 @@ export const noSavedThreadsView: View = {
                 }
             },
             homeTabActionRow(),
-            teamSelector(),
+            teamSelector(teams),
             {
                 "type": "divider"
             },
@@ -40,10 +43,10 @@ export const noSavedThreadsView: View = {
             }
         ]
     }
-}
+})
 
 
-export const savedThreadExistsView = (Threads: ISavedThread[]): View => ({
+export const savedThreadExistsView = (Threads: ISavedThread[], teams: ISavedTeam[]): View => ({
     ...homeViewBase,
     ...{
         "type": "home",
@@ -56,6 +59,7 @@ export const savedThreadExistsView = (Threads: ISavedThread[]): View => ({
                 }
             },
             homeTabActionRow(),
+            teamSelector(teams),
             {
                 "type": "divider"
             },
@@ -67,8 +71,18 @@ export const savedThreadExistsView = (Threads: ISavedThread[]): View => ({
 
 export const getSavedThreadViewByUser = async (userId:string) =>{
     const Threads = await threadRepo.getSavedThreadForUser(userId);
+    const teams = await getTeamsForUser(userId);
     if (Threads.length > 0) {
-        return savedThreadExistsView(Threads);
+        return savedThreadExistsView(Threads, teams);
     }
-    return noSavedThreadsView;
+    return noSavedThreadsView(teams);
+}
+
+
+export const getUserHomeView = async (userId: string, client: WebClient) => {
+    const updatedHomeView = await getSavedThreadViewByUser(userId);
+    client.views.publish({
+        user_id: userId,
+        view: updatedHomeView,
+    })
 }

@@ -2,14 +2,15 @@ import { App, SlackViewAction, ViewSubmitAction } from "@slack/bolt";
 import { createTeamActionId, createTeamCallbackId, createTeamView } from "./views";
 import { stringInputParser, viewInputReader } from "../../../utils";
 import { ITeam, IUserTeams, UserRole, addTeamToUserTeam, teamRepo, userTeamsRepo } from "../../../module/team";
-import { connection } from "mongoose";
+import mongoose, { connection } from "mongoose";
+import { getUserHomeView } from "../home-tab-view";
 
 const initialiseTeamHandlers = (app: App): void => {
     app.action(createTeamActionId, async ({ ack, body, client }) => {
         try {
             ack();
             const payload = body as any;
-            app.client.views.open({
+            client.views.open({
                 trigger_id: payload.trigger_id,
                 view: createTeamView({})
         })
@@ -34,17 +35,19 @@ const saveTeamHandler = (app: App) => {
             teamDescriptions: stringInputParser(team_description),
             orgId: orgId,
             ownerId: body.user.id,
-            teamUsers: teamUsers
+            teamUsers: teamUsers,
         }
         const session = await connection.startSession();    
         //create team and teamUsers in a transaction
         session.startTransaction();
         try {
             const newTeam = await teamRepo.create(team, session);
+            await addTeamToUserTeam({userId: body.user.id, teamId:newTeam.id, userRole: UserRole.Owner, session})
             for (const teamUser of teamUsers) {
                 await addTeamToUserTeam({userId: teamUser, teamId:newTeam.id, userRole: UserRole.Member, session})
             }
             await session.commitTransaction();
+            await getUserHomeView(body.user.id, client);
         } catch (error) {
             await session.abortTransaction();
             throw new Error(`error in create team: ${error}`)

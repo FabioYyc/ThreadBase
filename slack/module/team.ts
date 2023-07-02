@@ -1,4 +1,4 @@
-import mongoose, { ClientSession } from "mongoose";
+import mongoose, { ClientSession, Document } from "mongoose";
 
 export interface ITeam{
     ownerId: string;
@@ -38,6 +38,9 @@ export enum UserRole {
 const Team = mongoose.model("Team", TeamSchema);
 
 const UserTeams = mongoose.model("UserTeams", userTeamsSchema);
+
+
+export interface ISavedTeam extends Document, ITeam {}
 
 
 export const teamRepo = {
@@ -85,4 +88,14 @@ export const addTeamToUserTeam = async ({userId, teamId, userRole, session}:{use
         await userTeamsRepo.updateTeams(userId, teams, session);
     }
 
+}
+
+export const getTeamsForUser = async (userId: string): Promise<ISavedTeam[]> => {
+    const userTeams = await UserTeams.findOne({userId: userId});
+    if(!userTeams) {
+        return [];
+    }
+    const teams = userTeams.teams;
+    const teamIds = teams.map(team => team.teamId);
+    return await Team.find({_id: {$in: teamIds}}) || [];
 }
