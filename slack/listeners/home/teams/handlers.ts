@@ -4,6 +4,7 @@ import { stringInputParser, viewInputReader } from "../../../utils";
 import { ITeam, IUserTeams, UserRole, addTeamToUserTeam, teamRepo, userTeamsRepo } from "../../../module/team";
 import mongoose, { connection } from "mongoose";
 import { getUserHomeView } from "../home-tab-view";
+import { updateUserUILatestTeamId } from "../../../module/userUI";
 
 const initialiseTeamHandlers = (app: App): void => {
     app.action(createTeamActionId, async ({ ack, body, client }) => {
@@ -57,19 +58,21 @@ const saveTeamHandler = (app: App) => {
     })
 }
 
-
 export const switchTeamHandler = (app: App) => {
     app.action(teamSwitchActionId, async ({ ack, body, client }) => {
         //find the team
         ack();
         const payload = body as any;
         const selectedTeamValue = payload.actions[0].selected_option.value;
+        const userId = payload.user.id;
         if(selectedTeamValue === personalSpaceValue){
-            getUserHomeView(payload.user.id, client);
+            getUserHomeView(userId, client, personalSpaceValue);
+            await updateUserUILatestTeamId(userId, personalSpaceValue);
             return;
         }
         const selectedTeam = await teamRepo.getTeamById(selectedTeamValue);
         //update home tab view
+        await updateUserUILatestTeamId(userId, selectedTeam.id);
         getUserHomeView(payload.user.id, client, selectedTeam.id);
     })
 }

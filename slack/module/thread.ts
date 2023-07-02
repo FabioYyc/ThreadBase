@@ -1,10 +1,8 @@
 //Mongodb typescrpit schema for thread, properties: userId, threadId, threadLink. Collection will be threads
 
-import mongoose, { Document, Mongoose } from "mongoose";
+import mongoose, { Document } from "mongoose";
 
 /// connect to mongodb use env var MONGODB_URL
-mongoose.connect(process.env.MONGO_DB_URL as string);
-
 const threadSchema = new mongoose.Schema({
     userId: String,
     userName: String,
