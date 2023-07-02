@@ -55,7 +55,7 @@ const handler: Handler = async (
   event: HandlerEvent,
   context: HandlerContext
 ) => {
-  let payload = parseRequestBody(event.body, event.headers['content-type']);
+  const payload = parseRequestBody(event.body, event.headers['content-type']);
 
   if (payload && payload.type && payload.type === "url_verification") {
     return {
