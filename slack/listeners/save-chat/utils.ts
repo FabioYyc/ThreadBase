@@ -13,10 +13,12 @@ export const keywordsParser = (keywords: string|null|undefined) => {
 
 export const saveFromSaveChatView = async (view: ViewOutput) => {
     const values = viewInputReader(view);
+    const teams = values.teams.selected_options?.map((option:any) => option.value) || []
     const threadDetails = {
         title: stringInputParser(values.title),
         keywords: keywordsParser(values.keywords),
-        description: stringInputParser(values.description)
+        description: stringInputParser(values.description),
+        teams
     }
 
     if(!view.external_id) {

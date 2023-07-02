@@ -50,6 +50,9 @@ export const teamRepo = {
     },
     updateTeam: async (teamId: string, team: ITeam, session: ClientSession) => {
         await Team.updateOne({ _id: new mongoose.Types.ObjectId(teamId) }, { $set: team }, { session });
+    },
+    getTeamById: async (teamId: string): Promise<ISavedTeam> => {
+        return await Team.findOne({ _id: new mongoose.Types.ObjectId(teamId) }) as ISavedTeam;
     }
 }
 
@@ -99,3 +102,4 @@ export const getTeamsForUser = async (userId: string): Promise<ISavedTeam[]> => 
     const teamIds = teams.map(team => team.teamId);
     return await Team.find({_id: {$in: teamIds}}) || [];
 }
+

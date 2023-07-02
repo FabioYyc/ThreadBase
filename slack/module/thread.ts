@@ -16,6 +16,7 @@ const threadSchema = new mongoose.Schema({
     title: String,
     description: String,
     keywords: Array,
+    teams: Array,
     isSaved: Boolean,
 });
 
@@ -25,6 +26,7 @@ export interface ThreadDetails {
     title: string;
     description?: string;
     keywords: Array<string>;
+    teams?: Array<string>;
 }
 
 export interface IThread{
@@ -52,8 +54,13 @@ export const threadRepo = {
         return await Thread.findOne({ _id: new mongoose.Types.ObjectId(threadId) }) as IThread;
     },
 
-    getSavedThreadForUser: async (userId: string): Promise<ISavedThread[]> => {
-        return await Thread.find({ userId: userId, isSaved: true }) || [];
+    getPersonalSavedThreadForUser: async (userId: string): Promise<ISavedThread[]> => {
+        //find all threads with userId , isSaved = true, teams = [] or null
+        return await Thread.find({ userId: userId, isSaved: true, teams: { $in: [ [], null ] } }) || [];
+    },
+
+    getSavedThreadForTeam: async (teamId: string): Promise<ISavedThread[]> => {
+        return await Thread.find({ teams: teamId, isSaved: true }) || [];
     },
 
     deleteSavedThread: async (threadId: string) => {

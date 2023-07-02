@@ -100,19 +100,26 @@ export const createTeamView = ({teamId, isEdit = false, }:{teamId?: string, isEd
                     "type": "plain_text",
                     "text": "Add members",
                     "emoji": true
-                }
+                },
+                optional: true
             }
         ]
     }
 )
 
-export const teamSelector = (teams: ISavedTeam[]) => {
-    const firstTeam = teams[0]
+export const teamSwitchActionId = 'team_switch_action'
+
+export const personalSpaceValue = 'personal_space'
+export const teamSelector = (teams: ISavedTeam[], selectedTeamId?: string) => {
+    let selectedTeam;
+    if(selectedTeamId) {
+        selectedTeam = teams.find(team => team.id === selectedTeamId)
+    }
     const getTeamOption = (team:ISavedTeam) =>{
         return {
             "text": {
                 "type": "plain_text",
-                "text": team.teamName,
+                "text": `:people_holding_hands:${team.teamName}`,
                 "emoji": true
             },
             "value": team.id
@@ -120,20 +127,34 @@ export const teamSelector = (teams: ISavedTeam[]) => {
     }
 
     const teamOptions = teams.map(getTeamOption)
+    if(selectedTeam) {
+        const personalSpaceOption = {
+            "text": {
+                "type": "plain_text",
+                "text": ":bust_in_silhouette:Personal Space",
+                "emoji": true
+            },
+            "value": personalSpaceValue
+        }
+        teamOptions.unshift(personalSpaceOption)
+    }
 
+    const spaceText = selectedTeam? `*Current Team Space: ${selectedTeam.teamName}*` : `*Currently At Personal Space*`
     return {
     "type": "section",
     "text": {
         "type": "mrkdwn",
-        "text": `*Team: ${firstTeam.teamName}*`
+        "text": spaceText
     },
     "accessory": {
         "type": "static_select",
+        "action_id": teamSwitchActionId,
         "placeholder": {
             "type": "plain_text",
             "text": "Select team",
             "emoji": true
         },
-        "options": teamOptions
+        "options": teamOptions,
+        "initial_option": selectedTeam && getTeamOption(selectedTeam)
     }
 }}

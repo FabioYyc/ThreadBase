@@ -17,7 +17,7 @@ const homeViewBase: View = {
 
 
 
-export const noSavedThreadsView = (teams: ISavedTeam[]):View => ({
+export const noSavedThreadsView = (teams: ISavedTeam[], selectedTeamId?: string):View => ({
     ...homeViewBase,
     ...{
         "type": "home",
@@ -26,11 +26,11 @@ export const noSavedThreadsView = (teams: ISavedTeam[]):View => ({
                 "type": "header",
                 "text": {
                     "type": "plain_text",
-                    "text": "Looks like you haven't stashed any chats yet! 👆"
+                    "text": "Looks like there is no chat saved in this space yet👆"
                 }
             },
             homeTabActionRow(),
-            teamSelector(teams),
+            teamSelector(teams, selectedTeamId),
             {
                 "type": "divider"
             },
@@ -46,7 +46,7 @@ export const noSavedThreadsView = (teams: ISavedTeam[]):View => ({
 })
 
 
-export const savedThreadExistsView = (Threads: ISavedThread[], teams: ISavedTeam[]): View => ({
+export const savedThreadExistsView = (Threads: ISavedThread[], teams: ISavedTeam[], selectedTeamId?: string): View => ({
     ...homeViewBase,
     ...{
         "type": "home",
@@ -59,7 +59,7 @@ export const savedThreadExistsView = (Threads: ISavedThread[], teams: ISavedTeam
                 }
             },
             homeTabActionRow(),
-            teamSelector(teams),
+            teamSelector(teams, selectedTeamId),
             {
                 "type": "divider"
             },
@@ -69,18 +69,25 @@ export const savedThreadExistsView = (Threads: ISavedThread[], teams: ISavedTeam
 })
   
 
-export const getSavedThreadViewByUser = async (userId:string) =>{
-    const Threads = await threadRepo.getSavedThreadForUser(userId);
+export const getSavedThreadViewByUser = async (userId:string, selectedTeamId?:string) =>{
     const teams = await getTeamsForUser(userId);
-    if (Threads.length > 0) {
-        return savedThreadExistsView(Threads, teams);
+    let threads: ISavedThread[];
+    if(!selectedTeamId) {
+        threads = await threadRepo.getPersonalSavedThreadForUser(userId)
+    } else {
+        threads = await threadRepo.getSavedThreadForTeam(selectedTeamId)
     }
-    return noSavedThreadsView(teams);
+
+
+    if (threads.length > 0) {
+        return savedThreadExistsView(threads, teams, selectedTeamId);
+    }
+    return noSavedThreadsView(teams, selectedTeamId);
 }
 
 
-export const getUserHomeView = async (userId: string, client: WebClient) => {
-    const updatedHomeView = await getSavedThreadViewByUser(userId);
+export const getUserHomeView = async (userId: string, client: WebClient, selectedTeamId?: string) => {
+    const updatedHomeView = await getSavedThreadViewByUser(userId, selectedTeamId);
     client.views.publish({
         user_id: userId,
         view: updatedHomeView,

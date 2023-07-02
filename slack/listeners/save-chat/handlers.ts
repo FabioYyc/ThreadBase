@@ -36,7 +36,7 @@ const saveShortcutHandler = (app: App) =>{
                 channelId: messageShortcut.channel.id,
                 isSaved: false
             });
-            const returnView = createChatView({externalId:thread.id as string, isEdit: false})
+            const returnView = await createChatView({externalId:thread.id as string, isEdit: false, userId: messageShortcut.user.id})
             await client.views.open({
                 trigger_id: messageShortcut.trigger_id,
                 view: returnView
@@ -60,7 +60,7 @@ const editChatHandler = (app: App) => {
             throw new Error('Missing thread id')
         }
         const thread = await threadRepo.getThreadById(threadId) as ISavedThread
-        const returnView = createChatView({externalId: threadId, isEdit: true, thread})
+        const returnView = await createChatView({externalId: threadId, isEdit: true, thread, userId: thread.userId})
         await client.views.open({
             trigger_id: payload.trigger_id,
             view: returnView

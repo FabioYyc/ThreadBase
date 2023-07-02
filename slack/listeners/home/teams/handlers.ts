@@ -1,5 +1,5 @@
 import { App, SlackViewAction, ViewSubmitAction } from "@slack/bolt";
-import { createTeamActionId, createTeamCallbackId, createTeamView } from "./views";
+import { createTeamActionId, createTeamCallbackId, createTeamView, personalSpaceValue, teamSwitchActionId } from "./views";
 import { stringInputParser, viewInputReader } from "../../../utils";
 import { ITeam, IUserTeams, UserRole, addTeamToUserTeam, teamRepo, userTeamsRepo } from "../../../module/team";
 import mongoose, { connection } from "mongoose";
@@ -47,7 +47,7 @@ const saveTeamHandler = (app: App) => {
                 await addTeamToUserTeam({userId: teamUser, teamId:newTeam.id, userRole: UserRole.Member, session})
             }
             await session.commitTransaction();
-            await getUserHomeView(body.user.id, client);
+            await getUserHomeView(body.user.id, client, newTeam.id);
         } catch (error) {
             await session.abortTransaction();
             throw new Error(`error in create team: ${error}`)
@@ -57,7 +57,27 @@ const saveTeamHandler = (app: App) => {
     })
 }
 
+
+export const switchTeamHandler = (app: App) => {
+    app.action(teamSwitchActionId, async ({ ack, body, client }) => {
+        //find the team
+        ack();
+        const payload = body as any;
+        const selectedTeamValue = payload.actions[0].selected_option.value;
+        if(selectedTeamValue === personalSpaceValue){
+            getUserHomeView(payload.user.id, client);
+            return;
+        }
+        const selectedTeam = await teamRepo.getTeamById(selectedTeamValue);
+        //update home tab view
+        getUserHomeView(payload.user.id, client, selectedTeam.id);
+    })
+}
+
+
+
 export const registerCreateTeamHandlers = (app: App): void => {
     initialiseTeamHandlers(app);
     saveTeamHandler(app);
+    switchTeamHandler(app);
 }
