@@ -1,7 +1,7 @@
-import { App, View } from "@slack/bolt";
-import { threadRepo } from "../../module/thread";
-import { getSavedThreadViewByUser, noSavedThreadsView, savedThreadExistsView } from "./views";
+import { App } from "@slack/bolt";
+import { getSavedThreadViewByUser } from "./home-tab-view";
 import { deleteChatConfirm, deleteChatProcessor } from "./delete-chat";
+import { registerCreateTeamHandlers } from "./teams/handlers";
 
 
 const homeOpenListener = (app: App) => {
@@ -29,5 +29,6 @@ const homeOpenListener = (app: App) => {
     homeOpenListener(app);
     deleteChatConfirm(app);
     deleteChatProcessor(app);
+    registerCreateTeamHandlers(app);
   }
     

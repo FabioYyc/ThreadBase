@@ -2,9 +2,9 @@ import { App, MessageShortcut } from "@slack/bolt"
 import {ISavedThread, IThread, threadRepo} from "../../module/thread";
 import  { confirmationMessage, createChatView, editChatCallbackId, saveChatCallbackId } from "./views";
 import { viewInputReader } from "../../utils";
-import { saveFromSaveChatView } from "./operations";
+import { saveFromSaveChatView } from "./utils";
 import { ButtonBlockAction } from "../../types";
-import { getSavedThreadViewByUser } from "../home/views";
+import { getSavedThreadViewByUser } from "../home/home-tab-view";
 
 
 export const editChatActionId = 'edit_saved_chat'
@@ -30,13 +30,13 @@ const saveShortcutHandler = (app: App) =>{
                 userId: messageShortcut.user.id,
                 userName: messageShortcut.user.name,
                 threadId: messageShortcut.message_ts,
-                teamId: messageShortcut.team?.id,
+                orgId: messageShortcut.team?.id,
                 domain: messageShortcut.team?.domain,
                 threadLink: threadPermalink.permalink as string,
                 channelId: messageShortcut.channel.id,
                 isSaved: false
             });
-            const returnView = createChatView({externalId:thread.id as string, isEdit: false})
+            const returnView = await createChatView({externalId:thread.id as string, isEdit: false, userId: messageShortcut.user.id})
             await client.views.open({
                 trigger_id: messageShortcut.trigger_id,
                 view: returnView
@@ -60,7 +60,7 @@ const editChatHandler = (app: App) => {
             throw new Error('Missing thread id')
         }
         const thread = await threadRepo.getThreadById(threadId) as ISavedThread
-        const returnView = createChatView({externalId: threadId, isEdit: true, thread})
+        const returnView = await createChatView({externalId: threadId, isEdit: true, thread, userId: thread.userId})
         await client.views.open({
             trigger_id: payload.trigger_id,
             view: returnView
