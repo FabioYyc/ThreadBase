@@ -43,3 +43,12 @@ export const viewInputReader = (view: ViewOutput) =>{
   const values = view.state.values
   return parseViewValues(values)
 }
+
+export const stringInputParser = (string: string|null|undefined) => {
+  if(!string) {
+      return ''
+  }
+  // replace all "+" with space
+  return string.replace(/\+/g, ' ')
+
+}

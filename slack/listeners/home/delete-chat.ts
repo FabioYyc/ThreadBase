@@ -1,7 +1,7 @@
 import { App, View } from "@slack/bolt";
-import { ButtonBlockAction } from "../../../types";
-import { threadRepo } from "../../../module/thread";
-import { getSavedThreadViewByUser } from "../views";
+import { ButtonBlockAction } from "../../types";
+import { threadRepo } from "../../module/thread";
+import { getSavedThreadViewByUser, getUserHomeView } from "./home-tab-view";
 
 export const deleteChatActionId = 'delete_saved_thread';
 export const deleteChatConfirmViewId = 'delete-chat-view';
@@ -61,11 +61,7 @@ export const deleteChatProcessor = (app: App) => {
                 throw new Error('Missing external id')
             }
             await threadRepo.deleteSavedThread(external_id);
-            const updatedHomeView = await getSavedThreadViewByUser(body.user.id);
-            client.views.publish({
-                user_id: body.user.id,
-                view: updatedHomeView,
-            })
+            await getUserHomeView(body.user.id, client);
         } catch (error) {
             throw new Error(`error in delete chat: ${error}`)
         }
