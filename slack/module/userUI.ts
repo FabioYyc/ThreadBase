@@ -1,11 +1,13 @@
 import mongoose from "mongoose";
 
 export interface IUserUI{
+    orgId:string;
     userId: string;
     latestTeamId?: string;
 }
 
 const UserUISchema = new mongoose.Schema({
+    orgId: String,
     userId: String,
     latestTeamId: String,
 });
@@ -14,7 +16,7 @@ const UserUI = mongoose.model("UserUI", UserUISchema);
 
 export const userUIRepo = {
     createOrUpdate: async (userUI: IUserUI) => {
-        const existingUserUI = await UserUI.findOne({ userId: userUI.userId });
+        const existingUserUI = await UserUI.findOne({ userId: userUI.userId, orgId: userUI.orgId });
         if (existingUserUI) {
             await UserUI.updateOne({ _id: new mongoose.Types.ObjectId(existingUserUI._id) }, { $set: userUI });
         } else {
@@ -22,14 +24,15 @@ export const userUIRepo = {
             await newUserUI.save();
         }
     },
-    getUserUIByUserId: async (userId: string): Promise<IUserUI> => {
-        return await UserUI.findOne({ userId: userId }) as IUserUI;
+    getUserUIByUserId: async (orgId:string, userId: string): Promise<IUserUI> => {
+        return await UserUI.findOne({ orgId, userId: userId }) as IUserUI;
     }
 
 }
 
-export const updateUserUILatestTeamId = async (userId: string, latestTeamId?: string) => {
+export const updateUserUILatestTeamId = async (orgId:string, userId: string, latestTeamId?: string) => {
     const userUI = ({
+        orgId,
         userId,
         latestTeamId
     })
@@ -37,7 +40,7 @@ export const updateUserUILatestTeamId = async (userId: string, latestTeamId?: st
 }
 
 
-export const getLatestTeamIdForUser = async (userId: string) => {
-    const userUI = await userUIRepo.getUserUIByUserId(userId);
-    return userUI.latestTeamId;
+export const getLatestTeamIdForUser = async (orgId:string, userId: string) => {
+    const userUI = await userUIRepo.getUserUIByUserId(orgId, userId);
+    return userUI?.latestTeamId;
 }

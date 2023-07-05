@@ -6,7 +6,7 @@ import mongoose, { Document } from "mongoose";
 const threadSchema = new mongoose.Schema({
     userId: String,
     userName: String,
-    threadId: String,
+    threadTs: String,
     orgId: String,
     domain: String,
     threadLink: String,
@@ -30,7 +30,7 @@ export interface ThreadDetails {
 export interface IThread{
     userId: string;
     userName: string;
-    threadId: string;
+    threadTs: string;
     orgId: string;
     domain: string;
     threadLink: string;
@@ -52,9 +52,9 @@ export const threadRepo = {
         return await Thread.findOne({ _id: new mongoose.Types.ObjectId(threadId) }) as IThread;
     },
 
-    getPersonalSavedThreadForUser: async (userId: string): Promise<ISavedThread[]> => {
+    getPersonalSavedThreadForUser: async (orgId:string, userId: string): Promise<ISavedThread[]> => {
         //find all threads with userId , isSaved = true, teams = [] or null
-        return await Thread.find({ userId: userId, isSaved: true, teams: { $in: [ [], null ] } }) || [];
+        return await Thread.find({ orgId, userId: userId, isSaved: true, teams: { $in: [ [], null ] } }) || [];
     },
 
     getSavedThreadForTeam: async (teamId: string): Promise<ISavedThread[]> => {

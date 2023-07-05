@@ -1,5 +1,5 @@
-import { View } from "@slack/bolt"
-import { ISavedTeam, ITeam } from "../../../module/team"
+import { Block, PlainTextOption, SectionBlock, View } from "@slack/bolt"
+import { ISavedTeam } from "../../../module/team"
 
 export const createTeamActionId = 'create_team'
 export const homeTabActionRow = () =>(
@@ -111,11 +111,12 @@ export const teamSwitchActionId = 'team_switch_action'
 
 export const personalSpaceValue = 'personal_space'
 export const teamSelector = (teams: ISavedTeam[], selectedTeamId?: string) => {
+    console.log('selectedTeamId', selectedTeamId)
     let selectedTeam;
     if(selectedTeamId) {
         selectedTeam = teams.find(team => team.id === selectedTeamId)
     }
-    const getTeamOption = (team:ISavedTeam) =>{
+    const getTeamOption = (team:ISavedTeam): PlainTextOption =>{
         return {
             "text": {
                 "type": "plain_text",
@@ -128,7 +129,7 @@ export const teamSelector = (teams: ISavedTeam[], selectedTeamId?: string) => {
 
     const teamOptions = teams.map(getTeamOption)
     if(selectedTeam) {
-        const personalSpaceOption = {
+        const personalSpaceOption: PlainTextOption = {
             "text": {
                 "type": "plain_text",
                 "text": ":bust_in_silhouette:Personal Space",
@@ -140,21 +141,26 @@ export const teamSelector = (teams: ISavedTeam[], selectedTeamId?: string) => {
     }
 
     const spaceText = selectedTeam? `*Current Team Space: ${selectedTeam.teamName}*` : `*Currently At Personal Space*`
-    return {
-    "type": "section",
-    "text": {
-        "type": "mrkdwn",
-        "text": spaceText
-    },
-    "accessory": {
-        "type": "static_select",
-        "action_id": teamSwitchActionId,
-        "placeholder": {
-            "type": "plain_text",
-            "text": "Select team",
-            "emoji": true
-        },
-        "options": teamOptions,
-        "initial_option": selectedTeam && getTeamOption(selectedTeam)
+    const returnBlock: SectionBlock = {
+        "type": "section",
+        "text": {
+            "type": "mrkdwn",
+            "text": spaceText
+        }
     }
-}}
+
+    if(teamOptions.length >= 1) {
+        returnBlock.accessory = {
+            "type": "static_select",
+            "action_id": teamSwitchActionId,
+            "placeholder": {
+                "type": "plain_text",
+                "text": "Select team",
+                "emoji": true
+            },
+            "options": teamOptions,
+            "initial_option": selectedTeam && getTeamOption(selectedTeam)
+        }
+    }
+
+    return returnBlock }
