@@ -1,8 +1,8 @@
-import { App, SlackViewAction, ViewSubmitAction } from "@slack/bolt";
+import { App, ViewSubmitAction } from "@slack/bolt";
 import { createTeamActionId, createTeamCallbackId, createTeamView, personalSpaceValue, teamSwitchActionId } from "./views";
 import { stringInputParser, viewInputReader } from "../../../utils";
-import { ITeam, IUserTeams, UserRole, addTeamToUserTeam, teamRepo, userTeamsRepo } from "../../../module/team";
-import mongoose, { connection } from "mongoose";
+import { ITeam, UserRole, addTeamToUserTeam, teamRepo } from "../../../module/team";
+import { connection } from "mongoose";
 import { getUserHomeView } from "../home-tab-view";
 import { updateUserUILatestTeamId } from "../../../module/userUI";
 
@@ -43,13 +43,16 @@ const saveTeamHandler = (app: App) => {
         session.startTransaction();
         try {
             const newTeam = await teamRepo.create(team, session);
-            await addTeamToUserTeam({userId: body.user.id, teamId:newTeam.id, userRole: UserRole.Owner, session})
-            for (const teamUser of teamUsers) {
-                await addTeamToUserTeam({userId: teamUser, teamId:newTeam.id, userRole: UserRole.Member, session})
-            }
+            await addTeamToUserTeam({orgId, userId: body.user.id, teamId:newTeam.id, userRole: UserRole.Owner, session})
+            const addTeamPromises = teamUsers.map(async (teamUser:string) => {
+                await addTeamToUserTeam({ orgId, userId: teamUser, teamId: newTeam.id, userRole: UserRole.Member, session });
+              });
+            await Promise.all(addTeamPromises);
             await session.commitTransaction();
-            await getUserHomeView(body.user.id, client, newTeam.id);
+            await getUserHomeView(orgId, body.user.id, client, newTeam.id);
+
         } catch (error) {
+            console.error(error);
             await session.abortTransaction();
             throw new Error(`error in create team: ${error}`)
         }
@@ -65,15 +68,18 @@ export const switchTeamHandler = (app: App) => {
         const payload = body as any;
         const selectedTeamValue = payload.actions[0].selected_option.value;
         const userId = payload.user.id;
+        const orgId = payload.team.id;
+
+        console.log('payload', payload)
         if(selectedTeamValue === personalSpaceValue){
-            getUserHomeView(userId, client, personalSpaceValue);
-            await updateUserUILatestTeamId(userId, personalSpaceValue);
+            getUserHomeView(orgId, userId, client, personalSpaceValue);
+            await updateUserUILatestTeamId(orgId, userId, personalSpaceValue);
             return;
         }
         const selectedTeam = await teamRepo.getTeamById(selectedTeamValue);
         //update home tab view
-        await updateUserUILatestTeamId(userId, selectedTeam.id);
-        getUserHomeView(payload.user.id, client, selectedTeam.id);
+        await updateUserUILatestTeamId(orgId, userId, selectedTeam.id);
+        getUserHomeView(orgId, payload.user.id, client, selectedTeam.id);
     })
 }
 

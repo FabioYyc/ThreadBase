@@ -68,13 +68,15 @@ export const savedThreadExistsView = (Threads: ISavedThread[], teams: ISavedTeam
 })
   
 
-export const getSavedThreadViewByUser = async (userId:string, selectedTeamId?:string) =>{
-    const teams = await getTeamsForUser(userId);
-    const userLatestTeamId = await getLatestTeamIdForUser(userId);
+export const getSavedThreadViewByUser = async (orgId:string, userId:string, selectedTeamId?:string) =>{
+    console.log('orgId, userId, selectedTeamId', orgId, userId, selectedTeamId)
+    const teams = await getTeamsForUser(orgId, userId);
+    const userLatestTeamId = await getLatestTeamIdForUser(orgId, userId);
     const displayTeamId = selectedTeamId || userLatestTeamId;
     let threads: ISavedThread[];
+    console.log('teams are', teams)
     if(!displayTeamId || selectedTeamId === personalSpaceValue) {
-        threads = await threadRepo.getPersonalSavedThreadForUser(userId)
+        threads = await threadRepo.getPersonalSavedThreadForUser(orgId, userId)
     } else {
         threads = await threadRepo.getSavedThreadForTeam(displayTeamId)
     }
@@ -87,8 +89,8 @@ export const getSavedThreadViewByUser = async (userId:string, selectedTeamId?:st
 }
 
 
-export const getUserHomeView = async (userId: string, client: WebClient, selectedTeamId?: string) => {
-    const updatedHomeView = await getSavedThreadViewByUser(userId, selectedTeamId);
+export const getUserHomeView = async (orgId:string, userId: string, client: WebClient, selectedTeamId?: string) => {
+    const updatedHomeView = await getSavedThreadViewByUser(orgId,userId, selectedTeamId);
     client.views.publish({
         user_id: userId,
         view: updatedHomeView,

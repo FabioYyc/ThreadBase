@@ -28,14 +28,14 @@ const saveShortcutHandler = (app: App) =>{
             const thread = await threadRepo.create({
                 userId: messageShortcut.user.id,
                 userName: messageShortcut.user.name,
-                threadId: messageShortcut.message_ts,
+                threadTs: messageShortcut.message_ts,
                 orgId: messageShortcut.team?.id,
                 domain: messageShortcut.team?.domain,
                 threadLink: threadPermalink.permalink as string,
                 channelId: messageShortcut.channel.id,
                 isSaved: false
             });
-            const returnView = await createChatView({externalId:thread.id as string, isEdit: false, userId: messageShortcut.user.id})
+            const returnView = await createChatView({externalId:thread.id as string, isEdit: false, userId: messageShortcut.user.id, orgId: messageShortcut.team?.id,})
             await client.views.open({
                 trigger_id: messageShortcut.trigger_id,
                 view: returnView
@@ -59,7 +59,9 @@ const editChatHandler = (app: App) => {
             throw new Error('Missing thread id')
         }
         const thread = await threadRepo.getThreadById(threadId) as ISavedThread
-        const returnView = await createChatView({externalId: threadId, isEdit: true, thread, userId: thread.userId})
+        const orgId = thread.orgId;
+
+        const returnView = await createChatView({orgId, externalId: threadId, isEdit: true, thread, userId: thread.userId})
         await client.views.open({
             trigger_id: payload.trigger_id,
             view: returnView
@@ -79,7 +81,7 @@ export const saveViewHandler = (app: App) => {
             client.chat.postEphemeral({
                 channel: thread.channelId,
                 blocks: confirmationMessage(thread.userName),
-                thread_ts: thread.threadId,
+                thread_ts: thread.threadTs,
                 user: thread.userId
             });
 
@@ -96,7 +98,8 @@ export const editConfirmHandler = (app: App) => {
             await ack();
             await saveFromSaveChatView(view);
             const userId = body.user.id;
-            const returnView = await getSavedThreadViewByUser(userId);
+            const orgId = view.team_id;
+            const returnView = await getSavedThreadViewByUser(orgId, userId);
 
             const result = await client.views.publish({
       

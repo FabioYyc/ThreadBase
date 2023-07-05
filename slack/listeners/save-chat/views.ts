@@ -35,12 +35,12 @@ export const getTeamMultiSelect = (teams: ISavedTeam[]):  (Block | KnownBlock) =
 })
 
 
-export const createChatView = async ({externalId, thread, isEdit = false, userId}:{externalId: string, isEdit? : boolean, thread?: ISavedThread, userId: string}): Promise<View> => {
+export const createChatView = async ({externalId, thread, isEdit = false, userId, orgId}:{externalId: string, isEdit? : boolean, thread?: ISavedThread, userId: string, orgId: string}): Promise<View> => {
     if(isEdit && !thread) {
         throw new Error('Missing thread')
     }
 
-    const teams= await getTeamsForUser(userId)
+    const teams= await getTeamsForUser(orgId, userId)
     const blocks:  (Block | KnownBlock)[] = [
         {
             "type": "section",

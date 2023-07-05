@@ -18,11 +18,13 @@ const TeamSchema = new mongoose.Schema({
 
 const userTeamsSchema = new mongoose.Schema({
     userId: String,
+    orgId: String,
     teams: Array
 })
 
 export interface IUserTeams{
     userId: string;
+    orgId: string;
     teams: {
         teamId: string;
         userRole: string;
@@ -61,19 +63,20 @@ export const userTeamsRepo = {
         const newUserTeams = new UserTeams(userTeams);
         return await newUserTeams.save({session});
     },
-    updateTeams: async (userId: string, teams: string[], session:ClientSession) => {
-        await UserTeams.updateOne({ userId: userId }, { $set: {teams: teams} }, { session });
+    updateTeams: async ({userId, teams, session, orgId}:{userId: string, orgId:string, teams: string[], session:ClientSession}) => {
+        await UserTeams.updateOne({ userId: userId, orgId }, { $set: {teams: teams} }, { session });
     }
 }
 
-export const addTeamToUserTeam = async ({userId, teamId, userRole, session}:{userId: string, teamId: string, userRole: UserRole, session:ClientSession}) => {
+export const addTeamToUserTeam = async ({orgId, userId, teamId, userRole, session}:{orgId:string, userId: string, teamId: string, userRole: UserRole, session:ClientSession}) => {
 
     //find if user team exists, if not create with current teamId
     //if exists, add current teamId to teams array
 
-    const userTeams = await UserTeams.findOne({userId: userId});
+    const userTeams = await UserTeams.findOne({orgId, userId: userId});
     if(!userTeams) {
         const newUserTeams = {
+            orgId,
             userId: userId,
             teams: [{
                 teamId: teamId,
@@ -88,13 +91,13 @@ export const addTeamToUserTeam = async ({userId, teamId, userRole, session}:{use
             teamId: teamId,
             userRole: userRole
         })
-        await userTeamsRepo.updateTeams(userId, teams, session);
+        await userTeamsRepo.updateTeams({orgId, userId, teams, session});
     }
 
 }
 
-export const getTeamsForUser = async (userId: string): Promise<ISavedTeam[]> => {
-    const userTeams = await UserTeams.findOne({userId: userId});
+export const getTeamsForUser = async (orgId:string, userId: string): Promise<ISavedTeam[]> => {
+    const userTeams = await UserTeams.findOne({orgId, userId: userId});
     if(!userTeams) {
         return [];
     }

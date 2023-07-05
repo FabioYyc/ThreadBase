@@ -57,11 +57,12 @@ export const deleteChatProcessor = (app: App) => {
         try {
             await ack();
             const external_id = view.external_id;
+            const orgId = view.team_id;
             if(!external_id) {
                 throw new Error('Missing external id')
             }
             await threadRepo.deleteSavedThread(external_id);
-            await getUserHomeView(body.user.id, client);
+            await getUserHomeView(orgId, body.user.id, client);
         } catch (error) {
             throw new Error(`error in delete chat: ${error}`)
         }
