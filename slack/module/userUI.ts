@@ -30,7 +30,7 @@ export const userUIRepo = {
 
 }
 
-export const updateUserUILatestTeamId = async (orgId:string, userId: string, latestTeamId?: string) => {
+export const updateUserUILatestTeamId = async (orgId:string, userId: string, latestTeamId?: string): Promise<void> => {
     const userUI = ({
         orgId,
         userId,

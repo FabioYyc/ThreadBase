@@ -1,31 +1,57 @@
-import { Block, PlainTextOption, SectionBlock, View } from "@slack/bolt"
+import { ActionsBlock, Button, PlainTextOption, SectionBlock, View } from "@slack/bolt"
 import { ISavedTeam } from "../../../module/team"
+import { createTeamButtonActionId, personalSpaceValue, editTeamButtonActionId, editTeamCallbackId, createTeamCallbackId, teamSwitchActionId } from "./constants";
 
-export const createTeamActionId = 'create_team'
-export const homeTabActionRow = () =>(
-    {
-        "type": "actions",
-        "elements": [
-            {
-                "type": "button",
-                "text": {
-                    "type": "plain_text",
-                    "text": "Create New Team",
-                    "emoji": true
-                },
-                "style": "primary",
-                "value": "create_team",
-                "action_id": createTeamActionId
+
+export const homeTabActionRow = (selectedTeamId?: string, isOwner?:boolean): ActionsBlock => {
+    const elements: Button[] = [
+        {
+            "type": "button",
+            "text": {
+                "type": "plain_text",
+                "text": "Create New Team",
+                "emoji": true
             },
-        ]
-})
+            "style": "primary",
+            "value": "create_team",
+            "action_id": createTeamButtonActionId
+        }
+    ];
 
-export const createTeamModalCallBackId = 'create-team-modal-callback'
+    if (selectedTeamId && selectedTeamId !== personalSpaceValue && isOwner) {
+        elements.push({
+            "type": "button",
+            "text": {
+                "type": "plain_text",
+                "text": "Edit Current Team",
+                "emoji": true
+            },
+            "value": selectedTeamId,
+            "action_id": editTeamButtonActionId
+        });
+    }
 
-export const createTeamCallbackId = 'create-team-callback'
-export const editTeamCallbackId = 'edit-team-callback'
+    return {
+        "type": "actions",
+        "elements": elements
+    }
+}
 
-export const createTeamView = ({teamId, isEdit = false, }:{teamId?: string, isEdit? : boolean}): View => (
+
+
+type Team = {
+    ownerId: string;
+    teamName: string;
+    teamDescriptions: string;
+    teamUsers: string[];
+    orgId: string;
+}
+
+export const generateTeamView = ({
+    teamId,
+    team,
+    isEdit = false
+}:{teamId?: string, team?: Team, isEdit? : boolean}): View => (
     {
         "type": "modal",
         callback_id: isEdit? editTeamCallbackId : createTeamCallbackId,
@@ -42,7 +68,7 @@ export const createTeamView = ({teamId, isEdit = false, }:{teamId?: string, isEd
         },
         "title": {
             "type": "plain_text",
-            "text": "Create a new team :tada:",
+            "text": isEdit ? "Edit :writing_hand:" : "Create a new team :tada:",
             "emoji": true
         },
         "blocks": [
@@ -50,7 +76,7 @@ export const createTeamView = ({teamId, isEdit = false, }:{teamId?: string, isEd
                 "type": "section",
                 "text": {
                     "type": "plain_text",
-                    "text": "Create a new team to share your saved chats with your teammates! :construction_worker:",
+                    "text": isEdit ? "Edit your team details :construction_worker:" : "Create a new team to share your saved chats with your teammates! :construction_worker:",
                     "emoji": true
                 }
             },
@@ -68,6 +94,7 @@ export const createTeamView = ({teamId, isEdit = false, }:{teamId?: string, isEd
                 "element": {
                     "type": "plain_text_input",
                     "multiline": false,
+                    "initial_value": isEdit ? team?.teamName : undefined
                 }
             },
             {
@@ -81,6 +108,7 @@ export const createTeamView = ({teamId, isEdit = false, }:{teamId?: string, isEd
                 "element": {
                     "type": "plain_text_input",
                     "multiline": true,
+                    "initial_value": isEdit ? team?.teamDescriptions : undefined
                 },
                 "optional": true
             },
@@ -94,6 +122,7 @@ export const createTeamView = ({teamId, isEdit = false, }:{teamId?: string, isEd
                         "text": "Select users",
                         "emoji": true
                     },
+                    "initial_users": (isEdit && team?.teamUsers) ? team.teamUsers : [],
                     "action_id": "multi_users_select-action"
                 },
                 "label": {
@@ -107,11 +136,9 @@ export const createTeamView = ({teamId, isEdit = false, }:{teamId?: string, isEd
     }
 )
 
-export const teamSwitchActionId = 'team_switch_action'
 
-export const personalSpaceValue = 'personal_space'
+
 export const teamSelector = (teams: ISavedTeam[], selectedTeamId?: string) => {
-    console.log('selectedTeamId', selectedTeamId)
     let selectedTeam;
     if(selectedTeamId) {
         selectedTeam = teams.find(team => team.id === selectedTeamId)
