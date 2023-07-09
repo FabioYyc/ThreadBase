@@ -1,51 +1,12 @@
-import { ActionsBlock, Button, PlainTextOption, SectionBlock, View } from "@slack/bolt"
+import { PlainTextOption, SectionBlock, View } from "@slack/bolt"
 import { ISavedTeam } from "../../../module/team"
-import { createTeamButtonActionId, personalSpaceValue, editTeamButtonActionId, editTeamCallbackId, createTeamCallbackId, teamSwitchActionId } from "./constants";
-
-
-export const homeTabActionRow = (selectedTeamId?: string, isOwner?:boolean): ActionsBlock => {
-    const elements: Button[] = [
-        {
-            "type": "button",
-            "text": {
-                "type": "plain_text",
-                "text": "Create New Team",
-                "emoji": true
-            },
-            "style": "primary",
-            "value": "create_team",
-            "action_id": createTeamButtonActionId
-        }
-    ];
-
-    if (selectedTeamId && selectedTeamId !== personalSpaceValue && isOwner) {
-        elements.push({
-            "type": "button",
-            "text": {
-                "type": "plain_text",
-                "text": "Edit Current Team",
-                "emoji": true
-            },
-            "value": selectedTeamId,
-            "action_id": editTeamButtonActionId
-        });
-    }
-
-    return {
-        "type": "actions",
-        "elements": elements
-    }
-}
+import { personalSpaceValue, editTeamCallbackId, createTeamCallbackId, teamSwitchActionId } from "./constants";
+import { Team } from "./types";
 
 
 
-type Team = {
-    ownerId: string;
-    teamName: string;
-    teamDescriptions: string;
-    teamUsers: string[];
-    orgId: string;
-}
+
+
 
 export const generateTeamView = ({
     teamId,
