@@ -44,6 +44,8 @@ const UserTeams = mongoose.model("UserTeams", userTeamsSchema);
 
 export interface ISavedTeam extends Document, ITeam {}
 
+export interface ISavedUserTeams extends Document, IUserTeams {}
+
 
 export const teamRepo = {
     create: async (team: ITeam, session: ClientSession) => {
@@ -51,58 +53,35 @@ export const teamRepo = {
         return await newTeam.save({ session });
     },
     updateTeam: async (teamId: string, team: ITeam, session: ClientSession) => {
-        await Team.updateOne({ _id: new mongoose.Types.ObjectId(teamId) }, { $set: team }, { session });
+        return await Team.updateOne({ _id: new mongoose.Types.ObjectId(teamId) }, { $set: team }, { session });
     },
     getTeamById: async (teamId: string): Promise<ISavedTeam> => {
         return await Team.findOne({ _id: new mongoose.Types.ObjectId(teamId) }) as ISavedTeam;
-    }
+    },
+
+    getTeamsByIds: async (teamIds: string[]): Promise<ISavedTeam[]> => {
+        return await Team.find({ _id: { $in: teamIds } }) as ISavedTeam[];
+    },
+
 }
 
 export const userTeamsRepo = {
+    findById: async ({userId, orgId}:{userId: string, orgId: string}): Promise<ISavedUserTeams | null> => {
+        const userTeams = await UserTeams.findOne({ userId: userId, orgId: orgId });
+        return userTeams as ISavedUserTeams;
+    },
+
     create: async (userTeams: IUserTeams, session:ClientSession) => {
         const newUserTeams = new UserTeams(userTeams);
         return await newUserTeams.save({session});
     },
-    updateTeams: async ({userId, teams, session, orgId}:{userId: string, orgId:string, teams: string[], session:ClientSession}) => {
-        await UserTeams.updateOne({ userId: userId, orgId }, { $set: {teams: teams} }, { session });
-    }
+    addTeamToUser: async ({userId, team, session, orgId}:{userId: string, orgId:string, team: {teamId: string, userRole: string}, session:ClientSession}) => {
+        await UserTeams.updateOne({ userId: userId, orgId }, { $push: {teams: team} }, { session });
+    },
+    removeTeamFromUser: async ({userId, teamId, session, orgId}:{userId: string, orgId:string, teamId: string, session:ClientSession}) => {
+        await UserTeams.updateOne({ userId: userId, orgId }, { $pull: {teams: {teamId: teamId}} }, { session });
+    },
 }
 
-export const addTeamToUserTeam = async ({orgId, userId, teamId, userRole, session}:{orgId:string, userId: string, teamId: string, userRole: UserRole, session:ClientSession}) => {
 
-    //find if user team exists, if not create with current teamId
-    //if exists, add current teamId to teams array
-
-    const userTeams = await UserTeams.findOne({orgId, userId: userId});
-    if(!userTeams) {
-        const newUserTeams = {
-            orgId,
-            userId: userId,
-            teams: [{
-                teamId: teamId,
-                userRole: userRole
-            }]
-        }
-        await userTeamsRepo.create(newUserTeams, session);
-    }
-    else {
-        const teams = userTeams.teams;
-        teams.push({
-            teamId: teamId,
-            userRole: userRole
-        })
-        await userTeamsRepo.updateTeams({orgId, userId, teams, session});
-    }
-
-}
-
-export const getTeamsForUser = async (orgId:string, userId: string): Promise<ISavedTeam[]> => {
-    const userTeams = await UserTeams.findOne({orgId, userId: userId});
-    if(!userTeams) {
-        return [];
-    }
-    const teams = userTeams.teams;
-    const teamIds = teams.map(team => team.teamId);
-    return await Team.find({_id: {$in: teamIds}}) || [];
-}
 
