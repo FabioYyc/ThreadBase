@@ -17,7 +17,7 @@ const homeViewBase: View = {
 }
 
 
-export const homeTabActionRow = ({selectedTeamId, isOwner, hasThreads=false}:{selectedTeamId?: string, isOwner?:boolean, hasThreads:boolean}): ActionsBlock => {
+export const homeTabActionRow = ({selectedTeamId, isOwner}:{selectedTeamId?: string, isOwner?:boolean, hasThreads:boolean}): ActionsBlock => {
     const elements: Button[] = [
         {
             "type": "button",
@@ -44,9 +44,7 @@ export const homeTabActionRow = ({selectedTeamId, isOwner, hasThreads=false}:{se
         });
     }
 
-    if (hasThreads) {
-        elements.push(searchButton);
-    }
+    elements.push(searchButton);
 
     return {
         "type": "actions",

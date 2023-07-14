@@ -11,7 +11,10 @@ const threadSchema = new mongoose.Schema({
     domain: String,
     threadLink: String,
     channelId: String,
-    title: String,
+    title: {
+        type: String,
+        text: true
+    },
     description: String,
     keywords: Array,
     teams: Array,
@@ -40,7 +43,11 @@ export interface IThread{
 
 //Join thread and threadDetails as a new type
 export interface ISavedThread extends IThread, ThreadDetails, Document {}
-
+interface SearchParams {
+    orgId: string;
+    userId: string;
+    searchTerm: string;
+  }
 export const threadRepo = {
     create: async (thread: IThread) => {
         const newThread = new Thread(thread);
@@ -69,4 +76,31 @@ export const threadRepo = {
         return await Thread.findOne({ _id: new mongoose.Types.ObjectId(threadId) });
     },
 
+    searchByTitle: async ({ orgId, userId, searchTerm }: SearchParams) => {
+        const matchCondition: { [key: string]: string } = { orgId, userId };
+        
+        const pipeline = [
+          {
+            $search: {
+              index: 'title_search_index',
+              text: {
+                path: 'title',
+                query: searchTerm,
+                fuzzy: {}
+              }
+            }
+          },
+          {
+            $match: matchCondition
+          },
+          {
+            $limit: 10
+          }
+        ];
+      
+        // Use the aggregate() function to execute the pipeline
+        const results =  await Thread.aggregate(pipeline) || [];
+
+        return results as ISavedThread[];
+      }
 }
