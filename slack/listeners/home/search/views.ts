@@ -82,7 +82,6 @@ export const getThreadBlocks = (threads: ISavedThread[]) => {
             "text": {
                 "type": "mrkdwn",
                 "text": `*${thread.title}* <${thread.threadLink}|:link:> \n ${thread.description}`,
-                "emoji": true
             },
         }
     } )
