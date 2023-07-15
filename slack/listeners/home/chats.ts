@@ -9,7 +9,7 @@ const savedThreadBlock = (thread: ISavedThread): View['blocks'] => {
             "type": "section",
             "text": {
                 "type": "mrkdwn",
-                "text": `<${thread.threadLink}|*${thread.title}*> \n *${thread.keywords.join(', ')}* \n ${thread.description}`
+                "text": `*${thread.title}* <${thread.threadLink}|:link:> \n ${thread.description}`,
             },
         },
         {

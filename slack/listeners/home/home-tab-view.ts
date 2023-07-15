@@ -64,7 +64,7 @@ export const threadsView = ({ threads, teams, selectedTeamId, isOwner = false }:
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": `Use the *Save The Message* message shortcut to start organise chats with summaries, keywords, and descriptions. It's like a treasure map for your future self to find chats easily! 😎\nSimply hover over the message you want to save, click on the 'More actions' icon (it looks like three vertical dots), and choose 'Save The Chat'.`
+                    "text": `Use the *Save The Message* message shortcut to start organise chats with summaries and description. It's like a treasure map for your future self to find chats easily! 😎\nSimply hover over the message you want to save, click on the 'More actions' icon (it looks like three vertical dots), and choose 'Save The Chat'.`
                 }
             }
         ];

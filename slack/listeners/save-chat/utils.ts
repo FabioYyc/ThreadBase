@@ -16,7 +16,6 @@ export const saveFromSaveChatView = async (view: ViewOutput) => {
     const teams = values.teams.selected_options?.map((option:any) => option.value) || []
     const threadDetails = {
         title: stringInputParser(values.title),
-        keywords: keywordsParser(values.keywords),
         description: stringInputParser(values.description),
         teams
     }
