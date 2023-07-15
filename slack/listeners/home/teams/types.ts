@@ -7,3 +7,11 @@ export interface ITeamFormValues {
     };
 }
 
+
+export type Team = {
+    ownerId: string;
+    teamName: string;
+    teamDescriptions: string;
+    teamUsers: string[];
+    orgId: string;
+}
