@@ -19,6 +19,7 @@ const threadSchema = new mongoose.Schema({
     keywords: Array,
     teams: Array,
     isSaved: Boolean,
+    textSearch: String,
 });
 
 const Thread = mongoose.model("Thread", threadSchema);
@@ -28,6 +29,7 @@ export interface ThreadDetails {
     description?: string;
     keywords?: Array<string>;
     teams?: Array<string>;
+    textSearch?: string;
 }
 
 export interface IThread{
@@ -54,6 +56,8 @@ export const threadRepo = {
         return await newThread.save();
     },
     addDetailFields: async (threadDetails:ThreadDetails, threadId:string ) => {
+        const textSearch = `${threadDetails.title} ${threadDetails.description}`;
+        threadDetails.textSearch = textSearch;
         await Thread.updateOne({ _id: new mongoose.Types.ObjectId(threadId) }, { $set: {...threadDetails, isSaved:true} });
         //return the thread
         return await Thread.findOne({ _id: new mongoose.Types.ObjectId(threadId) }) as IThread;
@@ -76,17 +80,16 @@ export const threadRepo = {
         return await Thread.findOne({ _id: new mongoose.Types.ObjectId(threadId) });
     },
 
-    searchByTitle: async ({ orgId, userId, searchTerm }: SearchParams) => {
+    searchByText: async ({ orgId, userId, searchTerm }: SearchParams) => {
         const matchCondition: { [key: string]: string } = { orgId, userId };
         
         const pipeline = [
           {
             $search: {
-              index: 'title_search_index',
+              index: "title_search_index",
               text: {
-                path: 'title',
                 query: searchTerm,
-                fuzzy: {}
+                path: "textSearch"
               }
             }
           },
@@ -94,7 +97,7 @@ export const threadRepo = {
             $match: matchCondition
           },
           {
-            $limit: 10
+            $limit: 20
           }
         ];
       

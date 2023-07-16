@@ -70,7 +70,7 @@ export const searchModalHandler = (app : App) => {
         if(!orgId || !userId || !values) {
             throw new Error('Missing orgId, userId or values')
         }
-        const results = await threadRepo.searchByTitle({orgId, userId, searchTerm: values});
+        const results = await threadRepo.searchByText({orgId, userId, searchTerm: values});
         //update the modal view
         
         const threadBlocks = getThreadBlocks(results);
