@@ -1,6 +1,7 @@
 //Mongodb typescrpit schema for thread, properties: userId, threadId, threadLink. Collection will be threads
 
 import mongoose, { Document } from "mongoose";
+import { searchTextLimit } from "../types";
 
 /// connect to mongodb use env var MONGODB_URL
 const threadSchema = new mongoose.Schema({
@@ -57,7 +58,8 @@ export const threadRepo = {
     },
     addDetailFields: async (threadDetails:ThreadDetails, threadId:string ) => {
         const textSearch = `${threadDetails.title} ${threadDetails.description}`;
-        threadDetails.textSearch = textSearch;
+        //slice the textSearch to 100 characters
+        threadDetails.textSearch = textSearch.slice(0, searchTextLimit);
         await Thread.updateOne({ _id: new mongoose.Types.ObjectId(threadId) }, { $set: {...threadDetails, isSaved:true} });
         //return the thread
         return await Thread.findOne({ _id: new mongoose.Types.ObjectId(threadId) }) as IThread;

@@ -12,3 +12,5 @@ export type ButtonBlockAction = {
     value: string;
     text: any
 }
+
+export const searchTextLimit = 120;
