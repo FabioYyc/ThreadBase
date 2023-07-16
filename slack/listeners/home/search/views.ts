@@ -81,7 +81,7 @@ export const getThreadBlocks = (threads: ISavedThread[]) => {
             "type": "section",
             "text": {
                 "type": "mrkdwn",
-                "text": `<${thread.threadLink}|*${thread.title}*> \n *${thread.keywords.join(', ')}* \n ${thread.description}`
+                "text": `*${thread.title}* <${thread.threadLink}|:link:> \n ${thread.description}`,
             },
         }
     } )

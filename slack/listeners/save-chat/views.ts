@@ -73,25 +73,25 @@ export const createChatView = async ({externalId, thread, isEdit = false, userId
                 initial_value: isEdit ? thread?.title : undefined
             }
         },
-        {
-            "type": "input",
-            block_id: 'keywords',
-            "label": {
-                "type": "plain_text",
-                "text": "Keywords",
-                "emoji": true
-            },
-            "element": {
-                "type": "plain_text_input",
-                "multiline": false,
-                "placeholder": {
-                    "type": "plain_text",
-                    "text": "Keywords separated by commas, for example: frontend, css",
-                    "emoji": true
-                },
-                initial_value: isEdit ? thread?.keywords.join(',') : undefined
-            }
-        },
+        // {
+        //     "type": "input",
+        //     block_id: 'keywords',
+        //     "label": {
+        //         "type": "plain_text",
+        //         "text": "Keywords",
+        //         "emoji": true
+        //     },
+        //     "element": {
+        //         "type": "plain_text_input",
+        //         "multiline": false,
+        //         "placeholder": {
+        //             "type": "plain_text",
+        //             "text": "Keywords separated by commas, for example: frontend, css",
+        //             "emoji": true
+        //         },
+        //         initial_value: isEdit ? thread?.keywords.join(',') : undefined
+        //     }
+        // },
         {
             "type": "input",
             block_id: 'description',

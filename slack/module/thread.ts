@@ -26,7 +26,7 @@ const Thread = mongoose.model("Thread", threadSchema);
 export interface ThreadDetails {
     title: string;
     description?: string;
-    keywords: Array<string>;
+    keywords?: Array<string>;
     teams?: Array<string>;
 }
 
