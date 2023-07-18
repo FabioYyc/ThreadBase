@@ -3,7 +3,7 @@ import {ISavedThread, threadRepo} from "../../module/thread";
 import  { confirmationMessage, createChatView, editChatCallbackId, saveChatCallbackId } from "./views";
 import { saveFromSaveChatView } from "./utils";
 import { ButtonBlockAction } from "../../types";
-import { getSavedThreadViewByUser } from "../home/home-tab-view";
+import { getSavedThreadViewByUser } from "../home-saved-chat/home-tab-view";
 
 
 export const editChatActionId = 'edit_saved_chat'
@@ -23,7 +23,6 @@ const saveShortcutHandler = (app: App) =>{
     
             }
 
-            console.log('user is ', messageShortcut.user)
             //TODO: if thread already exist, update it
             const thread = await threadRepo.create({
                 userId: messageShortcut.user.id,
