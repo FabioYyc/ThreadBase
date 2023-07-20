@@ -7,8 +7,9 @@ export const getMessages = async ({ threadId, app }: { threadId: string, app: Ap
     const { channelId, messageTs, senderId, isReply } = thread;
 
     const messages = []
+    
     let result;
-    console.log('thread is %o', thread)
+
     if (!isReply) {
         result = await app.client.conversations.history({
             token: process.env.SLACK_BOT_TOKEN,
