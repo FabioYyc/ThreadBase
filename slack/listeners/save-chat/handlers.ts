@@ -20,21 +20,29 @@ const saveShortcutHandler = (app: App) =>{
     
             if(!messageShortcut.team?.id || !messageShortcut.team?.domain || !messageShortcut.user.id || !messageShortcut.message_ts || !messageShortcut.user.name) {
                 throw new Error('Missing required properties')
-    
+            }
+
+            const senderId = messageShortcut.message.user;
+
+            if(!senderId) {
+                throw new Error('Missing sender id')
             }
 
             //TODO: if thread already exist, update it
             const thread = await threadRepo.create({
                 userId: messageShortcut.user.id,
                 userName: messageShortcut.user.name,
-                threadTs: messageShortcut.message_ts,
+                messageTs: messageShortcut.message_ts,
                 orgId: messageShortcut.team?.id,
                 domain: messageShortcut.team?.domain,
                 threadLink: threadPermalink.permalink as string,
                 channelId: messageShortcut.channel.id,
-                isSaved: false
+                isSaved: false,
+                isReply: messageShortcut.message.parent_user_id ? true : false,
+                senderId
             });
             const returnView = await createChatView({externalId:thread.id as string, isEdit: false, userId: messageShortcut.user.id, orgId: messageShortcut.team?.id,})
+           
             await client.views.open({
                 trigger_id: messageShortcut.trigger_id,
                 view: returnView
@@ -80,7 +88,7 @@ export const saveViewHandler = (app: App) => {
             client.chat.postEphemeral({
                 channel: thread.channelId,
                 blocks: confirmationMessage(thread.userName),
-                thread_ts: thread.threadTs,
+                thread_ts: thread.messageTs,
                 user: thread.userId
             });
 

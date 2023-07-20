@@ -1,7 +1,7 @@
-import { Button } from "@slack/bolt";
+import { Block, Button, View } from "@slack/bolt";
 import { previewButtonActionId } from "./constants";
 
-export const previewButton = (threadId: string): Button =>( {
+export const previewButton = (threadId: string): Button => ({
     "type": "button",
     "text": {
         "type": "plain_text",
@@ -11,3 +11,29 @@ export const previewButton = (threadId: string): Button =>( {
     "action_id": previewButtonActionId,
     "value": threadId,
 })
+
+export const createPreviewModal = (message: any) => {
+    const text = message.text;
+    if (!text) {
+        throw new Error("Invalid message");
+    }
+
+    const previewModal = {
+        "type": "modal",
+        "title": {
+            "type": "plain_text",
+            "text": "Preview",
+            "emoji": true
+        },
+        blocks: [
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": text
+                }
+            }
+        ],
+    }
+    return previewModal as View;
+}
