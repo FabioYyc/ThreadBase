@@ -1,4 +1,4 @@
-import { Block, Button, View } from "@slack/bolt";
+import { Button, View } from "@slack/bolt";
 import { previewButtonActionId } from "./constants";
 
 export const previewButton = (threadId: string): Button => ({

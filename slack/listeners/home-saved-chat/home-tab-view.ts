@@ -57,6 +57,7 @@ export const threadsView = ({ threads, teams, selectedTeamId, isOwner = false }:
     let headerText: string;
     let additionalBlocks: any[];
 
+
     if (threads.length === 0) {
         headerText = "Looks like there is no chat saved in this space yet👆";
         additionalBlocks = [
@@ -107,7 +108,8 @@ export const getSavedThreadViewByUser = async (orgId:string, userId:string, sele
     const userLatestTeamId = await getLatestTeamIdForUser(orgId, userId);
     const displayTeamId = selectedTeamId || userLatestTeamId;
     let threads: ISavedThread[];
-    if(!displayTeamId || selectedTeamId === personalSpaceValue) {
+    const returnPersonalSpace = !displayTeamId || displayTeamId === personalSpaceValue;
+    if(returnPersonalSpace) {
         threads = await threadRepo.getPersonalSavedThreadForUser(orgId, userId)
     } else {
         threads = await threadRepo.getSavedThreadForTeam(displayTeamId)
