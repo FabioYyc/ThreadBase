@@ -3,6 +3,7 @@ import { getSavedThreadViewByUser } from "./home-tab-view";
 import { deleteChatConfirm, deleteChatProcessor } from "./delete-chat";
 import { registerCreateTeamHandlers } from "./teams/handlers";
 import { searchButtonHandler, searchModalHandler } from "./search/handlers";
+import { previewButtonHandler } from "./preview/handler";
 
 
 const homeOpenListener = (app: App) => {
@@ -33,5 +34,6 @@ const homeOpenListener = (app: App) => {
     registerCreateTeamHandlers(app);
     searchButtonHandler(app);
     searchModalHandler(app);
+    previewButtonHandler(app);
   }
     

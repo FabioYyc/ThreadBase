@@ -5,8 +5,9 @@ import mongoose, { Document } from "mongoose";
 /// connect to mongodb use env var MONGODB_URL
 const threadSchema = new mongoose.Schema({
     userId: String,
+    senderId: String,
     userName: String,
-    threadTs: String,
+    messageTs: String,
     orgId: String,
     domain: String,
     threadLink: String,
@@ -19,6 +20,7 @@ const threadSchema = new mongoose.Schema({
     keywords: Array,
     teams: Array,
     isSaved: Boolean,
+    isReply: Boolean,
 });
 
 const Thread = mongoose.model("Thread", threadSchema);
@@ -33,12 +35,14 @@ export interface ThreadDetails {
 export interface IThread{
     userId: string;
     userName: string;
-    threadTs: string;
+    messageTs: string;
     orgId: string;
     domain: string;
     threadLink: string;
     channelId: string;
+    senderId: string;
     isSaved: boolean;
+    isReply: boolean;
 }
 
 //Join thread and threadDetails as a new type

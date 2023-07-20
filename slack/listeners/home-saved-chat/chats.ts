@@ -2,6 +2,7 @@ import { View } from "@slack/bolt"
 import { ISavedThread } from "../../module/thread"
 import { editChatActionId } from "../save-chat/handlers"
 import { deleteChatActionId } from "./delete-chat"
+import { previewButton } from "./preview/views"
 
 const savedThreadBlock = (thread: ISavedThread): View['blocks'] => {
     return [
@@ -35,6 +36,7 @@ const savedThreadBlock = (thread: ISavedThread): View['blocks'] => {
                     "value": thread.id,
                     "action_id": deleteChatActionId
                 },
+                previewButton(thread.id)
             ]
         },
         {
