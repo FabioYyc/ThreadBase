@@ -1,6 +1,7 @@
 //Mongodb typescrpit schema for thread, properties: userId, threadId, threadLink. Collection will be threads
 
 import mongoose, { Document } from "mongoose";
+import { searchTextLimit } from "../types";
 
 /// connect to mongodb use env var MONGODB_URL
 const threadSchema = new mongoose.Schema({
@@ -20,6 +21,7 @@ const threadSchema = new mongoose.Schema({
     keywords: Array,
     teams: Array,
     isSaved: Boolean,
+    textSearch: String,
     isReply: Boolean,
 });
 
@@ -30,6 +32,7 @@ export interface ThreadDetails {
     description?: string;
     keywords?: Array<string>;
     teams?: Array<string>;
+    textSearch?: string;
 }
 
 export interface IThread{
@@ -58,6 +61,9 @@ export const threadRepo = {
         return await newThread.save();
     },
     addDetailFields: async (threadDetails:ThreadDetails, threadId:string ) => {
+        const textSearch = `${threadDetails.title} ${threadDetails.description}`;
+        //slice the textSearch to 100 characters
+        threadDetails.textSearch = textSearch.slice(0, searchTextLimit);
         await Thread.updateOne({ _id: new mongoose.Types.ObjectId(threadId) }, { $set: {...threadDetails, isSaved:true} });
         //return the thread
         return await Thread.findOne({ _id: new mongoose.Types.ObjectId(threadId) }) as IThread;
@@ -80,17 +86,16 @@ export const threadRepo = {
         return await Thread.findOne({ _id: new mongoose.Types.ObjectId(threadId) });
     },
 
-    searchByTitle: async ({ orgId, userId, searchTerm }: SearchParams) => {
+    searchByText: async ({ orgId, userId, searchTerm }: SearchParams) => {
         const matchCondition: { [key: string]: string } = { orgId, userId };
         
         const pipeline = [
           {
             $search: {
-              index: 'title_search_index',
+              index: "title_search_index",
               text: {
-                path: 'title',
                 query: searchTerm,
-                fuzzy: {}
+                path: "textSearch"
               }
             }
           },
@@ -98,7 +103,7 @@ export const threadRepo = {
             $match: matchCondition
           },
           {
-            $limit: 10
+            $limit: 20
           }
         ];
       
