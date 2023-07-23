@@ -90,11 +90,11 @@ export const threadRepo = {
         const matchCondition: { [key: string]: string } = { orgId, userId };
 
         console.log('searchTerm', searchTerm)
-        
+
         const pipeline = [
           {
             $search: {
-              index: "title_search_index",
+              index: "thread_text_search_index",
               text: {
                 query: searchTerm,
                 path: "textSearch"
