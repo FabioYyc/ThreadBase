@@ -88,6 +88,8 @@ export const threadRepo = {
 
     searchByText: async ({ orgId, userId, searchTerm }: SearchParams) => {
         const matchCondition: { [key: string]: string } = { orgId, userId };
+
+        console.log('searchTerm', searchTerm)
         
         const pipeline = [
           {
@@ -106,7 +108,7 @@ export const threadRepo = {
             $limit: 20
           }
         ];
-      
+        console.log('pipeline', pipeline)
         // Use the aggregate() function to execute the pipeline
         const results =  await Thread.aggregate(pipeline) || [];
 
