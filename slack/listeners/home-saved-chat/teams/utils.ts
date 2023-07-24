@@ -37,7 +37,7 @@ export const addTeamToUserTeam = async ({orgId, userId, teamId, userRole, sessio
     //find if user team exists, if not create with current teamId
     //if exists, add current teamId to teams array
 
-    const userTeams = await userTeamsRepo.findById({orgId, userId: userId});
+    const userTeams = await userTeamsRepo.findByUserId({orgId, userId: userId});
     if(!userTeams) {
         const newUserTeams = {
             orgId,
@@ -56,7 +56,7 @@ export const addTeamToUserTeam = async ({orgId, userId, teamId, userRole, sessio
 }
 
 export const getTeamsForUser = async (orgId:string, userId: string): Promise<ISavedTeam[]> => {
-    const userTeams = await userTeamsRepo.findById({orgId, userId: userId});
+    const userTeams = await userTeamsRepo.findByUserId({orgId, userId: userId});
     if(!userTeams) {
         return [];
     }
@@ -66,7 +66,7 @@ export const getTeamsForUser = async (orgId:string, userId: string): Promise<ISa
 }
 
 export const checkIfUserIsTeamOwner = async ({userId, teamId, orgId}:{userId: string, orgId:string, teamId: string}) => {
-    const userTeams = await userTeamsRepo.findById({orgId, userId: userId});
+    const userTeams = await userTeamsRepo.findByUserId({orgId, userId: userId});
     if(!userTeams) {
         return false;
     }

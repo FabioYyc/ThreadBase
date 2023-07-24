@@ -66,7 +66,7 @@ export const teamRepo = {
 }
 
 export const userTeamsRepo = {
-    findById: async ({userId, orgId}:{userId: string, orgId: string}): Promise<ISavedUserTeams | null> => {
+    findByUserId: async ({userId, orgId}:{userId: string, orgId: string}): Promise<ISavedUserTeams | null> => {
         const userTeams = await UserTeams.findOne({ userId: userId, orgId: orgId });
         return userTeams as ISavedUserTeams;
     },
