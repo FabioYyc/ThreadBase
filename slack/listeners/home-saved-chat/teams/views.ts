@@ -92,7 +92,23 @@ export const generateTeamView = ({
                     "emoji": true
                 },
                 optional: true
-            }
+            },
+            {
+                "type": "input",
+                block_id: 'team_conversations',
+                "element": {
+                    "type": "multi_conversations_select",
+                    "initial_conversations": [],
+                    "action_id": "multi_conversations_select-action",
+                    max_selected_items: 3
+                },
+                "label": {
+                    "type": "plain_text",
+                    "text": "Add Channel Users",
+                    "emoji": true
+                },
+                optional: true
+            },
         ]
     }
 )

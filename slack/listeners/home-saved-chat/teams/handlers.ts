@@ -19,12 +19,12 @@ const createTeamButtonHandler = (app: App): void => {
             client.views.open({
                 trigger_id: payload.trigger_id,
                 view: generateTeamView({})
-        })
+            })
         } catch (error) {
             throw new Error(`error in create team: ${error}`)
         }
-     
-})
+
+    })
 }
 
 const editTeamButtonHandler = (app: App): void => {
@@ -37,19 +37,22 @@ const editTeamButtonHandler = (app: App): void => {
             const selectedTeamValue = actions[0].value;
             //get team
             const team = await teamRepo.getTeamById(selectedTeamValue);
-            const isOwner = await checkIfUserIsTeamOwner({orgId: team.orgId, userId: body.user.id, teamId: team.id});
-            if(!isOwner){
+            const isOwner = await checkIfUserIsTeamOwner({ orgId: team.orgId, userId: body.user.id, teamId: team.id });
+            if (!isOwner) {
                 return
             }
             client.views.open({
                 trigger_id: payload.trigger_id,
-                view: generateTeamView({teamId: selectedTeamValue, team, isEdit: true})
-        })
+                view: generateTeamView({ teamId: `edit_team-${selectedTeamValue}`, team, isEdit: true })
+            }).catch((error) => {
+                console.error(error);
+            })
         } catch (error) {
+
             throw new Error(`error in create team: ${error}`)
         }
-     
-})
+
+    })
 }
 
 
@@ -61,11 +64,13 @@ const createTeamFormHandler = (app: App) => {
         session.startTransaction();
         const values = viewInputReader(view);
         const team = processTeamForm(values, body, view);
+        
+        console.log('team', team)
 
         try {
             const newTeam = await teamRepo.create(team, session);
-            await addTeamToUserTeam({orgId: team.orgId, userId: body.user.id, teamId:newTeam.id, userRole: UserRole.Owner, session})
-            const addTeamPromises = team.teamUsers.map(async (teamUser:string) => {
+            await addTeamToUserTeam({ orgId: team.orgId, userId: body.user.id, teamId: newTeam.id, userRole: UserRole.Owner, session })
+            const addTeamPromises = team.teamUsers.map(async (teamUser: string) => {
                 await addTeamToUserTeam({ orgId: team.orgId, userId: teamUser, teamId: newTeam.id, userRole: UserRole.Member, session });
             });
             await Promise.all(addTeamPromises);
@@ -86,29 +91,31 @@ const editTeamFormHandler = (app: App) => {
         ack();
         const session = await connection.startSession();
         const values = viewInputReader(view);
+        console.log('values', values)
         const team = processTeamForm(values, body, view);
 
         try {
-            const teamId = body.view.external_id; 
-            if(!teamId){
+            const externalId = body.view.external_id;
+            if (!externalId) {
                 throw new Error('team id is not provided');
             }
+            const teamId = externalId.split('-')[1];
             const oldTeam = await teamRepo.getTeamById(teamId);
-            if(!oldTeam){
+            if (!oldTeam) {
                 throw new Error('team is not found');
             }
 
             session.startTransaction();
 
             await teamRepo.updateTeam(teamId, team, session);
-            
+
             const addedMembers = _.difference(team.teamUsers, oldTeam.teamUsers);
             const removedMembers = _.difference(oldTeam.teamUsers, team.teamUsers);
 
             // If there are new members added, add the team to their userTeams
             if (addedMembers.length > 0) {
                 for (const memberId of addedMembers) {
-                    await userTeamsRepo.addTeamToUser({ userId: memberId, orgId: team.orgId, team: {teamId, userRole: UserRole.Member}, session });
+                    await userTeamsRepo.addTeamToUser({ userId: memberId, orgId: team.orgId, team: { teamId, userRole: UserRole.Member }, session });
                 }
             }
 
@@ -118,6 +125,8 @@ const editTeamFormHandler = (app: App) => {
                     await userTeamsRepo.removeTeamFromUser({ userId: memberId, orgId: team.orgId, teamId, session });
                 }
             }
+
+            //TODO: do the same difference check for team channels
 
             await session.commitTransaction();
             await getUserHomeView(team.orgId, body.user.id, client, teamId);
@@ -141,7 +150,7 @@ export const switchTeamHandler = (app: App) => {
         const userId = payload.user.id;
         const orgId = payload.team.id;
 
-        if(selectedTeamValue === personalSpaceValue){
+        if (selectedTeamValue === personalSpaceValue) {
             getUserHomeView(orgId, userId, client, personalSpaceValue);
             await updateUserUILatestTeamId(orgId, userId, personalSpaceValue);
             return;

@@ -5,6 +5,7 @@ export interface ITeam{
     teamName: string;
     teamDescriptions: string;
     teamUsers: string[];
+    teamConversations: string[];
     orgId: string;
 }
 
@@ -13,6 +14,7 @@ const TeamSchema = new mongoose.Schema({
     teamName: String,
     teamDescriptions: String,
     teamUsers: Array,
+    teamConversations: Array,
     orgId: String,
 });
 

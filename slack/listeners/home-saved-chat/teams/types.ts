@@ -5,6 +5,9 @@ export interface ITeamFormValues {
     team_members: {
         selected_users: string[];
     };
+    team_conversations:{
+        selected_conversations: string[];
+    }
 }
 
 

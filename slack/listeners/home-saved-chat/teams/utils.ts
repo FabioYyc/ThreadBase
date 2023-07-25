@@ -15,6 +15,7 @@ export const getRemovedMembers = (oldMembers: string[], newMembers: string[]): s
 export const processTeamForm = (values: ITeamFormValues, body: SlackViewAction, view: ViewOutput) => {
     const { team_name, team_description } = values;
     const teamUsers = values.team_members.selected_users;
+    const teamConversations = values.team_conversations.selected_conversations;
     const orgId = view.team_id;
 
     if(!team_name){
@@ -27,6 +28,7 @@ export const processTeamForm = (values: ITeamFormValues, body: SlackViewAction, 
         orgId: orgId,
         ownerId: body.user.id,
         teamUsers: teamUsers,
+        teamConversations: teamConversations,
     }
     return team;
 };
