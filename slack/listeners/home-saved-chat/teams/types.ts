@@ -16,5 +16,6 @@ export type Team = {
     teamName: string;
     teamDescriptions: string;
     teamUsers: string[];
+    teamConversations: string[];
     orgId: string;
 }

@@ -65,8 +65,6 @@ const createTeamFormHandler = (app: App) => {
         const values = viewInputReader(view);
         const team = processTeamForm(values, body, view);
         
-        console.log('team', team)
-
         try {
             const newTeam = await teamRepo.create(team, session);
             await addTeamToUserTeam({ orgId: team.orgId, userId: body.user.id, teamId: newTeam.id, userRole: UserRole.Owner, session })
@@ -91,7 +89,6 @@ const editTeamFormHandler = (app: App) => {
         ack();
         const session = await connection.startSession();
         const values = viewInputReader(view);
-        console.log('values', values)
         const team = processTeamForm(values, body, view);
 
         try {
@@ -125,8 +122,6 @@ const editTeamFormHandler = (app: App) => {
                     await userTeamsRepo.removeTeamFromUser({ userId: memberId, orgId: team.orgId, teamId, session });
                 }
             }
-
-            //TODO: do the same difference check for team channels
 
             await session.commitTransaction();
             await getUserHomeView(team.orgId, body.user.id, client, teamId);

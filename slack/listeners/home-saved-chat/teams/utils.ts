@@ -57,6 +57,15 @@ export const addTeamToUserTeam = async ({orgId, userId, teamId, userRole, sessio
 
 }
 
+export const getTeamsByUserChannel = async (orgId:string, userId: string): Promise<ISavedTeam[]> => {
+
+    //1. call slack api to get all channels user belongs to
+    //2. find all teams with teamConversations = [channelId1, channelId2, ...]
+    //3. return teams
+    return []
+
+}
+
 export const getTeamsForUser = async (orgId:string, userId: string): Promise<ISavedTeam[]> => {
     const userTeams = await userTeamsRepo.findByUserId({orgId, userId: userId});
     if(!userTeams) {
