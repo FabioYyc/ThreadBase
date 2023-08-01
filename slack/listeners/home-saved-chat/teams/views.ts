@@ -12,10 +12,10 @@ export const generateTeamView = ({
     teamId,
     team,
     isEdit = false
-}:{teamId?: string, team?: Team, isEdit? : boolean}): View => (
+}: { teamId?: string, team?: Team, isEdit?: boolean }): View => (
     {
         "type": "modal",
-        callback_id: isEdit? editTeamCallbackId : createTeamCallbackId,
+        callback_id: isEdit ? editTeamCallbackId : createTeamCallbackId,
         external_id: teamId,
         "submit": {
             "type": "plain_text",
@@ -117,10 +117,10 @@ export const generateTeamView = ({
 
 export const teamSelector = (teams: ISavedTeam[], selectedTeamId?: string) => {
     let selectedTeam;
-    if(selectedTeamId) {
+    if (selectedTeamId) {
         selectedTeam = teams.find(team => team.id === selectedTeamId)
     }
-    const getTeamOption = (team:ISavedTeam): PlainTextOption =>{
+    const getTeamOption = (team: ISavedTeam): PlainTextOption => {
         return {
             "text": {
                 "type": "plain_text",
@@ -132,19 +132,18 @@ export const teamSelector = (teams: ISavedTeam[], selectedTeamId?: string) => {
     }
 
     const teamOptions = teams.map(getTeamOption)
-    if(selectedTeam) {
-        const personalSpaceOption: PlainTextOption = {
-            "text": {
-                "type": "plain_text",
-                "text": ":bust_in_silhouette:Personal Space",
-                "emoji": true
-            },
-            "value": personalSpaceValue
-        }
-        teamOptions.unshift(personalSpaceOption)
+    const personalSpaceOption: PlainTextOption = {
+        "text": {
+            "type": "plain_text",
+            "text": ":bust_in_silhouette:Personal Space",
+            "emoji": true
+        },
+        "value": personalSpaceValue
     }
+    teamOptions.unshift(personalSpaceOption)
 
-    const spaceText = selectedTeam? `*Current Team Space: ${selectedTeam.teamName}*` : `*Currently At Personal Space*`
+
+    const spaceText = selectedTeam ? `*Current Team Space: ${selectedTeam.teamName}*` : `*Currently At Personal Space*`
     const returnBlock: SectionBlock = {
         "type": "section",
         "text": {
@@ -153,7 +152,7 @@ export const teamSelector = (teams: ISavedTeam[], selectedTeamId?: string) => {
         }
     }
 
-    if(teamOptions.length >= 1) {
+    if (teamOptions.length >= 1) {
         returnBlock.accessory = {
             "type": "static_select",
             "action_id": teamSwitchActionId,
@@ -163,8 +162,9 @@ export const teamSelector = (teams: ISavedTeam[], selectedTeamId?: string) => {
                 "emoji": true
             },
             "options": teamOptions,
-            "initial_option": selectedTeam && getTeamOption(selectedTeam)
+            "initial_option": selectedTeam ? getTeamOption(selectedTeam) : personalSpaceOption
         }
     }
 
-    return returnBlock }
+    return returnBlock
+}
