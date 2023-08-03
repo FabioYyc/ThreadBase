@@ -1,8 +1,9 @@
-import { SlackViewAction, ViewOutput } from "@slack/bolt";
-import { ISavedTeam, ITeam, UserRole, teamRepo, userTeamsRepo } from "../../../module/team";
+import { App, SlackViewAction, ViewOutput } from "@slack/bolt";
+import { ISavedTeam, ITeam, ITeamConversation, UserRole, teamRepo, userTeamsRepo } from "../../../module/team";
 import { stringInputParser } from "../../../utils";
 import { ITeamFormValues } from "./types";
 import { ClientSession } from "mongoose";
+import { createTeamConversations } from "./conversations";
 
 export const getAddedMembers = (oldMembers: string[], newMembers: string[]): string[] => {
     return newMembers.filter(member => !oldMembers.includes(member));
@@ -12,15 +13,26 @@ export const getRemovedMembers = (oldMembers: string[], newMembers: string[]): s
     return oldMembers.filter(member => !newMembers.includes(member));
 }
 
-export const processTeamForm = (values: ITeamFormValues, body: SlackViewAction, view: ViewOutput) => {
+export const processTeamForm = async ({app, values, body, view}:{app: App, values: ITeamFormValues, body: SlackViewAction, view: ViewOutput}) => {
     const { team_name, team_description } = values;
     const teamUsers = values.team_members.selected_users;
-    const teamConversations = values.team_conversations.selected_conversations;
     const orgId = view.team_id;
+    
 
     if(!team_name){
         throw new Error('team name is not provided');
     }
+
+    const conversations = values.team_conversations.selected_conversations;
+    
+    const teamConversations: ITeamConversation[] = [];
+
+    for(const conversation of conversations) {
+        const teamConversation = await createTeamConversations(app, conversation);
+        teamConversations.push(teamConversation);
+    }
+
+
 
     const team: ITeam = {
         teamName: stringInputParser(team_name),
@@ -28,7 +40,7 @@ export const processTeamForm = (values: ITeamFormValues, body: SlackViewAction, 
         orgId: orgId,
         ownerId: body.user.id,
         teamUsers: teamUsers,
-        teamConversations: teamConversations,
+        teamConversations: teamConversations
     }
     return team;
 };
@@ -57,14 +69,6 @@ export const addTeamToUserTeam = async ({orgId, userId, teamId, userRole, sessio
 
 }
 
-export const getTeamsByUserChannel = async (orgId:string, userId: string): Promise<ISavedTeam[]> => {
-
-    //1. call slack api to get all channels user belongs to
-    //2. find all teams with teamConversations = [channelId1, channelId2, ...]
-    //3. return teams
-    return []
-
-}
 
 export const getTeamsForUser = async (orgId:string, userId: string): Promise<ISavedTeam[]> => {
     const userTeams = await userTeamsRepo.findByUserId({orgId, userId: userId});
@@ -72,7 +76,11 @@ export const getTeamsForUser = async (orgId:string, userId: string): Promise<ISa
         return [];
     }
     const teams = userTeams.teams;
+    const channelTeams = await teamRepo.findTeamsWhereUserIsChannelMember(orgId, userId);
     const teamIds = teams.map(team => team.teamId);
+    if(channelTeams){
+        teamIds.push(...channelTeams.map(team => team.id));
+    }
     return await teamRepo.getTeamsByIds(teamIds) || [];
 }
 

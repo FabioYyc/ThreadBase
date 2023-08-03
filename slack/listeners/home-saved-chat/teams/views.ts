@@ -99,7 +99,7 @@ export const generateTeamView = ({
                 "element": {
                     "type": "multi_conversations_select",
                     "action_id": "multi_conversations_select-action",
-                    'initial_conversations': (isEdit && team?.teamConversations) ? team.teamConversations : undefined,
+                    'initial_conversations': (isEdit && team?.teamConversations) ? team.teamConversations.map(teamConversation => teamConversation.conversationId) : undefined,
                     max_selected_items: 3
                 },
                 "label": {

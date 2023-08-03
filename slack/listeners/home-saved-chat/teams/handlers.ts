@@ -63,7 +63,7 @@ const createTeamFormHandler = (app: App) => {
         const session = await connection.startSession();
         session.startTransaction();
         const values = viewInputReader(view);
-        const team = processTeamForm(values, body, view);
+        const team = await processTeamForm({app, values, body, view});
         
         try {
             const newTeam = await teamRepo.create(team, session);
@@ -89,7 +89,7 @@ const editTeamFormHandler = (app: App) => {
         ack();
         const session = await connection.startSession();
         const values = viewInputReader(view);
-        const team = processTeamForm(values, body, view);
+        const team = await processTeamForm({app, values, body, view});
 
         try {
             const externalId = body.view.external_id;
