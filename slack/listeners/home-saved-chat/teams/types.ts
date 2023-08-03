@@ -1,3 +1,4 @@
+import { ITeamConversation } from "../../../module/team";
 
 export interface ITeamFormValues {
     team_name: string;
@@ -5,6 +6,9 @@ export interface ITeamFormValues {
     team_members: {
         selected_users: string[];
     };
+    team_conversations:{
+        selected_conversations: string[];
+    }
 }
 
 
@@ -13,5 +17,6 @@ export type Team = {
     teamName: string;
     teamDescriptions: string;
     teamUsers: string[];
+    teamConversations?: ITeamConversation[];
     orgId: string;
 }

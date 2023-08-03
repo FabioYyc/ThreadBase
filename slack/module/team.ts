@@ -1,10 +1,15 @@
 import mongoose, { ClientSession, Document } from "mongoose";
 
+export interface ITeamConversation {
+    conversationId: string;
+    members: string[];
+}
 export interface ITeam{
     ownerId: string;
     teamName: string;
     teamDescriptions: string;
     teamUsers: string[];
+    teamConversations?: ITeamConversation[];
     orgId: string;
 }
 
@@ -13,6 +18,7 @@ const TeamSchema = new mongoose.Schema({
     teamName: String,
     teamDescriptions: String,
     teamUsers: Array,
+    teamConversations: Array,
     orgId: String,
 });
 
@@ -63,6 +69,11 @@ export const teamRepo = {
         return await Team.find({ _id: { $in: teamIds } }) as ISavedTeam[];
     },
 
+    findTeamsWhereUserIsChannelMember: async (orgId:string, userId: string): Promise<ISavedTeam[]> => {
+        return await Team.find({ orgId, teamConversations: { $elemMatch: { members: userId } } }) as ISavedTeam[];
+    }
+
+
 }
 
 export const userTeamsRepo = {
@@ -70,7 +81,6 @@ export const userTeamsRepo = {
         const userTeams = await UserTeams.findOne({ userId: userId, orgId: orgId });
         return userTeams as ISavedUserTeams;
     },
-
     create: async (userTeams: IUserTeams, session:ClientSession) => {
         const newUserTeams = new UserTeams(userTeams);
         return await newUserTeams.save({session});

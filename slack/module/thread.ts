@@ -2,7 +2,8 @@
 
 import mongoose, { Document } from "mongoose";
 import { searchTextLimit } from "../types";
-import { userTeamsRepo } from "./team";
+import { teamRepo, userTeamsRepo } from "./team";
+import { getTeamsForUser } from "../listeners/home-saved-chat/teams/utils";
 
 /// connect to mongodb use env var MONGODB_URL
 const threadSchema = new mongoose.Schema({
@@ -96,8 +97,8 @@ export const threadRepo = {
      * 1. need to get all teams user belongs to use userTeamsRepo
      * 2. teams = [teamId1, teamId2, ...]
      */
-    const userTeams = await userTeamsRepo.findByUserId({ userId, orgId });
-    const teamIds = userTeams?.teams.map((team) => team.teamId) || [];
+    const teams = await getTeamsForUser(orgId, userId)
+    const teamIds = teams.map((team) => team.id) || [];
 
     // Constructing the matchCondition
     const matchCondition = {
