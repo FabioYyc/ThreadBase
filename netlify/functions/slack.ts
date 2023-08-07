@@ -5,6 +5,7 @@ import { registerHomeTabListeners } from "../../slack/listeners/home-saved-chat"
 import { parseRequestBody } from "../../slack/utils";
 import { registerSaveChatHandler } from "../../slack/listeners/save-chat/handlers";
 import mongoose from "mongoose";
+import { registerConfluenceHandlers } from "../../slack/listeners/save-confluence/handlers";
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
@@ -17,6 +18,7 @@ const app = new App({
 
   registerHomeTabListeners(app);
   registerSaveChatHandler(app);
+  registerConfluenceHandlers(app);
 
 
 const handler: Handler = async (
