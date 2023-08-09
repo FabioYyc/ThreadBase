@@ -1,6 +1,6 @@
 import { View } from "@slack/bolt";
 
-export const confluenceAuthView = async (): Promise<View> => {
+export const confluenceAuthView = async (authorizeUrl: string): Promise<View> => {
 
     return{
         "type": "modal",
@@ -25,7 +25,7 @@ export const confluenceAuthView = async (): Promise<View> => {
                         "emoji": true
                     },
                     "value": "create_confluence",
-                    "url": "https://google.com",
+                    "url": authorizeUrl,
                     "action_id": "create-confluence-button-action"
                 }
             }
