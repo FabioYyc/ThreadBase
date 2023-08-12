@@ -1,6 +1,6 @@
 import { Block, Button, View } from "@slack/bolt";
 import { searchButtonActionId, searchDispatchActionId, searchModalId } from "./constants";
-import { ISavedThread } from "../../../../module/thread";
+import { ISavedThread } from "../../../../modules/thread";
 
 export const searchButton: Button = {
     "type": "button",

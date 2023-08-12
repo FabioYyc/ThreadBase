@@ -1,10 +1,10 @@
 import { App, BlockAction, ButtonAction } from "@slack/bolt";
 import { generateTeamView } from "./views";
 import { viewInputReader } from "../../../utils";
-import { UserRole, teamRepo, userTeamsRepo } from "../../../../module/team";
+import { UserRole, teamRepo, userTeamsRepo } from "../../../../modules/team";
 import { connection } from "mongoose";
 import { getUserHomeView } from "../home-tab-view";
-import { updateUserUILatestTeamId } from "../../../../module/userUI";
+import { updateUserUILatestTeamId } from "../../../../modules/userUI";
 import { addTeamToUserTeam, checkIfUserIsTeamOwner, processTeamForm } from "./utils";
 import _ from 'lodash';
 import { createTeamButtonActionId, createTeamCallbackId, editTeamButtonActionId, editTeamCallbackId, personalSpaceValue, teamSwitchActionId } from "./constants";

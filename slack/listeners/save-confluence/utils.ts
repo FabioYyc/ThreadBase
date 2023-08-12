@@ -4,5 +4,5 @@ export const getAuthorizeUrl = (orgId: string, userId: string) => {
 
     if(!authUrl) throw new Error('Missing auth url')
 
-    return authUrl.replace('${YOUR_USER_BOUND_VALUE', uniqueId) 
+    return authUrl.replace('${YOUR_USER_BOUND_VALUE}', uniqueId) 
 }

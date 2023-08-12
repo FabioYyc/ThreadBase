@@ -1,28 +1,9 @@
 import type { Handler, HandlerEvent, HandlerContext } from "@netlify/functions";
-import { userUIRepo } from "../../module/userUI";
-
-const handler: Handler = async (event: HandlerEvent, context: HandlerContext) => {
-  const payload = event.queryStringParameters;
-  const code = payload?.code;
-  console.log('code is', code)
-  const state = payload?.state;
-  const threadBaseUser = state?.split('-');
-  if(!code || !state || !threadBaseUser) {
-    return {
-        statusCode: 400,
-        body: 'Invalid request'
-        }
-    }
-  const orgId = threadBaseUser[0];
-  const userId = threadBaseUser[1];
-  console.log('orgId is', orgId)
-  console.log('userId is', userId)
-  //1. Get the code from the query string
-  //2. Exchange the code for an access token
-  //3. Store the access toke and refresh token in the database
-  return {
-    statusCode: 200,
-    body: `
+import { userUIRepo } from "../../modules/userUI";
+import mongoose from "mongoose";
+const returnBody = (message: string) => {
+    //TODO: improve this page, probably host it instead
+    return  `
     <html>
         <head>
             <style>
@@ -55,7 +36,7 @@ const handler: Handler = async (event: HandlerEvent, context: HandlerContext) =>
         <body>
             <div class="container">
                 <div class="logo">Threadbase</div>
-                <div class="message">Authentication successful for Confluence integration! This window will close shortly.</div>
+                <div class="message">${message}</div>
             </div>
             <script>
                 setTimeout(function() {
@@ -64,7 +45,50 @@ const handler: Handler = async (event: HandlerEvent, context: HandlerContext) =>
             </script>
         </body>
     </html> `
-};
+}
+
+mongoose.connect(process.env.MONGO_DB_URL as string);
+
+const handler: Handler = async (event: HandlerEvent) => {
+    try {
+        const payload = event.queryStringParameters;
+        console.log('payload', payload)
+        const code = payload?.code;
+        const state = payload?.state;
+        const threadBaseUser = state?.split('-');
+        if(!code || !state || !threadBaseUser) {
+          return {
+              statusCode: 400,
+              body: 'Invalid request'
+              }
+          }
+        const orgId = threadBaseUser[0];
+        const userId = threadBaseUser[1];
+        const confluenceAuth = {
+          domain: 'test',
+          authorizeToken: code
+        }
+        const result = await userUIRepo.updateAuthByUserId({orgId, userId, authType:'confluence',  authData: confluenceAuth})
+
+        if(!result?.acknowledged || result?.modifiedCount !== 1) {
+            return {
+                statusCode: 200,
+                body: returnBody('Something went wrong. Please try again.')
+            }; 
+        }
+      
+        await mongoose.connection.close();
+        return {
+          statusCode: 200,
+          body: returnBody('You have successfully linked your Confluence account! You can close this page now.')
+      };
+    } catch (error) {
+        return {
+            statusCode: 200,
+            body: returnBody('Something went wrong. Please try again.')
+        };
+    }
+ 
 };
 
 export { handler };

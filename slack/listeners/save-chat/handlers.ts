@@ -1,5 +1,5 @@
 import { App, MessageShortcut } from "@slack/bolt"
-import {ISavedThread, threadRepo} from "../../../module/thread";
+import {ISavedThread, threadRepo} from "../../../modules/thread";
 import  { confirmationMessage, createChatView, editChatCallbackId, saveChatCallbackId } from "./views";
 import { saveFromSaveChatView } from "./utils";
 import { ButtonBlockAction } from "../../types";
