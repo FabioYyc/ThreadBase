@@ -1,7 +1,7 @@
 import { App, BlockAction, PlainTextInputAction } from "@slack/bolt";
 import { searchButtonActionId, searchDispatchActionId, searchModalId } from "./constants";
 import { createSearchModal, getThreadBlocks } from "./views";
-import { threadRepo } from "../../../module/thread";
+import { threadRepo } from "../../../../module/thread";
 
 export const searchButtonHandler = (app : App) => {
     app.action(searchButtonActionId, async ({ ack, body, client }) => {

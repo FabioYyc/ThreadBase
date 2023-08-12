@@ -9,12 +9,13 @@ const saveConfluenceShortcutHandler = (app: App) => {
         const orgId = team?.id
         const userId = user?.id
         // need to store userId and orgId in the database with auth
+        // change redirect to slack
         const authorizeUrl = getAuthorizeUrl(orgId as string, userId as string)
         const authView = await confluenceAuthView(authorizeUrl)
         await client.views.open({
             trigger_id: shortcut.trigger_id,
             view: authView
-        })
+        }) 
     })
 }
 

@@ -1,5 +1,5 @@
 import { App } from "@slack/bolt";
-import { ISavedThread, threadRepo } from "../../../module/thread";
+import { ISavedThread, threadRepo } from "../../../../module/thread";
 
 export const getMessages = async ({ threadId, app }: { threadId: string, app: App }) => {
 

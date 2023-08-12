@@ -1,5 +1,5 @@
 import { App } from "@slack/bolt";
-import { ITeamConversation } from "../../../module/team";
+import { ITeamConversation } from "../../../../module/team";
 
 export const conversationMembers = async (app: App, conversationId: string) => {
     const res = await app.client.conversations.members({

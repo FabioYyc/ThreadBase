@@ -26,7 +26,7 @@ export const confluenceAuthView = async (authorizeUrl: string): Promise<View> =>
                     },
                     "value": "create_confluence",
                     "url": authorizeUrl,
-                    "action_id": "create-confluence-button-action"
+                    "action_id": "authorize_confluence"
                 }
             }
         ]
