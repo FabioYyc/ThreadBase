@@ -1,0 +1,1 @@
+export const confluenceDomainActionId = 'confluence-domain';
