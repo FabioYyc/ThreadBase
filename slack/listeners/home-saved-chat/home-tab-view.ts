@@ -1,11 +1,11 @@
 import { ActionsBlock, Button, View } from "@slack/bolt";
-import { ISavedThread, threadRepo } from "../../../modules/thread";
+import { ISavedThread, threadRepo } from "../../../common/modules/thread";
 import { teamSelector } from "./teams/views";
 import { savedThreadsViews } from "./chats";
-import { ISavedTeam } from "../../../modules/team";
+import { ISavedTeam } from "../../../common/modules/team";
 
 import { WebClient } from "@slack/web-api"
-import { getLatestTeamIdForUser } from "../../../modules/userUI";
+import { getLatestTeamIdForUser } from "../../../common/modules/userUI";
 import { createTeamButtonActionId, editTeamButtonActionId, personalSpaceValue } from "./teams/constants";
 import { checkIfUserIsTeamOwner, getTeamsForUser } from "./teams/utils";
 import { searchButton } from "./search/views";

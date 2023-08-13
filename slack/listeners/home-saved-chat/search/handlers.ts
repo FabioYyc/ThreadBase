@@ -1,7 +1,7 @@
 import { App, BlockAction, PlainTextInputAction } from "@slack/bolt";
 import { searchButtonActionId, searchDispatchActionId, searchModalId } from "./constants";
 import { createSearchModal, getThreadBlocks } from "./views";
-import { threadRepo } from "../../../../modules/thread";
+import { threadRepo } from "../../../../common/modules/thread";
 
 export const searchButtonHandler = (app : App) => {
     app.action(searchButtonActionId, async ({ ack, body, client }) => {
@@ -43,39 +43,29 @@ interface SearchViewUser {
     id: string;
     hash: string;
   }
-  
-  interface SearchViewBody {
-    type: string;
-    user: SearchViewUser;
-    api_app_id: string;
-    token: string;
-    container: { type: string; view_id: string };
-    trigger_id: string;
-    team: SearchViewTeam;
-    is_enterprise_install: boolean;
-    view: SearchViewIdentifiers;
-    actions: SearchViewAction[];
-  }
+
 
 export const searchModalHandler = (app : App) => {
     app.action(searchDispatchActionId, async ({ ack, body, client }) => {
         await ack();
         // use searchByTitle to get the results
-        const payload: SearchViewBody = body as any;
-        const userId = body.user.id;
-        const orgId = body.user.team_id;
+        const payload = body as BlockAction
+        const userId = payload.user.id;
+        const orgId = payload.team?.id;
+        const viewHash = payload.view?.hash;
+        const viewId = payload.view?.id;
         const action = payload.actions[0] as PlainTextInputAction;
-        const viewHash = payload.view.hash;
         const values = action.value;
-        if(!orgId || !userId || !values) {
-            throw new Error('Missing orgId, userId or values')
+
+        if(!orgId || !userId || !values || !viewHash || !viewId ) {
+            throw new Error('Missing orgId, userId, value or viewHash')
         }
         const results = await threadRepo.searchByText({orgId, userId, searchTerm: values});
         //update the modal view
         
         const threadBlocks = getThreadBlocks(results);
 
-        const updatedModal = createSearchModal().appendBlocksAndViewUpdateBody(threadBlocks, payload.view.id, viewHash);
+        const updatedModal = createSearchModal().appendBlocksAndViewUpdateBody(threadBlocks, viewId, viewHash);
 
         client.views.update(updatedModal);
 

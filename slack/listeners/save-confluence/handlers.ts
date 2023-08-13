@@ -1,24 +1,47 @@
-import { App } from "@slack/bolt"
-import { confluenceAuthView } from "./view"
-import { getAuthorizeUrl } from "./utils"
+import { App, BlockAction, PlainTextInputAction } from "@slack/bolt"
+import { getAuthorizeUrl } from "../../../common/utils/auth-url-utils"
+import { createConfluenceAuthModal } from "./view"
+import { confluenceDomainActionId } from "./constants"
 
 const saveConfluenceShortcutHandler = (app: App) => {
     return app.shortcut('create-confluence', async ({ shortcut, ack, client }) => {
         ack()
-        const { team, user } = shortcut
-        const orgId = team?.id
-        const userId = user?.id
-        // need to store userId and orgId in the database with auth
-        // change redirect to slack
-        const authorizeUrl = getAuthorizeUrl(orgId as string, userId as string)
-        const authView = await confluenceAuthView(authorizeUrl)
+        const confluenceAuthView = createConfluenceAuthModal()
+
+        const setDomainView = confluenceAuthView.setDomainView()
         await client.views.open({
             trigger_id: shortcut.trigger_id,
-            view: authView
+            view: setDomainView
         }) 
     })
 }
 
+const setDomainHandler = (app: App) => {
+    return app.action(confluenceDomainActionId, async ({ ack, body, client }) => {
+        const confluenceAuthView = createConfluenceAuthModal()
+        const payload = body as BlockAction
+        const userId = payload.user.id;
+        const orgId = payload.team?.id;
+        const viewHash = payload.view?.hash;
+        const viewId = payload.view?.id;
+        const action = payload.actions[0] as PlainTextInputAction;
+        const value = action.value;
+
+        if(!orgId || !userId || !value || !viewHash || !viewId ) {
+            throw new Error('Missing orgId, userId, value or viewHash')
+        }
+
+        const confluenceSiteUrl = value
+        const authorizeUrl = getAuthorizeUrl(orgId, userId, confluenceSiteUrl)
+
+        const setAuthViewModal = confluenceAuthView.appendLinkButton(authorizeUrl, confluenceSiteUrl, viewId, viewHash)
+
+        await client.views.update(setAuthViewModal)
+    }
+    )
+}
+
 export const registerConfluenceHandlers = (app: App) => {
     saveConfluenceShortcutHandler(app)
+    setDomainHandler(app)
 }

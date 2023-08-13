@@ -1,8 +1,30 @@
-import { View } from "@slack/bolt";
+import { ActionsBlock, Block, SectionBlock, View } from "@slack/bolt"
+import { confluenceDomainActionId } from "./constants"
 
-export const confluenceAuthView = async (authorizeUrl: string): Promise<View> => {
+export const authButtonLinkBlock = (authorizeUrl: string, confluenceSiteUrl:string): SectionBlock => {
+    return {
+        "type": "section",
+        "text": {
+            "type": "mrkdwn",
+            "text": `Link your account with Confluence site \n ${confluenceSiteUrl} `
+        },
+        "accessory": {
+            "type": "button",
+            "style": "primary",
+            "text": {
+                "type": "plain_text",
+                "text": "Link Now",
+                "emoji": true
+            },
+            "value": "create_confluence",
+            "url": authorizeUrl,
+            "action_id": "authorize_confluence"
+        }
+    }
+}
 
-    return{
+export const createConfluenceAuthModal = () => {
+    const baseModal: View = {
         "type": "modal",
         "title": {
             "type": "plain_text",
@@ -11,24 +33,36 @@ export const confluenceAuthView = async (authorizeUrl: string): Promise<View> =>
         },
         "blocks": [
             {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": "Link your account with Confluence"
-                },
-                "accessory": {
-                    "type": "button",
-                    style: "primary",
-                    "text": {
+                "dispatch_action": true,
+                "type": "input",
+                "element": {
+                    "type": "plain_text_input",
+                    "action_id": confluenceDomainActionId,
+                    "placeholder": {
                         "type": "plain_text",
-                        "text": "Link Now",
+                        "text": "mycompany.atlassian.net",
                         "emoji": true
-                    },
-                    "value": "create_confluence",
-                    "url": authorizeUrl,
-                    "action_id": "authorize_confluence"
+                    }
+                },
+                "label": {
+                    "type": "plain_text",
+                    "text": "Enter your Confluence Site URL",
+                    "emoji": true
                 }
             }
         ]
+    }
+
+    return {
+        setDomainView: () => baseModal as View,
+        appendLinkButton: (authorizeUrl:string, confluenceSiteUrl:string, viewId: string, hash: string) => {
+            const newModal = {...baseModal};
+            newModal.blocks = [...newModal.blocks, authButtonLinkBlock(authorizeUrl, confluenceSiteUrl)];
+            return {
+                view_id: viewId,
+                hash: hash,
+                view: newModal
+            }
+        }
     }
 }

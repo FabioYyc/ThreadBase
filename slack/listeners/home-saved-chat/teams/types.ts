@@ -1,4 +1,4 @@
-import { ITeamConversation } from "../../../../modules/team";
+import { ITeamConversation } from "../../../../common/modules/team";
 
 export interface ITeamFormValues {
     team_name: string;

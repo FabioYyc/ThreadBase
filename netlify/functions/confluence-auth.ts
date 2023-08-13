@@ -1,9 +1,10 @@
 import type { Handler, HandlerEvent, HandlerContext } from "@netlify/functions";
-import { userUIRepo } from "../../modules/userUI";
+import { userUIRepo } from "../../common/modules/userUI";
 import mongoose from "mongoose";
+import { parseAuthorizeUrlState } from "../../common/utils/auth-url-utils";
 const returnBody = (message: string) => {
     //TODO: improve this page, probably host it instead
-    return  `
+    return `
     <html>
         <head>
             <style>
@@ -55,40 +56,41 @@ const handler: Handler = async (event: HandlerEvent) => {
         console.log('payload', payload)
         const code = payload?.code;
         const state = payload?.state;
-        const threadBaseUser = state?.split('-');
-        if(!code || !state || !threadBaseUser) {
-          return {
-              statusCode: 400,
-              body: 'Invalid request'
-              }
-          }
-        const orgId = threadBaseUser[0];
-        const userId = threadBaseUser[1];
-        const confluenceAuth = {
-          domain: 'test',
-          authorizeToken: code
+        if (!code || !state) {
+            throw ('Invalid request')
         }
-        const result = await userUIRepo.updateAuthByUserId({orgId, userId, authType:'confluence',  authData: confluenceAuth})
 
-        if(!result?.acknowledged || result?.modifiedCount !== 1) {
+        const { orgId, userId, confluenceSiteUrl } = parseAuthorizeUrlState(state);
+        if (!orgId || !userId || !confluenceSiteUrl) {
+            throw ('Invalid request')
+        }
+        console.log('confluenceSiteUrl', confluenceSiteUrl)
+        const confluenceAuth = {
+            domainUrl: confluenceSiteUrl,
+            authorizeToken: code
+        }
+
+        const result = await userUIRepo.updateAuthByUserId({ orgId, userId, authType: 'confluence', authData: confluenceAuth })
+
+        if (!result?.acknowledged || result?.modifiedCount !== 1) {
             return {
                 statusCode: 200,
                 body: returnBody('Something went wrong. Please try again.')
-            }; 
+            };
         }
-      
+
         await mongoose.connection.close();
         return {
-          statusCode: 200,
-          body: returnBody('You have successfully linked your Confluence account! You can close this page now.')
-      };
+            statusCode: 200,
+            body: returnBody('You have successfully linked your Confluence account! You can close this page now.')
+        };
     } catch (error) {
         return {
             statusCode: 200,
             body: returnBody('Something went wrong. Please try again.')
         };
     }
- 
+
 };
 
 export { handler };

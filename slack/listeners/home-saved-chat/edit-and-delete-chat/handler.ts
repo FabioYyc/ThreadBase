@@ -1,6 +1,6 @@
 import { App, BlockAction, OverflowAction } from "@slack/bolt";
 import { ButtonBlockAction } from "../../../types";
-import { ISavedThread, threadRepo } from "../../../../modules/thread";
+import { ISavedThread, threadRepo } from "../../../../common/modules/thread";
 import { getUserHomeView } from "../home-tab-view";
 import { createChatView } from "../../save-chat/views";
 import { deleteChatConfirmView, overflowActionId } from "./view";
