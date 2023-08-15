@@ -82,7 +82,7 @@ const handler: Handler = async (event: HandlerEvent) => {
         await mongoose.connection.close();
         return {
             statusCode: 200,
-            body: returnBody('You have successfully linked your Confluence account! You can close this page now.')
+            body: returnBody('Successfully linked to your Confluence workspace! You can close this page, and use the shortcut again.')
         };
     } catch (error) {
         return {

@@ -2,17 +2,25 @@ import { App, BlockAction, PlainTextInputAction } from "@slack/bolt"
 import { getAuthorizeUrl } from "../../../common/utils/auth-url-utils"
 import { createConfluenceAuthModal } from "./view"
 import { confluenceDomainActionId } from "./constants"
+import { getUserConfluenceAuth } from "./utils"
 
 const saveConfluenceShortcutHandler = (app: App) => {
     return app.shortcut('create-confluence', async ({ shortcut, ack, client }) => {
         ack()
-        const confluenceAuthView = createConfluenceAuthModal()
+        const orgId = shortcut.team?.id
+        const userId = shortcut.user.id
+        if (!orgId || !userId) {
+            throw new Error('Missing orgId or userId')
+        }
+        const confluenceAuth = await getUserConfluenceAuth(orgId, userId)
+        const confluenceViewCreator = createConfluenceAuthModal()
 
-        const setDomainView = confluenceAuthView.setDomainView()
+        const confluenceView = confluenceAuth ? confluenceViewCreator.saveToConfluencePageModal() : confluenceViewCreator.setDomainView()
+        
         await client.views.open({
             trigger_id: shortcut.trigger_id,
-            view: setDomainView
-        }) 
+            view: confluenceView
+        })
     })
 }
 
@@ -27,7 +35,7 @@ const setDomainHandler = (app: App) => {
         const action = payload.actions[0] as PlainTextInputAction;
         const value = action.value;
 
-        if(!orgId || !userId || !value || !viewHash || !viewId ) {
+        if (!orgId || !userId || !value || !viewHash || !viewId) {
             throw new Error('Missing orgId, userId, value or viewHash')
         }
 

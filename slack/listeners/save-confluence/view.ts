@@ -1,12 +1,12 @@
-import { ActionsBlock, Block, SectionBlock, View } from "@slack/bolt"
+import { ActionsBlock, Block, ModalView, SectionBlock, View } from "@slack/bolt"
 import { confluenceDomainActionId } from "./constants"
 
-export const authButtonLinkBlock = (authorizeUrl: string, confluenceSiteUrl:string): SectionBlock => {
-    return {
+export const authButtonLinkBlock = (authorizeUrl: string, confluenceSiteUrl: string): SectionBlock[] => {
+    return [{
         "type": "section",
         "text": {
             "type": "mrkdwn",
-            "text": `Link your account with Confluence site \n ${confluenceSiteUrl} `
+            "text": `Link your account with Confluence site \n ${confluenceSiteUrl}`
         },
         "accessory": {
             "type": "button",
@@ -20,11 +20,20 @@ export const authButtonLinkBlock = (authorizeUrl: string, confluenceSiteUrl:stri
             "url": authorizeUrl,
             "action_id": "authorize_confluence"
         }
-    }
+    },
+    {
+        "type": "section",
+        "text": {
+            "type": "mrkdwn",
+            "text": `:information_source: _Close this window and use the shortcut again after you've linked your workspace._`
+        },
+    },
+
+    ]
 }
 
 export const createConfluenceAuthModal = () => {
-    const baseModal: View = {
+    const setDomainModal: View = {
         "type": "modal",
         "title": {
             "type": "plain_text",
@@ -53,16 +62,42 @@ export const createConfluenceAuthModal = () => {
         ]
     }
 
+    const saveToConfluencePageModal = ({ conflunceWorkspaceUrl }: { conflunceWorkspaceUrl?: string }): ModalView => {
+        return {
+            "type": "modal",
+            "callback_id": "save_to_confluence",
+            "title": {
+                "type": "plain_text",
+                "text": "Save to Confluence",
+                "emoji": true
+            },
+            blocks: [
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Add more info to this chat and you'll find it easily next time! :brain:",
+                        "emoji": true
+                    }
+                }
+            ]
+        }
+    
+    }
+
     return {
-        setDomainView: () => baseModal as View,
-        appendLinkButton: (authorizeUrl:string, confluenceSiteUrl:string, viewId: string, hash: string) => {
-            const newModal = {...baseModal};
-            newModal.blocks = [...newModal.blocks, authButtonLinkBlock(authorizeUrl, confluenceSiteUrl)];
+        setDomainView: () => setDomainModal as View,
+        appendLinkButton: (authorizeUrl: string, confluenceSiteUrl: string, viewId: string, hash: string) => {
+            const newModal = { ...setDomainModal };
+            newModal.blocks = [...newModal.blocks, ...authButtonLinkBlock(authorizeUrl, confluenceSiteUrl)];
             return {
                 view_id: viewId,
                 hash: hash,
                 view: newModal
             }
-        }
+        },
+        saveToConfluencePageModal: ()=> saveToConfluencePageModal({})
     }
 }
+
+
