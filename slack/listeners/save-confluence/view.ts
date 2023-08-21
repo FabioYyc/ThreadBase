@@ -1,5 +1,7 @@
-import { ActionsBlock, Block, ModalView, SectionBlock, View } from "@slack/bolt"
-import { confluenceDomainActionId } from "./constants"
+import { ModalView, PlainTextOption, SectionBlock, View } from "@slack/bolt"
+import { IPage, confluenceDomainActionId } from "./constants"
+import { IConfluenceAuth } from "../../../common/modules/userUI"
+import { values } from "lodash"
 
 export const authButtonLinkBlock = (authorizeUrl: string, confluenceSiteUrl: string): SectionBlock[] => {
     return [{
@@ -25,7 +27,7 @@ export const authButtonLinkBlock = (authorizeUrl: string, confluenceSiteUrl: str
         "type": "section",
         "text": {
             "type": "mrkdwn",
-            "text": `:information_source: _Close this window and use the shortcut again after you've linked your workspace._`
+            "text": `:information_source: _Close this window and use the shortcut again after you've linked your site._`
         },
     },
 
@@ -62,10 +64,25 @@ export const createConfluenceAuthModal = () => {
         ]
     }
 
-    const saveToConfluencePageModal = ({ conflunceWorkspaceUrl }: { conflunceWorkspaceUrl?: string }): ModalView => {
+    const saveToConfluencePageModal = ({ confluenceSiteUrl, pages, messageLink }: { confluenceSiteUrl?: string, pages: IPage[], messageLink?: string }): ModalView => {
+        const options: PlainTextOption[] = pages.map(page => {
+            return {
+                "text": {
+                    "type": "plain_text",
+                    "text": page.title,
+                    "emoji": true
+                },
+                "value": page.id
+            }
+        })
         return {
             "type": "modal",
             "callback_id": "save_to_confluence",
+            "submit": {
+                "type": "plain_text",
+                "text": "Submit",
+                "emoji": true
+            },
             "title": {
                 "type": "plain_text",
                 "text": "Save to Confluence",
@@ -74,12 +91,66 @@ export const createConfluenceAuthModal = () => {
             blocks: [
                 {
                     "type": "section",
-                    "text": {
+                    fields:[
+                        {
+                            "type": "plain_text",
+                            "text": "Create a Confluence page",
+                            "emoji": true
+                        },
+                        {
+                            "type": "mrkdwn",
+                            "text": `*Confluence Site* \n ${confluenceSiteUrl}`
+                        }
+                    ]
+                },
+                {
+                    "type": "input",
+                    block_id: 'parent_page',
+                    "element": {
+                        "type": "static_select",
+                        "placeholder": {
+                            "type": "plain_text",
+                            "text": "Select the parent page for the",
+                            "emoji": true
+                        },
+                        "options": options,
+                        "action_id": "static_select-action"
+                    },
+                    "label": {
                         "type": "plain_text",
-                        "text": "Add more info to this chat and you'll find it easily next time! :brain:",
+                        "text": "Select Page",
+                        "emoji": true
+                    }
+                },
+                {
+                    "type": "input",
+                    block_id: 'title',
+                    "element": {
+                        "type": "plain_text_input",
+                    },
+                    "label": {
+                        "type": "plain_text",
+                        "text": "Page Title",
+                        "emoji": true
+                    }
+                },
+                {
+                    "type": "input",
+                    block_id: 'content',
+                    "element": {
+                        "type": "plain_text_input",
+                        "multiline": true,
+                        initial_value: messageLink
+
+                    },
+                    "label": {
+                        "type": "plain_text",
+                        "text": "Page Content",
                         "emoji": true
                     }
                 }
+
+
             ]
         }
     
@@ -96,8 +167,6 @@ export const createConfluenceAuthModal = () => {
                 view: newModal
             }
         },
-        saveToConfluencePageModal: ()=> saveToConfluencePageModal({})
+        saveToConfluencePageModal
     }
 }
-
-

@@ -1,7 +1,8 @@
 import type { Handler, HandlerEvent, HandlerContext } from "@netlify/functions";
-import { userUIRepo } from "../../common/modules/userUI";
+import { IConfluenceAuth, userUIRepo } from "../../common/modules/userUI";
 import mongoose from "mongoose";
 import { parseAuthorizeUrlState } from "../../common/utils/auth-url-utils";
+import { getAccessToken } from "../../common/services/confluence-service";
 const returnBody = (message: string) => {
     //TODO: improve this page, probably host it instead
     return `
@@ -63,11 +64,15 @@ const handler: Handler = async (event: HandlerEvent) => {
         const { orgId, userId, confluenceSiteUrl } = parseAuthorizeUrlState(state);
         if (!orgId || !userId || !confluenceSiteUrl) {
             throw ('Invalid request')
-        }
-        console.log('confluenceSiteUrl', confluenceSiteUrl)
-        const confluenceAuth = {
-            domainUrl: confluenceSiteUrl,
-            authorizeToken: code
+        }   
+
+        const authResponse = await getAccessToken({authorizeCode:code, type: 'authorize'});
+
+        const refreshToken = authResponse?.refresh_token;
+
+        const confluenceAuth: IConfluenceAuth = {
+            siteUrl: confluenceSiteUrl,
+            refreshToken: refreshToken
         }
 
         const result = await userUIRepo.updateAuthByUserId({ orgId, userId, authType: 'confluence', authData: confluenceAuth })
@@ -82,7 +87,7 @@ const handler: Handler = async (event: HandlerEvent) => {
         await mongoose.connection.close();
         return {
             statusCode: 200,
-            body: returnBody('Successfully linked to your Confluence workspace! You can close this page, and use the shortcut again.')
+            body: returnBody('Successfully linked to your Confluence site! You can close this page, and use the shortcut again.')
         };
     } catch (error) {
         return {

@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
 
 export interface IConfluenceAuth {
-    authorizeToken: string;
-    domainUrl: string;
+    refreshToken: string;
+    siteUrl: string;
 }
 
 export interface IUserUI{
@@ -16,8 +16,8 @@ export interface IUserUI{
 
 
 const ConfluenceAuthSchema = new mongoose.Schema({
-    domainUrl: String,
-    authorizeToken: String,
+    siteUrl: String,
+    refreshToken: String,
 });
 
 const UserUISchema = new mongoose.Schema({
@@ -75,10 +75,10 @@ export const userUIRepo = {
         const auth = existingUser.auth || {};
         const authArray = auth[authType] || [];
         
-        const existingDomainIndex = authArray.findIndex(a => a.domainUrl === authData.domainUrl);
+        const existingDomainIndex = authArray.findIndex(a => a.siteUrl === authData.siteUrl);
         
         if (existingDomainIndex !== -1) {
-            authArray[existingDomainIndex].authorizeToken = authData.authorizeToken;
+            authArray[existingDomainIndex].refreshToken = authData.refreshToken;
         } else {
             authArray.push(authData);
         }

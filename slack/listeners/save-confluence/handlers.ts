@@ -2,21 +2,32 @@ import { App, BlockAction, PlainTextInputAction } from "@slack/bolt"
 import { getAuthorizeUrl } from "../../../common/utils/auth-url-utils"
 import { createConfluenceAuthModal } from "./view"
 import { confluenceDomainActionId } from "./constants"
-import { getUserConfluenceAuth } from "./utils"
+import { getSaveConfluenceViewData, getUserConfluenceAuth } from "./utils"
 
-const saveConfluenceShortcutHandler = (app: App) => {
-    return app.shortcut('create-confluence', async ({ shortcut, ack, client }) => {
+const saveConfluenceShortcutHandler = async (app: App) => {
+    return app.shortcut('create-confluence', async ({ shortcut, ack, client, context }) => {
         ack()
         const orgId = shortcut.team?.id
         const userId = shortcut.user.id
         if (!orgId || !userId) {
             throw new Error('Missing orgId or userId')
         }
-        const confluenceAuth = await getUserConfluenceAuth(orgId, userId)
+        const confluenceAuthList = await getUserConfluenceAuth(orgId, userId)
         const confluenceViewCreator = createConfluenceAuthModal()
+        let confluenceView = confluenceViewCreator.setDomainView()
 
-        const confluenceView = confluenceAuth ? confluenceViewCreator.saveToConfluencePageModal() : confluenceViewCreator.setDomainView()
-        
+        if (confluenceAuthList && confluenceAuthList.length > 0) {
+            const firstSite = confluenceAuthList[0]
+            //TODO: request to confluence to get the space list
+                const cfInfo = await getSaveConfluenceViewData({ orgId, userId, confluenceAuth: firstSite })
+                if (cfInfo) {
+                    //TODO: get permalink of the message
+                    confluenceView = confluenceViewCreator.saveToConfluencePageModal({confluenceSiteUrl: firstSite.siteUrl, pages: cfInfo.pages} )
+                }
+            
+        }
+
+
         await client.views.open({
             trigger_id: shortcut.trigger_id,
             view: confluenceView
@@ -53,3 +64,4 @@ export const registerConfluenceHandlers = (app: App) => {
     saveConfluenceShortcutHandler(app)
     setDomainHandler(app)
 }
+
