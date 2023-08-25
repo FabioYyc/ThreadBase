@@ -64,7 +64,7 @@ export const createConfluenceAuthModal = () => {
         ]
     }
 
-    const saveToConfluencePageModal = ({ confluenceSiteUrl, pages, messageLink }: { confluenceSiteUrl?: string, pages: IPage[], messageLink?: string }): ModalView => {
+    const saveToConfluencePageModal = ({ confluenceSiteUrl, pages, messageLink, sessionId }: { confluenceSiteUrl?: string, pages: IPage[], messageLink?: string, sessionId?: string }): ModalView => {
         const options: PlainTextOption[] = pages.map(page => {
             return {
                 "text": {
@@ -78,6 +78,7 @@ export const createConfluenceAuthModal = () => {
         return {
             "type": "modal",
             "callback_id": "save_to_confluence",
+            "private_metadata": sessionId,
             "submit": {
                 "type": "plain_text",
                 "text": "Submit",

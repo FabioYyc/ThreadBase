@@ -2,7 +2,7 @@ import { App, BlockAction, MessageShortcut, PlainTextInputAction } from "@slack/
 import { getAuthorizeUrl } from "../../../common/utils/auth-url-utils"
 import { createConfluenceAuthModal } from "./view"
 import { confluenceDomainActionId } from "./constants"
-import { getSaveConfluenceViewData, getUserConfluenceAuth } from "./utils"
+import { getAccessTokenFromRefreshToken, getSaveConfluenceViewData, getUserConfluenceAuth } from "./utils"
 import { getPermalinkWithTimeout } from "../../apis/messages"
 
 const saveConfluenceShortcutHandler = async (app: App) => {
@@ -19,17 +19,16 @@ const saveConfluenceShortcutHandler = async (app: App) => {
 
         if (confluenceAuthList && confluenceAuthList.length > 0) {
             const firstSite = confluenceAuthList[0]
-            //TODO: request to confluence to get the space list
-            const cfInfo = await getSaveConfluenceViewData({ orgId, userId, confluenceAuth: firstSite })
+            const {accessToken} = await getAccessTokenFromRefreshToken({ orgId, userId, confluenceAuth: firstSite, createNewSession: true })
+            const cfInfo = await getSaveConfluenceViewData(accessToken)
+            
             if (cfInfo) {
-                //TODO: get permalink of the message
                 const messageShortcut = shortcut as MessageShortcut
                 const messageLink = await getPermalinkWithTimeout(client, messageShortcut.channel.id, messageShortcut.message_ts)
                 confluenceView = confluenceViewCreator.saveToConfluencePageModal({ confluenceSiteUrl: firstSite.siteUrl, pages: cfInfo.pages, messageLink: messageLink || '' })
             }
 
         }
-
 
         await client.views.open({
             trigger_id: shortcut.trigger_id,

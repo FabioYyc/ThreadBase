@@ -1,3 +1,5 @@
+import { create } from "lodash"
+import { sessionRepo } from "../../../common/modles/session"
 import { IConfluenceAuth, userUIRepo } from "../../../common/modles/userUI"
 import { fetchCfUrl, getAccessToken, getCloudId } from "../../../common/services/confluence-service"
 import { IPage, ISpace } from "./constants"
@@ -30,19 +32,36 @@ export const getCfSpaces = async (accessToken: string) => {
     return spaces.results as ISpace[]
 }
 
-export const getSaveConfluenceViewData = async ({ orgId, userId, confluenceAuth }: { orgId: string, userId: string, confluenceAuth: IConfluenceAuth }) => {
+
+export const getAccessTokenFromRefreshToken = async ({ orgId, userId, confluenceAuth, createNewSession=false }: { orgId: string, userId: string, confluenceAuth: IConfluenceAuth, createNewSession?: boolean }) => {
+    const session = await sessionRepo.getValidSessionForUser(orgId, userId, confluenceAuth.siteUrl);
+    
+    if(session){
+        return {accessToken: session.accessToken}
+    }
+
     const accessTokenRes = await getAccessToken({ type: 'refresh', refresh_token: confluenceAuth.refreshToken })
     if (!accessTokenRes) {
         console.error('Error in getAccessToken', accessTokenRes.statusText)
-        return false
+        throw new Error('Error in getAccessToken')
     }
-    const { refresh_token, access_token } = accessTokenRes
+    const { refresh_token, access_token, expires_in } = accessTokenRes
+    
+    if(createNewSession){
+        const expiresAt = Date.now() + expires_in * 1000
+        await sessionRepo.create({ orgId, userId, confluenceSiteUrl: confluenceAuth.siteUrl, accessToken: access_token, expiresAt })
+    }
+
     const newConfluenceAuth: IConfluenceAuth = {
         siteUrl: confluenceAuth.siteUrl,
         refreshToken: refresh_token,
     }
     await userUIRepo.updateAuthByUserId({ orgId, userId, authType: 'confluence', authData: newConfluenceAuth })
-    const pages = await getCfPages(access_token)
+    return {accessToken: access_token }
+}
+
+export const getSaveConfluenceViewData = async (accessToken: string) => {
+    const pages = await getCfPages(accessToken)
 
     return { pages }
 }
