@@ -1,5 +1,5 @@
 import type { Handler, HandlerEvent, HandlerContext } from "@netlify/functions";
-import { IConfluenceAuth, userUIRepo } from "../../common/modules/userUI";
+import { IConfluenceAuth, userUIRepo } from "../../common/modles/userUI";
 import mongoose from "mongoose";
 import { parseAuthorizeUrlState } from "../../common/utils/auth-url-utils";
 import { getAccessToken } from "../../common/services/confluence-service";

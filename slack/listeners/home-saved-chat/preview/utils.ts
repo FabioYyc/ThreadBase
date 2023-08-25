@@ -1,5 +1,5 @@
 import { App } from "@slack/bolt";
-import { ISavedThread, threadRepo } from "../../../../common/modules/thread";
+import { ISavedThread, threadRepo } from "../../../../common/modles/thread";
 import { getMessage } from "../../../apis/messages";
 
 

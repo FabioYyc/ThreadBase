@@ -1,5 +1,5 @@
 import { App, SlackViewAction, ViewOutput } from "@slack/bolt";
-import { ISavedTeam, ITeam, ITeamConversation, UserRole, teamRepo, userTeamsRepo } from "../../../../common/modules/team";
+import { ISavedTeam, ITeam, ITeamConversation, UserRole, teamRepo, userTeamsRepo } from "../../../../common/modles/team";
 import { stringInputParser } from "../../../utils";
 import { ITeamFormValues } from "./types";
 import { ClientSession } from "mongoose";

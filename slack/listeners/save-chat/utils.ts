@@ -1,5 +1,5 @@
 import { ViewOutput } from "@slack/bolt";
-import { threadRepo } from "../../../common/modules/thread";
+import { threadRepo } from "../../../common/modles/thread";
 import { stringInputParser, viewInputReader } from "../../utils";
 
 

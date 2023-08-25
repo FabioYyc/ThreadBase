@@ -1,4 +1,4 @@
-import { IConfluenceAuth, userUIRepo } from "../../../common/modules/userUI"
+import { IConfluenceAuth, userUIRepo } from "../../../common/modles/userUI"
 import { fetchCfUrl, getAccessToken, getCloudId } from "../../../common/services/confluence-service"
 import { IPage, ISpace } from "./constants"
 

@@ -1,6 +1,6 @@
 import { ModalView, PlainTextOption, SectionBlock, View } from "@slack/bolt"
 import { IPage, confluenceDomainActionId } from "./constants"
-import { IConfluenceAuth } from "../../../common/modules/userUI"
+import { IConfluenceAuth } from "../../../common/modles/userUI"
 import { values } from "lodash"
 
 export const authButtonLinkBlock = (authorizeUrl: string, confluenceSiteUrl: string): SectionBlock[] => {

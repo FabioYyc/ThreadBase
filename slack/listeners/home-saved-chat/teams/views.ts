@@ -1,5 +1,5 @@
 import { PlainTextOption, SectionBlock, View } from "@slack/bolt"
-import { ISavedTeam } from "../../../../common/modules/team"
+import { ISavedTeam } from "../../../../common/modles/team"
 import { personalSpaceValue, editTeamCallbackId, createTeamCallbackId, teamSwitchActionId } from "./constants";
 import { Team } from "./types";
 

@@ -1,6 +1,6 @@
 import { Block, KnownBlock, View } from "@slack/bolt";
-import { ISavedThread } from "../../../common/modules/thread";
-import { ISavedTeam } from "../../../common/modules/team";
+import { ISavedThread } from "../../../common/modles/thread";
+import { ISavedTeam } from "../../../common/modles/team";
 import { getTeamsForUser } from "../home-saved-chat/teams/utils";
 
 export const saveChatCallbackId = 'save-chat-view'
