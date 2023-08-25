@@ -4,8 +4,8 @@ import mongoose from "mongoose";
 import { parseAuthorizeUrlState } from "../../common/utils/auth-url-utils";
 import { getAccessToken } from "../../common/services/confluence-service";
 const returnBody = (message: string) => {
-    //TODO: improve this page, probably host it instead
-    return `
+  //TODO: improve this page, probably host it instead
+  return `
     <html>
         <head>
             <style>
@@ -46,56 +46,62 @@ const returnBody = (message: string) => {
                 }, 3000);
             </script>
         </body>
-    </html> `
-}
+    </html> `;
+};
 
 mongoose.connect(process.env.MONGO_DB_URL as string);
 
 const handler: Handler = async (event: HandlerEvent) => {
-    try {
-        const payload = event.queryStringParameters;
-        console.log('payload', payload)
-        const code = payload?.code;
-        const state = payload?.state;
-        if (!code || !state) {
-            throw ('Invalid request')
-        }
-
-        const { orgId, userId, confluenceSiteUrl } = parseAuthorizeUrlState(state);
-        if (!orgId || !userId || !confluenceSiteUrl) {
-            throw ('Invalid request')
-        }   
-
-        const authResponse = await getAccessToken({authorizeCode:code, type: 'authorize'});
-
-        const refreshToken = authResponse?.refresh_token;
-
-        const confluenceAuth: IConfluenceAuth = {
-            siteUrl: confluenceSiteUrl,
-            refreshToken: refreshToken
-        }
-
-        const result = await userUIRepo.updateAuthByUserId({ orgId, userId, authType: 'confluence', authData: confluenceAuth })
-
-        if (!result?.acknowledged || result?.modifiedCount !== 1) {
-            return {
-                statusCode: 200,
-                body: returnBody('Something went wrong. Please try again.')
-            };
-        }
-
-        await mongoose.connection.close();
-        return {
-            statusCode: 200,
-            body: returnBody('Successfully linked to your Confluence site! You can close this page, and use the shortcut again.')
-        };
-    } catch (error) {
-        return {
-            statusCode: 200,
-            body: returnBody('Something went wrong. Please try again.')
-        };
+  try {
+    const payload = event.queryStringParameters;
+    console.log("payload", payload);
+    const code = payload?.code;
+    const state = payload?.state;
+    if (!code || !state) {
+      throw "Invalid request";
     }
 
+    const { orgId, userId, confluenceSiteUrl } = parseAuthorizeUrlState(state);
+    if (!orgId || !userId || !confluenceSiteUrl) {
+      throw "Invalid request";
+    }
+
+    const authResponse = await getAccessToken({ authorizeCode: code, type: "authorize" });
+
+    const refreshToken = authResponse?.refresh_token;
+
+    const confluenceAuth: IConfluenceAuth = {
+      siteUrl: confluenceSiteUrl,
+      refreshToken: refreshToken,
+    };
+
+    const result = await userUIRepo.updateAuthByUserId({
+      orgId,
+      userId,
+      authType: "confluence",
+      authData: confluenceAuth,
+    });
+
+    if (!result?.acknowledged || result?.modifiedCount !== 1) {
+      return {
+        statusCode: 200,
+        body: returnBody("Something went wrong. Please try again."),
+      };
+    }
+
+    await mongoose.connection.close();
+    return {
+      statusCode: 200,
+      body: returnBody(
+        "Successfully linked to your Confluence site! You can close this page, and use the shortcut again.",
+      ),
+    };
+  } catch (error) {
+    return {
+      statusCode: 200,
+      body: returnBody("Something went wrong. Please try again."),
+    };
+  }
 };
 
 export { handler };

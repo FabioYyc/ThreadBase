@@ -1,3 +1,3 @@
 export enum AvaliableAuthIntegrations {
-    Confluence = 'confluence'
+  Confluence = "confluence",
 }
