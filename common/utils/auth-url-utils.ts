@@ -9,8 +9,8 @@ function base64UrlDecode(data: string): string {
   return Buffer.from(data, "base64").toString();
 }
 
-export const getAuthorizeUrl = (orgId: string, userId: string, confluenceUrl: string) => {
-  const uniqueId = `${orgId}-${userId}-${confluenceUrl}`;
+export const getAuthorizeUrl = (orgId: string, userId: string) => {
+  const uniqueId = `${orgId}-${userId}`;
   const encodedUniqueId = base64UrlEncode(uniqueId);
   const authUrl = process.env.CONFLUENCE_AUTH_URL;
 
@@ -23,12 +23,11 @@ export const parseAuthorizeUrlState = (state: string) => {
   const decodedState = base64UrlDecode(state);
   const stateItems = decodedState.split("-");
 
-  if (stateItems.length < 3) throw new Error("Invalid state format");
+  if (stateItems.length < 2) throw new Error("Invalid state format");
 
   return {
     orgId: stateItems[0],
     userId: stateItems[1],
-    confluenceSiteUrl: stateItems.slice(2).join("-"), // This accounts for any '-' that might exist within the confluenceSiteUrl
   };
 };
 

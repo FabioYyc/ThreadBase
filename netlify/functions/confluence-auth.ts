@@ -2,7 +2,7 @@ import type { Handler, HandlerEvent, HandlerContext } from "@netlify/functions";
 import { IConfluenceAuth, userUIRepo } from "../../common/modles/userUI";
 import mongoose from "mongoose";
 import { parseAuthorizeUrlState } from "../../common/utils/auth-url-utils";
-import { getAccessToken } from "../../common/services/confluence-service";
+import { getAccessToken, getAccessibleResource } from "../../common/services/confluence-service";
 const returnBody = (message: string) => {
   //TODO: improve this page, probably host it instead
   return `
@@ -61,17 +61,20 @@ const handler: Handler = async (event: HandlerEvent) => {
       throw "Invalid request";
     }
 
-    const { orgId, userId, confluenceSiteUrl } = parseAuthorizeUrlState(state);
-    if (!orgId || !userId || !confluenceSiteUrl) {
+    const { orgId, userId } = parseAuthorizeUrlState(state);
+    if (!orgId || !userId) {
       throw "Invalid request";
     }
 
     const authResponse = await getAccessToken({ authorizeCode: code, type: "authorize" });
 
     const refreshToken = authResponse?.refresh_token;
+    const accessToken = authResponse?.access_token;
+
+    const accessibleResource = await getAccessibleResource(accessToken);
 
     const confluenceAuth: IConfluenceAuth = {
-      siteUrl: confluenceSiteUrl,
+      siteUrl: accessibleResource.url,
       refreshToken: refreshToken,
     };
 

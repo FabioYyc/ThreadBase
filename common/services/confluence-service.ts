@@ -9,6 +9,11 @@ export type IAuthPayload = {
   refresh_token?: string;
 };
 
+export interface ICloudIdResponse {
+  id: string;
+  url: string;
+}
+
 export const getAccessToken = async ({
   authorizeCode,
   type,
@@ -83,7 +88,7 @@ export const getAccessToken = async ({
 //     .then(data => console.log(data))
 //     .catch(error => console.error(error));
 
-export const getCloudId = async (accessToken: string) => {
+export const getAccessibleResource = async (accessToken: string): Promise<ICloudIdResponse> => {
   const url = "https://api.atlassian.com/oauth/token/accessible-resources";
   const response = await fetch(url, {
     method: "GET",
@@ -92,7 +97,7 @@ export const getCloudId = async (accessToken: string) => {
     },
   });
   const res = await response.json();
-  return res[0].id;
+  return res[0];
 };
 
 export const fetchCfUrl = async ({

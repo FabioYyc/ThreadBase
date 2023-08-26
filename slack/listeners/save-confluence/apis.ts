@@ -1,7 +1,7 @@
 import { sessionRepo } from "../../../common/modles/session";
 import { IConfluenceAuth, userUIRepo } from "../../../common/modles/userUI";
 import {
-  getCloudId,
+  getAccessibleResource,
   fetchCfUrl,
   getAccessToken,
 } from "../../../common/services/confluence-service";
@@ -16,9 +16,9 @@ import {
 import { getPageDataFromValue } from "./utils";
 
 export const getCfPages = async (accessToken: string) => {
-  const cloudId = await getCloudId(accessToken);
+  const resource = await getAccessibleResource(accessToken);
   const pageRes = await fetchCfUrl({
-    cloudId,
+    cloudId: resource.id,
     accessToken,
     path: "/wiki/api/v2/pages",
     method: "GET",
@@ -27,9 +27,9 @@ export const getCfPages = async (accessToken: string) => {
 };
 
 export const getCfSpaces = async (accessToken: string) => {
-  const cloudId = await getCloudId(accessToken);
+  const resource = await getAccessibleResource(accessToken);
   const spaces = await fetchCfUrl({
-    cloudId,
+    cloudId: resource.id,
     accessToken,
     path: "/wiki/api/v2/spaces",
     method: "GET",
@@ -70,6 +70,7 @@ export const getAccessTokenFromRefreshToken = async ({
     type: "refresh",
     refresh_token: confluenceAuth.refreshToken,
   });
+
   if (!accessTokenRes) {
     console.error("Error in getAccessToken", accessTokenRes.statusText);
     throw new Error("Error in getAccessToken");
@@ -116,7 +117,7 @@ export const createNewPage = async ({
   viewPayload: SaveConfluencePayload;
 }) => {
   try {
-    const cloudId = await getCloudId(accessToken);
+    const resource = await getAccessibleResource(accessToken);
     const pageValue = viewPayload["parent-page"].selected_option.value;
     const title = stringInputParser(viewPayload.title);
     const { pageId, spaceId } = getPageDataFromValue(pageValue);
@@ -131,7 +132,7 @@ export const createNewPage = async ({
     };
 
     const pageRes = await fetchCfUrl({
-      cloudId,
+      cloudId: resource.id,
       accessToken,
       path: "/wiki/api/v2/pages",
       method: "POST",
