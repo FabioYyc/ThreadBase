@@ -50,7 +50,6 @@ export const getCorrectConfluenceViewByAuth = async (
   const confluenceViewCreator = SaveConfluenceViews();
   const authorizeUrl = getAuthorizeUrl(orgId, userId);
   const authView = confluenceViewCreator.authModal(authorizeUrl);
-
   if (!confluenceAuthList || confluenceAuthList.length < 1) {
     return authView;
   }

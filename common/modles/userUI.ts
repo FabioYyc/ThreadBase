@@ -85,7 +85,6 @@ export const userUIRepo = {
     }
 
     auth[authType] = authArray;
-    console.log("saving auth", auth);
     const result = await UserUI.updateOne({ orgId, userId }, { $set: { auth } });
     return result;
   },

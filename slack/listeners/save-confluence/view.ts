@@ -147,7 +147,7 @@ export const SaveConfluenceViews = () => {
           },
           label: {
             type: "plain_text",
-            text: "Select Page",
+            text: "Select Parent Page",
             emoji: true,
           },
         },
