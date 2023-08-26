@@ -1,13 +1,16 @@
 import { App, BlockAction, MessageShortcut, PlainTextInputAction } from "@slack/bolt";
-import { getAuthorizeUrl } from "../../../common/utils/auth-url-utils";
-import { createConfluenceAuthModal } from "./view";
-import { confluenceDomainActionId } from "./constants";
+import { getAuthorizeUrl, joinUrls } from "../../../common/utils/auth-url-utils";
+import { SaveConfluenceViews } from "./view";
 import {
-  getAccessTokenFromRefreshToken,
-  getSaveConfluenceViewData,
-  getUserConfluenceAuth,
-} from "./utils";
+  SaveConfluencePayload,
+  confluenceDomainActionId,
+  saveConfluenceCallbackId,
+} from "./constants";
+import { getSessionFromId, getUserConfluenceAuth } from "./utils";
 import { getPermalinkWithTimeout } from "../../apis/messages";
+import { viewInputReader } from "../../utils";
+import { createNewPage, getAccessTokenFromRefreshToken, getSaveConfluenceViewData } from "./apis";
+import { sessionRepo } from "../../../common/modles/session";
 
 const saveConfluenceShortcutHandler = async (app: App) => {
   return app.shortcut("create-confluence", async ({ shortcut, ack, client }) => {
@@ -18,7 +21,7 @@ const saveConfluenceShortcutHandler = async (app: App) => {
       throw new Error("Missing orgId or userId");
     }
     const confluenceAuthList = await getUserConfluenceAuth(orgId, userId);
-    const confluenceViewCreator = createConfluenceAuthModal();
+    const confluenceViewCreator = SaveConfluenceViews();
     let confluenceView = confluenceViewCreator.setDomainView();
 
     if (confluenceAuthList && confluenceAuthList.length > 0) {
@@ -38,10 +41,13 @@ const saveConfluenceShortcutHandler = async (app: App) => {
           messageShortcut.channel.id,
           messageShortcut.message_ts,
         );
+
+        const session = await sessionRepo.getValidSessionForUser(orgId, userId, firstSite.siteUrl);
         confluenceView = confluenceViewCreator.saveToConfluencePageModal({
           confluenceSiteUrl: firstSite.siteUrl,
           pages: cfInfo.pages,
           messageLink: messageLink || "",
+          sessionId: session._id,
         });
       }
     }
@@ -55,7 +61,7 @@ const saveConfluenceShortcutHandler = async (app: App) => {
 
 const setDomainHandler = (app: App) => {
   return app.action(confluenceDomainActionId, async ({ ack, body, client }) => {
-    const confluenceAuthView = createConfluenceAuthModal();
+    const confluenceAuthView = SaveConfluenceViews();
     const payload = body as BlockAction;
     const userId = payload.user.id;
     const orgId = payload.team?.id;
@@ -82,7 +88,61 @@ const setDomainHandler = (app: App) => {
   });
 };
 
+export const saveConfluenceCallbackHandler = (app: App) => {
+  app.view(saveConfluenceCallbackId, async ({ ack, payload, body, client }) => {
+    try {
+      ack();
+      const sessionId = payload.external_id;
+      const userId = body.user.id;
+      const orgId = payload.team_id;
+
+      if (!sessionId) {
+        throw new Error("Missing sessionId");
+      }
+
+      const viewPayload = viewInputReader<SaveConfluencePayload>(payload);
+      const session = await getSessionFromId(sessionId);
+      let accessToken = session?.accessToken;
+      const siteUrl = payload.private_metadata;
+
+      if (!session) {
+        const newAccessToken = await getAccessTokenFromRefreshToken({
+          orgId,
+          userId,
+          siteUrl,
+        });
+        accessToken = newAccessToken.accessToken;
+      }
+
+      if (!accessToken) {
+        throw new Error("Missing accessToken");
+      }
+
+      const createPageRes = await createNewPage({
+        accessToken,
+        viewPayload,
+      });
+      const linkToPage = joinUrls(`https://${siteUrl}`, "wiki", createPageRes._links.webui);
+
+      const successMessage = SaveConfluenceViews().successMessage(linkToPage, createPageRes.title);
+
+      client.chat
+        .postMessage({
+          channel: body.user.id,
+          token: process.env.SLACK_BOT_TOKEN,
+          blocks: successMessage,
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    } catch (error) {
+      console.error(`error in save confluence: ${error}`);
+    }
+  });
+};
+
 export const registerConfluenceHandlers = (app: App) => {
   saveConfluenceShortcutHandler(app);
   setDomainHandler(app);
+  saveConfluenceCallbackHandler(app);
 };

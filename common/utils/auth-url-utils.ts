@@ -31,3 +31,12 @@ export const parseAuthorizeUrlState = (state: string) => {
     confluenceSiteUrl: stateItems.slice(2).join("-"), // This accounts for any '-' that might exist within the confluenceSiteUrl
   };
 };
+
+export const joinUrls = (...urls: string[]) => {
+  return urls
+    .map((url) => {
+      // Trim starting and ending slashes
+      return url.replace(/^\/+|\/+$/g, "");
+    })
+    .join("/");
+};

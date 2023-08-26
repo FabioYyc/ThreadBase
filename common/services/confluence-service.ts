@@ -1,3 +1,5 @@
+import { joinUrls } from "../utils/auth-url-utils";
+
 export type IAuthPayload = {
   grant_type: string;
   client_id: string;
@@ -5,14 +7,6 @@ export type IAuthPayload = {
   code?: string;
   redirect_uri: string;
   refresh_token?: string;
-};
-export const joinUrls = (...urls: string[]) => {
-  return urls
-    .map((url) => {
-      // Trim starting and ending slashes
-      return url.replace(/^\/+|\/+$/g, "");
-    })
-    .join("/");
 };
 
 export const getAccessToken = async ({
@@ -106,11 +100,13 @@ export const fetchCfUrl = async ({
   accessToken,
   path,
   method,
+  body,
 }: {
   cloudId: string;
   accessToken: string;
   path: string;
   method: "GET" | "POST";
+  body?: any;
 }) => {
   const baseUrl = `https://api.atlassian.com/ex/confluence/${cloudId}`;
   const url = joinUrls(baseUrl, path);
@@ -119,15 +115,20 @@ export const fetchCfUrl = async ({
   const headers = {
     Accept: "application/json",
     Authorization: `Bearer ${accessToken}`,
+    "Content-Type": "application/json",
   };
-
-  const response = await fetch(url, {
+  const requestParams: RequestInit = {
     method,
     headers: headers,
-  });
+  };
+  if (method === "POST" && body) {
+    requestParams["body"] = JSON.stringify(body);
+  }
+  const response = await fetch(url, requestParams);
 
   if (!response.ok) {
-    console.warn("Error in getCFPages: %o", response.statusText);
+    console.warn("Error in fetch cf url: %o", response.statusText);
+    console.log("request params", requestParams);
     return false;
   }
   return await response.json();

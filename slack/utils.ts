@@ -40,9 +40,9 @@ const parseViewValues = (data: any) => {
 
   return result;
 };
-export const viewInputReader = (view: ViewOutput) => {
-  const values = view.state.values;
-  return parseViewValues(values);
+export const viewInputReader = <T>(view: ViewOutput) => {
+  const values = view.state?.values || view;
+  return parseViewValues(values) as T;
 };
 
 export const stringInputParser = (string: string | null | undefined) => {

@@ -1,7 +1,13 @@
-import { ModalView, PlainTextOption, SectionBlock, View } from "@slack/bolt";
-import { IPage, confluenceDomainActionId } from "./constants";
-import { IConfluenceAuth } from "../../../common/modles/userUI";
-import { values } from "lodash";
+import { KnownBlock, ModalView, PlainTextOption, SectionBlock, View } from "@slack/bolt";
+import {
+  IPage,
+  confluenceDomainActionId,
+  pageContentBlockId,
+  pageTitleBlockId,
+  parentPageBlockId,
+  saveConfluenceCallbackId,
+} from "./constants";
+import { formatPageValue } from "./utils";
 
 export const authButtonLinkBlock = (
   authorizeUrl: string,
@@ -37,7 +43,7 @@ export const authButtonLinkBlock = (
   ];
 };
 
-export const createConfluenceAuthModal = () => {
+export const SaveConfluenceViews = () => {
   const setDomainModal: View = {
     type: "modal",
     title: {
@@ -76,7 +82,7 @@ export const createConfluenceAuthModal = () => {
     confluenceSiteUrl?: string;
     pages: IPage[];
     messageLink?: string;
-    sessionId?: string;
+    sessionId: string;
   }): ModalView => {
     const options: PlainTextOption[] = pages.map((page) => {
       return {
@@ -85,13 +91,14 @@ export const createConfluenceAuthModal = () => {
           text: page.title,
           emoji: true,
         },
-        value: page.id,
+        value: formatPageValue(page),
       };
     });
     return {
       type: "modal",
-      callback_id: "save_to_confluence",
-      private_metadata: sessionId,
+      callback_id: saveConfluenceCallbackId,
+      external_id: sessionId,
+      private_metadata: confluenceSiteUrl,
       submit: {
         type: "plain_text",
         text: "Submit",
@@ -119,12 +126,12 @@ export const createConfluenceAuthModal = () => {
         },
         {
           type: "input",
-          block_id: "parent_page",
+          block_id: parentPageBlockId,
           element: {
             type: "static_select",
             placeholder: {
               type: "plain_text",
-              text: "Select the parent page for the",
+              text: "Select the parent page for the new page",
               emoji: true,
             },
             options: options,
@@ -138,7 +145,7 @@ export const createConfluenceAuthModal = () => {
         },
         {
           type: "input",
-          block_id: "title",
+          block_id: pageTitleBlockId,
           element: {
             type: "plain_text_input",
           },
@@ -150,7 +157,7 @@ export const createConfluenceAuthModal = () => {
         },
         {
           type: "input",
-          block_id: "content",
+          block_id: pageContentBlockId,
           element: {
             type: "plain_text_input",
             multiline: true,
@@ -165,6 +172,16 @@ export const createConfluenceAuthModal = () => {
       ],
     };
   };
+
+  const successMessage = (pageUrl: string, title: string): KnownBlock[] => [
+    {
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: `Success! A new Confluence Page titled "${title}" has been created. Click <${pageUrl}|here> to view it. :tada:`,
+      },
+    },
+  ];
 
   return {
     setDomainView: () => setDomainModal as View,
@@ -186,5 +203,6 @@ export const createConfluenceAuthModal = () => {
       };
     },
     saveToConfluencePageModal,
+    successMessage,
   };
 };

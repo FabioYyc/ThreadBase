@@ -15,6 +15,7 @@ import {
   personalSpaceValue,
   teamSwitchActionId,
 } from "./constants";
+import { ITeamFormValues } from "./types";
 
 const createTeamButtonHandler = (app: App): void => {
   app.action(createTeamButtonActionId, async ({ ack, body, client }) => {
@@ -68,7 +69,7 @@ const createTeamFormHandler = (app: App) => {
     ack();
     const session = await connection.startSession();
     session.startTransaction();
-    const values = viewInputReader(view);
+    const values = viewInputReader(view) as ITeamFormValues;
     const team = await processTeamForm({ app, values, body, view });
 
     try {
@@ -106,7 +107,7 @@ const editTeamFormHandler = (app: App) => {
   app.view(editTeamCallbackId, async ({ ack, body, view, client }) => {
     ack();
     const session = await connection.startSession();
-    const values = viewInputReader(view);
+    const values = viewInputReader(view) as ITeamFormValues;
     const team = await processTeamForm({ app, values, body, view });
 
     try {
