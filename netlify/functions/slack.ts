@@ -5,6 +5,7 @@ import { registerHomeTabListeners } from "../../slack/listeners/home-saved-chat"
 import { parseRequestBody } from "../../slack/utils";
 import { registerSaveChatHandler } from "../../slack/listeners/save-chat/handlers";
 import mongoose from "mongoose";
+import { registerConfluenceHandlers } from "../../slack/listeners/save-confluence/handlers";
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
@@ -13,17 +14,14 @@ const app = new App({
     signingSecret: process.env.SLACK_SIGNING_SECRET as string,
   }),
 });
-  mongoose.connect(process.env.MONGO_DB_URL as string);
+mongoose.connect(process.env.MONGO_DB_URL as string);
 
-  registerHomeTabListeners(app);
-  registerSaveChatHandler(app);
+registerHomeTabListeners(app);
+registerSaveChatHandler(app);
+registerConfluenceHandlers(app);
 
-
-const handler: Handler = async (
-  event: HandlerEvent,
-  context: HandlerContext
-) => {
-  const payload = parseRequestBody(event.body, event.headers['content-type']);
+const handler: Handler = async (event: HandlerEvent, context: HandlerContext) => {
+  const payload = parseRequestBody(event.body, event.headers["content-type"]);
 
   if (payload && payload.type && payload.type === "url_verification") {
     return {
@@ -47,8 +45,7 @@ const handler: Handler = async (
   await app.processEvent(slackEvent);
   return {
     statusCode: 201,
+  };
 };
-};
-
 
 export { handler };

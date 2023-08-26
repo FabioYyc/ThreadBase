@@ -1,1 +1,1 @@
-export const previewButtonActionId = 'preview_button';
+export const previewButtonActionId = "preview_button";
