@@ -1,10 +1,9 @@
 import { App, BlockAction, ButtonAction } from "@slack/bolt";
 import { generateTeamView } from "./views";
 import { viewInputReader } from "../../../utils";
-import { UserRole, teamRepo, userTeamsRepo } from "../../../../common/modles/team";
+import { teamRepo } from "../../../../common/modles/team";
 import { connection } from "mongoose";
 import { getUserHomeView } from "../home-tab-view";
-import { updateUserUILatestTeamId } from "../../../../common/modles/userUI";
 import { addTeamToUserTeam, checkIfUserIsTeamOwner, processTeamForm } from "./utils";
 import _ from "lodash";
 import {
@@ -16,6 +15,7 @@ import {
   teamSwitchActionId,
 } from "./constants";
 import { ITeamFormValues } from "./types";
+import { UserRepo, UserRole, updateUserUILatestTeamId } from "../../../../common/modles/user";
 
 const createTeamButtonHandler = (app: App): void => {
   app.action(createTeamButtonActionId, async ({ ack, body, client }) => {
@@ -109,6 +109,7 @@ const editTeamFormHandler = (app: App) => {
     const session = await connection.startSession();
     const values = viewInputReader(view) as ITeamFormValues;
     const team = await processTeamForm({ app, values, body, view });
+    const userRepo = UserRepo(session);
 
     try {
       const externalId = body.view.external_id;
@@ -131,11 +132,10 @@ const editTeamFormHandler = (app: App) => {
       // If there are new members added, add the team to their userTeams
       if (addedMembers.length > 0) {
         for (const memberId of addedMembers) {
-          await userTeamsRepo.addTeamToUser({
+          await userRepo.addTeamToUser({
             userId: memberId,
             orgId: team.orgId,
             team: { teamId, userRole: UserRole.Member },
-            session,
           });
         }
       }
@@ -143,11 +143,10 @@ const editTeamFormHandler = (app: App) => {
       // If there are members removed, remove the team from their userTeams
       if (removedMembers.length > 0) {
         for (const memberId of removedMembers) {
-          await userTeamsRepo.removeTeamFromUser({
+          await userRepo.removeTeamFromUser({
             userId: memberId,
             orgId: team.orgId,
             teamId,
-            session,
           });
         }
       }

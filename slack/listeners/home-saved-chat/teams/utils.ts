@@ -1,16 +1,10 @@
 import { App, SlackViewAction, ViewOutput } from "@slack/bolt";
-import {
-  ISavedTeam,
-  ITeam,
-  ITeamConversation,
-  UserRole,
-  teamRepo,
-  userTeamsRepo,
-} from "../../../../common/modles/team";
+import { ISavedTeam, ITeam, ITeamConversation, teamRepo } from "../../../../common/modles/team";
 import { stringInputParser } from "../../../utils";
 import { ITeamFormValues } from "./types";
 import { ClientSession } from "mongoose";
 import { createTeamConversations } from "./conversations";
+import { UserRepo, UserRole } from "../../../../common/modles/user";
 
 export const getAddedMembers = (oldMembers: string[], newMembers: string[]): string[] => {
   return newMembers.filter((member) => !oldMembers.includes(member));
@@ -74,8 +68,8 @@ export const addTeamToUserTeam = async ({
 }) => {
   //find if user team exists, if not create with current teamId
   //if exists, add current teamId to teams array
-
-  const userTeams = await userTeamsRepo.findByUserId({ orgId, userId: userId });
+  const userRepo = UserRepo(session);
+  const userTeams = await userRepo.findByUserId({ orgId, userId: userId });
   if (!userTeams) {
     const newUserTeams = {
       orgId,
@@ -87,14 +81,15 @@ export const addTeamToUserTeam = async ({
         },
       ],
     };
-    await userTeamsRepo.create(newUserTeams, session);
+    await userRepo.create(newUserTeams);
   } else {
-    await userTeamsRepo.addTeamToUser({ orgId, userId, team: { teamId, userRole }, session });
+    await userRepo.addTeamToUser({ orgId, userId, team: { teamId, userRole } });
   }
 };
 
 export const getTeamsForUser = async (orgId: string, userId: string): Promise<ISavedTeam[]> => {
-  const userTeams = await userTeamsRepo.findByUserId({ orgId, userId: userId });
+  const userRepo = UserRepo();
+  const userTeams = await userRepo.findByUserId({ orgId, userId: userId });
   if (!userTeams) {
     return [];
   }
@@ -116,7 +111,8 @@ export const checkIfUserIsTeamOwner = async ({
   orgId: string;
   teamId: string;
 }) => {
-  const userTeams = await userTeamsRepo.findByUserId({ orgId, userId: userId });
+  const userRepo = UserRepo();
+  const userTeams = await userRepo.findByUserId({ orgId, userId: userId });
   if (!userTeams) {
     return false;
   }

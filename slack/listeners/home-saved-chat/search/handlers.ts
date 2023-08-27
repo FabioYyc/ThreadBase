@@ -1,7 +1,8 @@
 import { App, BlockAction, PlainTextInputAction } from "@slack/bolt";
-import { searchButtonActionId, searchDispatchActionId, searchModalId } from "./constants";
+import { searchButtonActionId, searchDispatchActionId } from "./constants";
 import { createSearchModal, getThreadBlocks } from "./views";
 import { threadRepo } from "../../../../common/modles/thread";
+import { getTeamsForUser } from "../teams/utils";
 
 export const searchButtonHandler = (app: App) => {
   app.action(searchButtonActionId, async ({ ack, body, client }) => {
@@ -20,29 +21,6 @@ export const searchButtonHandler = (app: App) => {
   });
 };
 
-interface SearchViewUser {
-  id: string;
-  team_id: string;
-}
-
-interface SearchViewTeam {
-  id: string;
-  domain: string;
-}
-
-interface SearchViewAction {
-  type: string;
-  block_id: string;
-  action_id: string;
-  value: string;
-  action_ts: string;
-}
-
-interface SearchViewIdentifiers {
-  id: string;
-  hash: string;
-}
-
 export const searchModalHandler = (app: App) => {
   app.action(searchDispatchActionId, async ({ ack, body, client }) => {
     await ack();
@@ -58,7 +36,9 @@ export const searchModalHandler = (app: App) => {
     if (!orgId || !userId || !values || !viewHash || !viewId) {
       throw new Error("Missing orgId, userId, value or viewHash");
     }
-    const results = await threadRepo.searchByText({ orgId, userId, searchTerm: values });
+    const teams = await getTeamsForUser(orgId, userId);
+    const teamIds = teams.map((team) => team.id);
+    const results = await threadRepo.searchByText({ orgId, userId, teamIds, searchTerm: values });
     //update the modal view
 
     const threadBlocks = getThreadBlocks(results);

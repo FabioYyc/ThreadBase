@@ -1,9 +1,10 @@
 import type { Handler, HandlerEvent } from "@netlify/functions";
-import { IConfluenceAuth, userUIRepo } from "../../../common/modles/userUI";
+import { IConfluenceAuth } from "../../../common/modles/user";
 import mongoose from "mongoose";
 import { parseAuthorizeUrlState } from "../../../common/utils/auth-url-utils";
 import { getAccessToken, getAccessibleResource } from "../../../common/services/confluence-service";
 import { returnBody, successMessageHTML } from "./response";
+import { UserRepo } from "../../../common/modles/user";
 
 const handler: Handler = async (event: HandlerEvent) => {
   try {
@@ -31,8 +32,8 @@ const handler: Handler = async (event: HandlerEvent) => {
       siteUrl: accessibleResource.url,
       refreshToken: refreshToken,
     };
-
-    const result = await userUIRepo.updateAuthByUserId({
+    const userRepo = UserRepo();
+    const result = await userRepo.updateAuthByUserId({
       orgId,
       userId,
       authType: "confluence",

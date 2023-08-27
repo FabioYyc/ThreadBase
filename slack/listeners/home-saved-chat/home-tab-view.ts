@@ -5,7 +5,6 @@ import { savedThreadsViews } from "./chats";
 import { ISavedTeam } from "../../../common/modles/team";
 
 import { WebClient } from "@slack/web-api";
-import { getLatestTeamIdForUser } from "../../../common/modles/userUI";
 import {
   createTeamButtonActionId,
   editTeamButtonActionId,
@@ -13,6 +12,7 @@ import {
 } from "./teams/constants";
 import { checkIfUserIsTeamOwner, getTeamsForUser } from "./teams/utils";
 import { searchButton } from "./search/views";
+import { getLatestTeamIdForUser } from "../../../common/modles/user";
 
 const homeViewBase: View = {
   type: "home",

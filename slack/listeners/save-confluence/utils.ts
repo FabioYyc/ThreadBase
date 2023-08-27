@@ -1,15 +1,16 @@
 import { MessageShortcut } from "@slack/bolt";
 import { sessionRepo } from "../../../common/modles/session";
-import { userUIRepo } from "../../../common/modles/userUI";
 import { getAuthorizeUrl } from "../../../common/utils/auth-url-utils";
 import { getPermalinkWithTimeout } from "../../apis/messages";
 import { getAccessTokenFromRefreshToken, getSaveConfluenceViewData } from "./apis";
 import { IPage } from "./constants";
 import { SaveConfluenceViews } from "./view";
 import { WebClient } from "@slack/web-api";
+import { UserRepo } from "../../../common/modles/user";
 
 export const getUserConfluenceAuth = async (orgId: string, userId: string) => {
-  const userUI = await userUIRepo.getUserUIByUserId(orgId, userId);
+  const userRepo = UserRepo();
+  const userUI = await userRepo.getUserUIByUserId(orgId, userId);
   if (!userUI) {
     return false;
   }

@@ -2,8 +2,6 @@
 
 import mongoose, { Document } from "mongoose";
 import { searchTextLimit } from "../../slack/types";
-import { teamRepo, userTeamsRepo } from "./team";
-import { getTeamsForUser } from "../../slack/listeners/home-saved-chat/teams/utils";
 
 /// connect to mongodb use env var MONGODB_URL
 const threadSchema = new mongoose.Schema({
@@ -55,6 +53,7 @@ export interface ISavedThread extends IThread, ThreadDetails, Document {}
 interface SearchParams {
   orgId: string;
   userId: string;
+  teamIds: string[];
   searchTerm: string;
 }
 export const threadRepo = {
@@ -94,7 +93,7 @@ export const threadRepo = {
     return await Thread.findOne({ _id: new mongoose.Types.ObjectId(threadId) });
   },
 
-  searchByText: async ({ orgId, userId, searchTerm }: SearchParams) => {
+  searchByText: async ({ orgId, userId, teamIds, searchTerm }: SearchParams) => {
     // const matchCondition: { [key: string]: string } = { orgId, userId };
     /**
      * only return thread
@@ -103,17 +102,12 @@ export const threadRepo = {
      * 1. need to get all teams user belongs to use userTeamsRepo
      * 2. teams = [teamId1, teamId2, ...]
      */
-    const teams = await getTeamsForUser(orgId, userId);
-    const teamIds = teams.map((team) => team.id) || [];
 
     // Constructing the matchCondition
     const matchCondition = {
       $or: [
         // Personal Space
-        {
-          userId: userId,
-          $or: [{ teams: { $eq: [] } }, { teams: { $eq: null } }],
-        },
+        { orgId, userId: userId, $or: [{ teams: { $eq: [] } }, { teams: { $eq: null } }] },
         // Team Space
         {
           teams: {
@@ -140,7 +134,6 @@ export const threadRepo = {
         $limit: 20,
       },
     ];
-    console.log("pipeline", pipeline);
     const results = (await Thread.aggregate(pipeline)) || [];
 
     return results as ISavedThread[];
