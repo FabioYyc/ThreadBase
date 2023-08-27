@@ -1,5 +1,5 @@
 import { sessionRepo } from "../../../common/modles/session";
-import { IConfluenceAuth, userUIRepo } from "../../../common/modles/userUI";
+import { IConfluenceAuth, UserRepo } from "../../../common/modles/user";
 import {
   getAccessibleResource,
   fetchCfUrl,
@@ -94,7 +94,8 @@ export const getAccessTokenFromRefreshToken = async ({
     siteUrl: confluenceAuth.siteUrl,
     refreshToken: refresh_token,
   };
-  await userUIRepo.updateAuthByUserId({
+  const userRepo = UserRepo();
+  await userRepo.updateAuthByUserId({
     orgId,
     userId,
     authType: "confluence",

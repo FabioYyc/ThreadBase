@@ -9,9 +9,17 @@ export const keywordsParser = (keywords: string | null | undefined) => {
   return keywords.split(",");
 };
 
+export type SaveThreadViewOuput = {
+  title: string;
+  description?: string;
+  teams: {
+    selected_options?: Array<{ value: string }>;
+  };
+};
+
 export const saveFromSaveChatView = async (view: ViewOutput) => {
-  const values = viewInputReader(view);
-  const teams = values.teams.selected_options?.map((option: any) => option.value) || [];
+  const values = viewInputReader<SaveThreadViewOuput>(view);
+  const teams = values.teams.selected_options?.map((option) => option.value) || [];
   const threadDetails = {
     title: stringInputParser(values.title),
     description: stringInputParser(values.description),

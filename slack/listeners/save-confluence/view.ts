@@ -1,7 +1,6 @@
 import { KnownBlock, ModalView, PlainTextOption, SectionBlock, View } from "@slack/bolt";
 import {
   IPage,
-  confluenceDomainActionId,
   pageContentBlockId,
   pageTitleBlockId,
   parentPageBlockId,
