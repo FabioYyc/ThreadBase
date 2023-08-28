@@ -74,6 +74,8 @@ const createTeamFormHandler = (app: App) => {
 
     try {
       const newTeam = await teamRepo.create(team, session);
+      const userId = body.user.id;
+      const orgId = team.orgId;
       await addTeamToUserTeam({
         orgId: team.orgId,
         userId: body.user.id,
@@ -92,6 +94,7 @@ const createTeamFormHandler = (app: App) => {
       });
       await Promise.all(addTeamPromises);
       await session.commitTransaction();
+      await updateUserUILatestTeamId(orgId, userId, newTeam.id);
       await getUserHomeView(team.orgId, body.user.id, client, newTeam.id);
     } catch (error) {
       console.error(error);
