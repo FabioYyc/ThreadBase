@@ -1,10 +1,12 @@
-import { App, MessageShortcut } from "@slack/bolt";
-import { joinUrls } from "../../../common/utils/auth-url-utils";
+import { App, BlockAction, MessageShortcut } from "@slack/bolt";
+import { getAuthorizeUrl, joinUrls } from "../../../common/utils/auth-url-utils";
 import { SaveConfluenceViews } from "./view";
-import { SaveConfluencePayload, saveConfluenceCallbackId } from "./constants";
-import { getCorrectConfluenceViewByAuth, getSessionFromId } from "./utils";
+import { SaveConfluencePayload, logoutActionId, saveConfluenceCallbackId } from "./constants";
+import { getAuthView, getCorrectConfluenceViewByAuth, getSessionFromId } from "./utils";
 import { viewInputReader } from "../../utils";
 import { createNewPage, getAccessTokenFromRefreshToken } from "./apis";
+import { UserRepo } from "../../../common/modles/user";
+import { sessionRepo } from "../../../common/modles/session";
 
 const saveConfluenceShortcutHandler = async (app: App) => {
   return app.shortcut("create-confluence", async ({ shortcut, ack, client }) => {
@@ -84,7 +86,36 @@ export const saveConfluenceCallbackHandler = (app: App) => {
   });
 };
 
+const logoutHandler = (app: App) => {
+  app.action(logoutActionId, async ({ ack, body, client, payload }) => {
+    ack();
+    const actionBody = body as BlockAction;
+    const orgId = actionBody.team?.id;
+    const userId = actionBody.user.id;
+    const userRepo = UserRepo();
+    const confluenceSiteUrl = actionBody?.view?.private_metadata;
+    if (!orgId || !userId || !confluenceSiteUrl) {
+      throw new Error("Missing orgId or userId");
+    }
+    await userRepo.removeConfluenceAuth({ orgId, userId });
+    await sessionRepo.removeSession(orgId, userId, confluenceSiteUrl);
+    const confluenceViewCreator = SaveConfluenceViews();
+    const authView = getAuthView(orgId, userId, confluenceViewCreator);
+
+    if (!actionBody.view?.id) {
+      console.log(actionBody);
+      throw new Error("Missing view id");
+    }
+    client.views.update({
+      view_id: actionBody.view.id,
+      hash: actionBody.view.hash,
+      view: authView,
+    });
+  });
+};
+
 export const registerConfluenceHandlers = (app: App) => {
   saveConfluenceShortcutHandler(app);
   saveConfluenceCallbackHandler(app);
+  logoutHandler(app);
 };

@@ -41,6 +41,12 @@ export const getSessionFromId = async (sessionId: string) => {
   }
 };
 
+export const getAuthView = (orgId: string, userId: string, confluenceViewCreator: any) => {
+  const authorizeUrl = getAuthorizeUrl(orgId, userId);
+  const authView = confluenceViewCreator.authModal(authorizeUrl);
+  return authView;
+};
+
 export const getCorrectConfluenceViewByAuth = async (
   orgId: string,
   userId: string,
@@ -49,8 +55,7 @@ export const getCorrectConfluenceViewByAuth = async (
 ) => {
   const confluenceAuthList = await getUserConfluenceAuth(orgId, userId);
   const confluenceViewCreator = SaveConfluenceViews();
-  const authorizeUrl = getAuthorizeUrl(orgId, userId);
-  const authView = confluenceViewCreator.authModal(authorizeUrl);
+  const authView = getAuthView(orgId, userId, confluenceViewCreator);
   if (!confluenceAuthList || confluenceAuthList.length < 1) {
     return authView;
   }
@@ -84,5 +89,21 @@ export const getCorrectConfluenceViewByAuth = async (
     pages: cfInfo.pages,
     messageLink: messageLink || "",
     sessionId: session._id,
+  });
+};
+
+export const logout = async (orgId: string, userId: string) => {
+  const userRepo = UserRepo();
+  const user = await userRepo.getUserUIByUserId(orgId, userId);
+  if (!user) {
+    throw new Error("User not found");
+  }
+  const confluenceAuth = user.auth?.confluence;
+  if (!confluenceAuth || !confluenceAuth.length) {
+    throw new Error("Confluence auth not found");
+  }
+  await userRepo.removeConfluenceAuth({
+    orgId,
+    userId,
   });
 };

@@ -57,4 +57,8 @@ export const sessionRepo = {
     const filters = { orgId, userId, confluenceSiteUrl, expiresAt: { $gt: Date.now() } };
     return (await Session.findOne(filters)) as Session;
   },
+
+  removeSession: async (orgId: string, userId: string, confluenceSiteUrl: string) => {
+    await Session.deleteOne({ orgId, userId, confluenceSiteUrl });
+  },
 };

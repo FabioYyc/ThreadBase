@@ -1,6 +1,7 @@
 import { KnownBlock, ModalView, PlainTextOption, SectionBlock, View } from "@slack/bolt";
 import {
   IPage,
+  logoutActionId,
   pageContentBlockId,
   pageTitleBlockId,
   parentPageBlockId,
@@ -121,15 +122,20 @@ export const SaveConfluenceViews = () => {
           type: "section",
           fields: [
             {
-              type: "plain_text",
-              text: "Create a Confluence page",
-              emoji: true,
-            },
-            {
               type: "mrkdwn",
               text: `*Confluence Site* \n ${confluenceSiteUrl}`,
             },
           ],
+          accessory: {
+            type: "button",
+            style: "primary",
+            action_id: logoutActionId,
+            text: {
+              type: "plain_text",
+              text: "Link Another Site",
+              emoji: true,
+            },
+          },
         },
         {
           type: "input",
