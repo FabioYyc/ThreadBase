@@ -33,7 +33,7 @@ const handler: Handler = async (event: HandlerEvent) => {
       refreshToken: refreshToken,
     };
     const userRepo = UserRepo();
-    const result = await userRepo.updateAuthByUserId({
+    const result = await userRepo.createOrUpdateUserAuth({
       orgId,
       userId,
       authType: "confluence",
