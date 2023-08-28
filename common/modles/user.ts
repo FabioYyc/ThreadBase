@@ -53,7 +53,7 @@ export const UserRepo = (clientSession?: ClientSession) => {
   const sessionOption = clientSession ? { session: clientSession } : {};
 
   return {
-    createOrUpdate: async (userUI: Partial<IUser>) => {
+    createOrUpdateUserUI: async (userUI: Partial<IUser>) => {
       const existingUserUI = await User.findOne({ userId: userUI.userId, orgId: userUI.orgId });
       if (existingUserUI) {
         await User.updateOne(
@@ -65,6 +65,7 @@ export const UserRepo = (clientSession?: ClientSession) => {
         await newUserUI.save();
       }
     },
+
     findByUserId: async ({
       userId,
       orgId,
@@ -113,7 +114,7 @@ export const UserRepo = (clientSession?: ClientSession) => {
       await User.updateOne({ orgId, userId }, { $set: user }, sessionOption);
     },
 
-    updateAuthByUserId: async ({
+    createOrUpdateUserAuth: async ({
       orgId,
       userId,
       authType,
@@ -125,17 +126,20 @@ export const UserRepo = (clientSession?: ClientSession) => {
       authData: IConfluenceAuth;
     }) => {
       const existingUserDoc = await User.findOne({ orgId, userId });
+      let user;
 
-      if (!existingUserDoc) {
-        // Handle the case where the user doesn't exist if necessary
-        // For example, you might want to throw an error, return, or create a new user record.
-        console.log("user not found", orgId, userId);
-        return; // Or throw new Error('User not found');
+      user = existingUserDoc?.toObject() as IUser;
+
+      if (!user) {
+        // create a new user
+        const newUser = new User({
+          orgId,
+          userId,
+        });
+        user = await newUser.save();
       }
 
-      const existingUser = existingUserDoc?.toObject() as IUser;
-
-      const auth = existingUser.auth || {};
+      const auth = user.auth || {};
       const authArray = auth[authType] || [];
 
       const existingDomainIndex = authArray.findIndex((a) => a.siteUrl === authData.siteUrl);
@@ -170,5 +174,5 @@ export const updateUserUILatestTeamId = async (
     latestTeamId,
   };
   const userRepo = UserRepo();
-  await userRepo.createOrUpdate(userUI);
+  await userRepo.createOrUpdateUserUI(userUI);
 };

@@ -19,7 +19,7 @@ export type SaveThreadViewOuput = {
 
 export const saveFromSaveChatView = async (view: ViewOutput) => {
   const values = viewInputReader<SaveThreadViewOuput>(view);
-  const teams = values.teams.selected_options?.map((option) => option.value) || [];
+  const teams = values.teams?.selected_options?.map((option) => option.value) || [];
   const threadDetails = {
     title: stringInputParser(values.title),
     description: stringInputParser(values.description),

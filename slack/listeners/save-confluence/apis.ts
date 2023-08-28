@@ -95,7 +95,7 @@ export const getAccessTokenFromRefreshToken = async ({
     refreshToken: refresh_token,
   };
   const userRepo = UserRepo();
-  await userRepo.updateAuthByUserId({
+  await userRepo.createOrUpdateUserAuth({
     orgId,
     userId,
     authType: "confluence",

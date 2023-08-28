@@ -124,7 +124,7 @@ export const createChatView = async ({
     },
   ];
   let teamMultiSelect;
-  if (teams) {
+  if (teams && teams.length > 0) {
     teamMultiSelect = getTeamMultiSelect(teams);
     blocks.push(teamMultiSelect);
   }
