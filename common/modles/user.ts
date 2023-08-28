@@ -154,6 +154,14 @@ export const UserRepo = (clientSession?: ClientSession) => {
       const result = await User.updateOne({ orgId, userId }, { $set: { auth } });
       return result;
     },
+
+    removeConfluenceAuth: async ({ orgId, userId }: { orgId: string; userId: string }) => {
+      const user = await User.findOne({ orgId, userId });
+      if (!user) {
+        throw new Error("User not found");
+      }
+      await User.updateOne({ orgId, userId }, { $pull: { "auth.confluence": {} } }, sessionOption);
+    },
   };
 };
 
