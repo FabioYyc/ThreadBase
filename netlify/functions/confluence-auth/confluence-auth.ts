@@ -1,10 +1,10 @@
 import type { Handler, HandlerEvent } from "@netlify/functions";
-import { IConfluenceAuth } from "../../../common/modles/user";
+import { IConfluenceAuth } from "../../../common/models/user";
 import mongoose from "mongoose";
 import { parseAuthorizeUrlState } from "../../../common/utils/auth-url-utils";
 import { getAccessToken, getAccessibleResource } from "../../../common/services/confluence-service";
 import { returnBody, successMessageHTML } from "./response";
-import { UserRepo } from "../../../common/modles/user";
+import { UserRepo } from "../../../common/models/user";
 
 const handler: Handler = async (event: HandlerEvent) => {
   try {

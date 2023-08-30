@@ -1,8 +1,8 @@
 import { ActionsBlock, Button, View } from "@slack/bolt";
-import { ISavedThread, threadRepo } from "../../../common/modles/thread";
+import { ISavedThread, threadRepo } from "../../../common/models/thread";
 import { teamSelector } from "./teams/views";
 import { savedThreadsViews } from "./chats";
-import { ISavedTeam } from "../../../common/modles/team";
+import { ISavedTeam } from "../../../common/models/team";
 
 import { WebClient } from "@slack/web-api";
 import {
@@ -12,7 +12,7 @@ import {
 } from "./teams/constants";
 import { checkIfUserIsTeamOwner, getTeamsForUser } from "./teams/utils";
 import { searchButton } from "./search/views";
-import { getLatestTeamIdForUser } from "../../../common/modles/user";
+import { getLatestTeamIdForUser } from "../../../common/models/user";
 
 const homeViewBase: View = {
   type: "home",

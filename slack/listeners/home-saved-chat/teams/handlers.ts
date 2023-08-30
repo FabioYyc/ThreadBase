@@ -1,7 +1,7 @@
 import { App, BlockAction, ButtonAction } from "@slack/bolt";
 import { generateTeamView } from "./views";
 import { viewInputReader } from "../../../utils";
-import { teamRepo } from "../../../../common/modles/team";
+import { teamRepo } from "../../../../common/models/team";
 import { connection } from "mongoose";
 import { getUserHomeView } from "../home-tab-view";
 import { addTeamToUserTeam, checkIfUserIsTeamOwner, processTeamForm } from "./utils";
@@ -15,7 +15,7 @@ import {
   teamSwitchActionId,
 } from "./constants";
 import { ITeamFormValues } from "./types";
-import { UserRepo, UserRole, updateUserUILatestTeamId } from "../../../../common/modles/user";
+import { UserRepo, UserRole, updateUserUILatestTeamId } from "../../../../common/models/user";
 
 const createTeamButtonHandler = (app: App): void => {
   app.action(createTeamButtonActionId, async ({ ack, body, client }) => {

@@ -1,6 +1,6 @@
-import { Block, Button, View } from "@slack/bolt";
+import { Block, Button, KnownBlock, View } from "@slack/bolt";
 import { searchButtonActionId, searchDispatchActionId, searchModalId } from "./constants";
-import { ISavedThread } from "../../../../common/modles/thread";
+import { ISavedThread } from "../../../../common/models/thread";
 
 export const searchButton: Button = {
   type: "button",
@@ -77,7 +77,7 @@ export const getThreadBlocks = (threads: ISavedThread[]) => {
     ];
   }
 
-  const blocks: Block[] = threads.map((thread) => {
+  const blocks: Block[] = threads.map((thread): KnownBlock => {
     return {
       type: "section",
       text: {

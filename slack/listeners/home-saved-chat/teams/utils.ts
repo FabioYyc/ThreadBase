@@ -1,10 +1,10 @@
 import { App, SlackViewAction, ViewOutput } from "@slack/bolt";
-import { ISavedTeam, ITeam, ITeamConversation, teamRepo } from "../../../../common/modles/team";
+import { ISavedTeam, ITeam, ITeamConversation, teamRepo } from "../../../../common/models/team";
 import { stringInputParser } from "../../../utils";
 import { ITeamFormValues } from "./types";
 import { ClientSession } from "mongoose";
 import { createTeamConversations } from "./conversations";
-import { UserRepo, UserRole } from "../../../../common/modles/user";
+import { UserRepo, UserRole } from "../../../../common/models/user";
 
 export const getAddedMembers = (oldMembers: string[], newMembers: string[]): string[] => {
   return newMembers.filter((member) => !oldMembers.includes(member));

@@ -1,5 +1,5 @@
 import { PlainTextOption, SectionBlock, View } from "@slack/bolt";
-import { ISavedTeam } from "../../../../common/modles/team";
+import { ISavedTeam } from "../../../../common/models/team";
 import {
   personalSpaceValue,
   editTeamCallbackId,
@@ -16,7 +16,8 @@ export const generateTeamView = ({
   teamId?: string;
   team?: Team;
   isEdit?: boolean;
-}): View => ({
+}): View => {
+  return {
   type: "modal",
   callback_id: isEdit ? editTeamCallbackId : createTeamCallbackId,
   external_id: teamId,
@@ -117,8 +118,25 @@ export const generateTeamView = ({
       },
       optional: true,
     },
+    {type: "divider"},
+    {
+			"type": "actions",
+			"elements": [
+				{
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"text": "Delete Team",
+						"emoji": true
+					},
+					"value": "click_me_123",
+					"action_id": "actionId-0",
+          "style": "danger",
+				}
+			]
+		}
   ],
-});
+}};
 
 export const teamSelector = (teams: ISavedTeam[], selectedTeamId?: string) => {
   let selectedTeam;

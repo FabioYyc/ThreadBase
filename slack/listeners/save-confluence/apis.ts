@@ -1,5 +1,5 @@
-import { sessionRepo } from "../../../common/modles/session";
-import { IConfluenceAuth, UserRepo } from "../../../common/modles/user";
+import { sessionRepo } from "../../../common/models/session";
+import { IConfluenceAuth, UserRepo } from "../../../common/models/user";
 import {
   getAccessibleResource,
   fetchCfUrl,
