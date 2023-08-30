@@ -5,6 +5,8 @@ import {
   editTeamCallbackId,
   createTeamCallbackId,
   teamSwitchActionId,
+  deleteTeamConfirmButtonActionId,
+  deleteTeamButtonActionId,
 } from "./constants";
 import { Team } from "./types";
 
@@ -130,7 +132,7 @@ export const generateTeamView = ({
 						"emoji": true
 					},
 					"value": "click_me_123",
-					"action_id": "actionId-0",
+					"action_id": deleteTeamButtonActionId,
           "style": "danger",
 				}
 			]
@@ -192,3 +194,34 @@ export const teamSelector = (teams: ISavedTeam[], selectedTeamId?: string) => {
 
   return returnBlock;
 };
+
+
+export const deleteTeamConfirmView = (teamId: string, teamName: string): View => ({
+  type: "modal",
+  callback_id: deleteTeamConfirmButtonActionId,
+  external_id: teamId,
+  submit: {
+    type: "plain_text",
+    text: "Confirm",
+    emoji: true,
+  },
+  close: {
+    type: "plain_text",
+    text: "Cancel",
+    emoji: true,
+  },
+  title: {
+    type: "plain_text",
+    text: "Delete this team :broom:",
+    emoji: true,
+  },
+  blocks: [
+    {
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: `Confirm you want to *DELETE* team: *${teamName}*`,
+      },
+    },
+  ],
+});

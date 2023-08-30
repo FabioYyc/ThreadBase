@@ -1,5 +1,5 @@
 import { App, BlockAction, ButtonAction } from "@slack/bolt";
-import { generateTeamView } from "./views";
+import { deleteTeamConfirmView, generateTeamView } from "./views";
 import { viewInputReader } from "../../../utils";
 import { teamRepo } from "../../../../common/models/team";
 import { connection } from "mongoose";
@@ -9,6 +9,8 @@ import _ from "lodash";
 import {
   createTeamButtonActionId,
   createTeamCallbackId,
+  deleteTeamButtonActionId,
+  deleteTeamConfirmButtonActionId,
   editTeamButtonActionId,
   editTeamCallbackId,
   personalSpaceValue,
@@ -166,7 +168,7 @@ const editTeamFormHandler = (app: App) => {
   });
 };
 
-export const switchTeamHandler = (app: App) => {
+const switchTeamHandler = (app: App) => {
   app.action(teamSwitchActionId, async ({ ack, body, client }) => {
     //find the team
     ack();
@@ -187,10 +189,61 @@ export const switchTeamHandler = (app: App) => {
   });
 };
 
+const deleteTeamHandler =(app: App) => {
+  app.action(deleteTeamButtonActionId, async ({ ack, body, client, payload }) => {
+    try {
+      ack();
+      const payload = body as BlockAction;
+      const externalId = payload.view?.external_id;
+      const teamId = externalId?.split("-")[1];
+      const view = payload.view;
+      if(!view || !externalId || !teamId) {
+        console.log({
+          teamId,
+          externalId,
+        })
+        throw new Error("Missing view or external id or team id");
+      }
+      const value = viewInputReader(view) as ITeamFormValues;
+
+      const teamName = value.team_name;
+
+      client.views.update({
+        view_id: payload.view?.id,
+        viewHash: payload.view?.hash,
+        view: deleteTeamConfirmView(teamId, teamName),
+      });
+    } catch (error) {
+      throw new Error(`error in delete team: ${error}`);
+    }
+  });
+}
+
+const deleteTeamConfirmHandler = (app: App) => {
+  app.view(deleteTeamConfirmButtonActionId, async ({ ack, body, view, client }) => {
+    try {
+      await ack();
+      const external_id = view.external_id;
+      const orgId = view.team_id;
+      const userId = body.user.id;
+      if (!external_id) {
+        throw new Error("Missing external id");
+      }
+      await teamRepo.archiveTeam(external_id);
+      await getUserHomeView(orgId, userId, client, personalSpaceValue);
+    } catch (error) {
+      throw new Error(`error in delete team: ${error}`);
+    }
+  });
+};
+
+
 export const registerCreateTeamHandlers = (app: App): void => {
   createTeamButtonHandler(app);
   editTeamButtonHandler(app);
   createTeamFormHandler(app);
   editTeamFormHandler(app);
   switchTeamHandler(app);
+  deleteTeamHandler(app)
+  deleteTeamConfirmHandler(app);
 };
