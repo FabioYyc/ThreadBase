@@ -11,6 +11,7 @@ export interface ITeam {
   teamUsers: string[];
   teamConversations?: ITeamConversation[];
   orgId: string;
+  isArchived?: boolean;
 }
 
 const TeamSchema = new mongoose.Schema({
@@ -20,6 +21,7 @@ const TeamSchema = new mongoose.Schema({
   teamUsers: Array,
   teamConversations: Array,
   orgId: String,
+  isArchived: Boolean,
 });
 
 const Team = mongoose.model("Team", TeamSchema);
@@ -27,6 +29,7 @@ const Team = mongoose.model("Team", TeamSchema);
 export interface ISavedTeam extends Document, ITeam {}
 
 export const teamRepo = {
+
   create: async (team: ITeam, session: ClientSession) => {
     const newTeam = new Team(team);
     return await newTeam.save({ session });
@@ -39,11 +42,11 @@ export const teamRepo = {
     );
   },
   getTeamById: async (teamId: string): Promise<ISavedTeam> => {
-    return (await Team.findOne({ _id: new mongoose.Types.ObjectId(teamId) })) as ISavedTeam;
+    return (await Team.findOne({ _id: new mongoose.Types.ObjectId(teamId), $or: [{ "isArchived": false }, { "isArchived": { $exists: false } }] })) as ISavedTeam;
   },
 
   getTeamsByIds: async (teamIds: string[]): Promise<ISavedTeam[]> => {
-    return (await Team.find({ _id: { $in: teamIds } })) as ISavedTeam[];
+    return (await Team.find({ _id: { $in: teamIds }, $or: [{ "isArchived": false }, { "isArchived": { $exists: false } }]})) as ISavedTeam[];
   },
 
   findTeamsWhereUserIsChannelMember: async (
@@ -53,6 +56,14 @@ export const teamRepo = {
     return (await Team.find({
       orgId,
       teamConversations: { $elemMatch: { members: userId } },
+      $or: [{ "isArchived": false }, { "isArchived": { $exists: false } }],
     })) as ISavedTeam[];
   },
+
+  archiveTeam: async (teamId: string) => {
+    return await Team.updateOne(
+      { _id: new mongoose.Types.ObjectId(teamId) },
+      { $set: { isArchived: true } },
+    );
+  }
 };

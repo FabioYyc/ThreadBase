@@ -1,5 +1,5 @@
 import { ViewOutput } from "@slack/bolt";
-import { threadRepo } from "../../../common/modles/thread";
+import { threadRepo } from "../../../common/models/thread";
 import { stringInputParser, viewInputReader } from "../../utils";
 
 export const keywordsParser = (keywords: string | null | undefined) => {

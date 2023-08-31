@@ -1,5 +1,5 @@
 import { View } from "@slack/bolt";
-import { ISavedThread } from "../../../common/modles/thread";
+import { ISavedThread } from "../../../common/models/thread";
 import { editChatActionId } from "../save-chat/handlers";
 import { deleteChatActionId } from "./edit-and-delete-chat/handler";
 import { previewButton } from "./preview/views";
