@@ -1,6 +1,6 @@
 import { App, BlockAction, ButtonAction } from "@slack/bolt";
 import { deleteTeamConfirmView, generateTeamView } from "./views";
-import { viewInputReader } from "../../../utils";
+import { stringInputParser, viewInputReader } from "../../../utils";
 import { teamRepo } from "../../../../common/models/team";
 import { connection } from "mongoose";
 import { getUserHomeView } from "../home-tab-view";
@@ -206,7 +206,7 @@ const deleteTeamHandler =(app: App) => {
       }
       const value = viewInputReader(view) as ITeamFormValues;
 
-      const teamName = value.team_name;
+      const teamName = stringInputParser(value.team_name);
 
       client.views.update({
         view_id: payload.view?.id,
