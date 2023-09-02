@@ -8,7 +8,7 @@ import {
 } from "./views";
 import { saveFromSaveChatView } from "./utils";
 import { ButtonBlockAction } from "../../types";
-import { getSavedThreadViewByUser } from "../home-saved-chat/home-tab-view";
+import { getSavedThreadViewByUser } from "../home/home-tab-view";
 
 export const editChatActionId = "edit_saved_chat";
 

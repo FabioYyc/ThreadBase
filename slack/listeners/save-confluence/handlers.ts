@@ -4,9 +4,10 @@ import { SaveConfluenceViews } from "./view";
 import { SaveConfluencePayload, logoutActionId, saveConfluenceCallbackId } from "./constants";
 import { getAuthView, getCorrectConfluenceViewByAuth, getSessionFromId } from "./utils";
 import { viewInputReader } from "../../utils";
-import { createNewPage, getAccessTokenFromRefreshToken } from "./apis";
+import { createNewPage } from "./apis";
 import { UserRepo } from "../../../common/models/user";
 import { sessionRepo } from "../../../common/models/session";
+import { getAccessTokenFromRefreshToken } from "../../shared/confluence/utils";
 
 const saveConfluenceShortcutHandler = async (app: App) => {
   return app.shortcut("create-confluence", async ({ shortcut, ack, client }) => {

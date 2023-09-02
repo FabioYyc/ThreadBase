@@ -2,11 +2,12 @@ import { MessageShortcut } from "@slack/bolt";
 import { sessionRepo } from "../../../common/models/session";
 import { getAuthorizeUrl } from "../../../common/utils/auth-url-utils";
 import { getPermalinkWithTimeout } from "../../apis/messages";
-import { getAccessTokenFromRefreshToken, getSaveConfluenceViewData } from "./apis";
+import { getSaveConfluenceViewData } from "./apis";
 import { IPage } from "./constants";
 import { SaveConfluenceViews } from "./view";
 import { WebClient } from "@slack/web-api";
 import { UserRepo } from "../../../common/models/user";
+import { getAccessTokenFromRefreshToken } from "../../shared/confluence/utils";
 
 export const getUserConfluenceAuth = async (orgId: string, userId: string) => {
   const userRepo = UserRepo();
@@ -89,21 +90,5 @@ export const getCorrectConfluenceViewByAuth = async (
     pages: cfInfo.pages,
     messageLink: messageLink || "",
     sessionId: session._id,
-  });
-};
-
-export const logout = async (orgId: string, userId: string) => {
-  const userRepo = UserRepo();
-  const user = await userRepo.getUserUIByUserId(orgId, userId);
-  if (!user) {
-    throw new Error("User not found");
-  }
-  const confluenceAuth = user.auth?.confluence;
-  if (!confluenceAuth || !confluenceAuth.length) {
-    throw new Error("Confluence auth not found");
-  }
-  await userRepo.removeConfluenceAuth({
-    orgId,
-    userId,
   });
 };

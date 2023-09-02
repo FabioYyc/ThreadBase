@@ -48,7 +48,16 @@ export const createSearchModal = () => {
       },
     ],
   };
-
+  const LinkConfluenceButton: Button = {
+    type: "button",
+    text: {
+      type: "plain_text",
+      text: "Link Confluence",
+      emoji: true,
+    },
+    style: "primary",
+    action_id: "create-confluence",
+  };
   return {
     getOriginal: () => baseModal as View,
     appendBlocksAndViewUpdateBody: (additionalBlocks: Block[], viewId: string, hash: string) => {

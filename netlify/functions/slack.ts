@@ -1,7 +1,7 @@
 import type { Handler, HandlerEvent, HandlerContext } from "@netlify/functions";
 import { App, ReceiverEvent } from "@slack/bolt";
 import { ExpressReceiver } from "@slack/bolt";
-import { registerHomeTabListeners } from "../../slack/listeners/home-saved-chat";
+import { registerHomeTabListeners } from "../../slack/listeners/home";
 import { parseRequestBody } from "../../slack/utils";
 import { registerSaveChatHandler } from "../../slack/listeners/save-chat/handlers";
 import mongoose from "mongoose";
