@@ -9,7 +9,7 @@ export const searchButtonHandler = (app: App) => {
     await ack();
     const payload = body as BlockAction;
     const searchModalMaker = createSearchModal();
-    const searchModal = searchModalMaker.getOriginal();
+    const searchModal = searchModalMaker.getSearchInput();
     try {
       await client.views.open({
         trigger_id: payload.trigger_id,

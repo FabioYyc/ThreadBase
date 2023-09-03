@@ -46,20 +46,33 @@ export const createSearchModal = () => {
           emoji: true,
         },
       },
+      {
+        type: "actions",
+        elements: [
+          {
+            type: "checkboxes",
+            options: [
+              {
+                text: {
+                  type: "plain_text",
+                  text: "Include Confluence Pages in Search",
+                  emoji: true,
+                },
+                description: {
+                  type: "plain_text",
+                  text: "Enable this option to include results from Confluence pages in your search.",
+                  emoji: true,
+                },
+                value: "value-0",
+              },
+            ],
+          },
+        ],
+      },
     ],
   };
-  const LinkConfluenceButton: Button = {
-    type: "button",
-    text: {
-      type: "plain_text",
-      text: "Link Confluence",
-      emoji: true,
-    },
-    style: "primary",
-    action_id: "create-confluence",
-  };
   return {
-    getOriginal: () => baseModal as View,
+    getSearchInput: () => baseModal as View,
     appendBlocksAndViewUpdateBody: (additionalBlocks: Block[], viewId: string, hash: string) => {
       const newModal = { ...baseModal };
       newModal.blocks = [...newModal.blocks, ...additionalBlocks];

@@ -91,6 +91,7 @@ const logoutHandler = (app: App) => {
   app.action(logoutActionId, async ({ ack, body, client, payload }) => {
     ack();
     const actionBody = body as BlockAction;
+    //TODO: Make this a shared function between save-confluence and search with confluence
     const orgId = actionBody.team?.id;
     const userId = actionBody.user.id;
     const userRepo = UserRepo();
