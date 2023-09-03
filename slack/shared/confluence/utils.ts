@@ -84,3 +84,18 @@ export const getAccessTokenFromRefreshToken = async ({
   });
   return { accessToken };
 };
+
+export const getUserConfluenceAuth = async (orgId: string, userId: string) => {
+  const userRepo = UserRepo();
+  const userUI = await userRepo.getUserUIByUserId(orgId, userId);
+  if (!userUI) {
+    return false;
+  }
+
+  const confluenceAuth = userUI.auth?.confluence;
+
+  if (!confluenceAuth || !confluenceAuth.length) {
+    return false;
+  }
+  return confluenceAuth;
+};

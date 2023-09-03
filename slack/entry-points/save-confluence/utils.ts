@@ -6,23 +6,10 @@ import { getSaveConfluenceViewData } from "./apis";
 import { IPage } from "./constants";
 import { SaveConfluenceViews } from "./view";
 import { WebClient } from "@slack/web-api";
-import { UserRepo } from "../../../common/models/user";
-import { getAccessTokenFromRefreshToken } from "../../shared/confluence/utils";
-
-export const getUserConfluenceAuth = async (orgId: string, userId: string) => {
-  const userRepo = UserRepo();
-  const userUI = await userRepo.getUserUIByUserId(orgId, userId);
-  if (!userUI) {
-    return false;
-  }
-
-  const confluenceAuth = userUI.auth?.confluence;
-
-  if (!confluenceAuth || !confluenceAuth.length) {
-    return false;
-  }
-  return confluenceAuth;
-};
+import {
+  getAccessTokenFromRefreshToken,
+  getUserConfluenceAuth,
+} from "../../shared/confluence/utils";
 
 export const formatPageValue = (page: IPage) => {
   return `${page.id}-${page.spaceId}`;
