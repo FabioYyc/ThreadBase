@@ -16,6 +16,8 @@ import { threadRepo } from "../../../../common/models/thread";
 import { getTeamsForUser } from "../teams/utils";
 import { getUserConfluenceAuth } from "../../../shared/confluence/utils";
 import { getAuthorizeUrl } from "../../../../common/utils/auth-url-utils";
+import { getUserConfluenceAccessToken } from "./utils";
+import { searchWithText } from "./apis";
 
 const searchButtonHandler = (app: App) => {
   app.action(searchButtonActionId, async ({ ack, body, client }) => {
@@ -34,7 +36,7 @@ const searchButtonHandler = (app: App) => {
   });
 };
 
-const searchModalHandler = (app: App) => {
+const searchModalHandler = async (app: App) => {
   app.action(searchDispatchActionId, async ({ ack, body, client }) => {
     await ack();
     // use searchByTitle to get the results
@@ -45,16 +47,34 @@ const searchModalHandler = (app: App) => {
     const viewId = payload.view?.id;
     const action = payload.actions[0] as PlainTextInputAction;
     const values = action.value;
+    const confluenceEnabledCheckbox =
+      payload.view?.state.values[searchConfluneceBlockId][searchConfluenceCheckedActionId]
+        .selected_options;
+    const confluenceEnabled = confluenceEnabledCheckbox && confluenceEnabledCheckbox.length > 0;
 
     if (!orgId || !userId || !values || !viewHash || !viewId) {
       throw new Error("Missing orgId, userId, value or viewHash");
     }
     const teams = await getTeamsForUser(orgId, userId);
     const teamIds = teams.map((team) => team.id);
-    const results = await threadRepo.searchByText({ orgId, userId, teamIds, searchTerm: values });
+    const threadResults = await threadRepo.searchByText({
+      orgId,
+      userId,
+      teamIds,
+      searchTerm: values,
+    });
+
+    if (confluenceEnabled) {
+      const accessToken = await getUserConfluenceAccessToken(orgId, userId);
+      if (accessToken) {
+        const results = await searchWithText(accessToken, values);
+        console.log("results ", JSON.stringify(results));
+      }
+    }
+
     //update the modal view
 
-    const threadBlocks = getThreadBlocks(results);
+    const threadBlocks = getThreadBlocks(threadResults);
 
     const updatedModal = createSearchModal().appendBlocksToBaseView(threadBlocks, viewId, viewHash);
 

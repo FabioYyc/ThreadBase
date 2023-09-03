@@ -106,16 +106,17 @@ export const fetchCfUrl = async ({
   path,
   method,
   body,
+  queryParams,
 }: {
   cloudId: string;
   accessToken: string;
   path: string;
   method: "GET" | "POST";
   body?: any;
+  queryParams?: any;
 }) => {
   const baseUrl = `https://api.atlassian.com/ex/confluence/${cloudId}`;
-  const url = joinUrls(baseUrl, path);
-  console.log("url is ", url);
+  let url = joinUrls(baseUrl, path);
 
   const headers = {
     Accept: "application/json",
@@ -126,14 +127,23 @@ export const fetchCfUrl = async ({
     method,
     headers: headers,
   };
+
+  if (queryParams) {
+    const urlParams = new URLSearchParams(queryParams);
+    urlParams.forEach((value, key) => {
+      urlParams.set(key, value);
+    });
+    url = url.concat("?", urlParams.toString());
+  }
+
   if (method === "POST" && body) {
     requestParams["body"] = JSON.stringify(body);
   }
   const response = await fetch(url, requestParams);
 
   if (!response.ok) {
-    console.warn("Error in fetch cf url: %o", response.statusText);
-    console.log("request params", requestParams);
+    console.warn(`Error in fetch cf url ${url}: %o`, response.statusText);
+    console.log("requestParams", requestParams);
     return false;
   }
   return await response.json();

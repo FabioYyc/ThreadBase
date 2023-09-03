@@ -1,10 +1,4 @@
-import { sessionRepo } from "../../../common/models/session";
-import { IConfluenceAuth, UserRepo } from "../../../common/models/user";
-import {
-  getAccessibleResource,
-  fetchCfUrl,
-  getAccessToken,
-} from "../../../common/services/confluence-service";
+import { getAccessibleResource, fetchCfUrl } from "../../../common/services/confluence-service";
 import { stringInputParser } from "../../utils";
 import {
   ICreateCfPageRequestPayload,

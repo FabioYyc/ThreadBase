@@ -12,9 +12,26 @@ function base64UrlDecode(data: string): string {
 export const getAuthorizeUrl = (orgId: string, userId: string) => {
   const uniqueId = `${orgId}-${userId}`;
   const encodedUniqueId = base64UrlEncode(uniqueId);
-  const authUrl = process.env.CONFLUENCE_AUTH_URL;
+  let authUrl = process.env.CONFLUENCE_AUTH_URL;
 
   if (!authUrl) throw new Error("Missing auth url");
+
+  // Add offline_access to the scope parameter
+  const scopeParam = "scope=";
+  const scopeIndex = authUrl.indexOf(scopeParam);
+
+  if (scopeIndex === -1) {
+    throw new Error("Scope parameter not found in auth URL");
+  }
+
+  const scopeStart = scopeIndex + scopeParam.length;
+  const scopeEnd = authUrl.indexOf("&", scopeStart);
+
+  const existingScopes = authUrl.slice(scopeStart, scopeEnd === -1 ? undefined : scopeEnd);
+  const newScopes = `${existingScopes}%20offline_access`;
+
+  authUrl =
+    authUrl.slice(0, scopeStart) + newScopes + (scopeEnd === -1 ? "" : authUrl.slice(scopeEnd));
 
   return authUrl.replace("${YOUR_USER_BOUND_VALUE}", encodedUniqueId);
 };

@@ -46,7 +46,6 @@ export const getAccessTokenFromRefreshToken = async ({
   if (!confluenceAuth) {
     throw new Error("Missing confluenceAuth and Session");
   }
-
   const accessTokenRes = await getAccessToken({
     type: "refresh",
     refresh_token: confluenceAuth.refreshToken,
