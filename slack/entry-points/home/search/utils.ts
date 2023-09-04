@@ -7,12 +7,12 @@ import {
 export const getUserConfluenceAccessToken = async (orgId: string, userId: string) => {
   const confluenceAuth = await getUserConfluenceAuth(orgId, userId);
   if (!confluenceAuth || confluenceAuth.length < 1) {
-    return;
+    return {};
   }
   const firstSite = confluenceAuth[0];
   const session = await sessionRepo.getValidSessionForUser(orgId, userId, firstSite.siteUrl);
   if (session) {
-    return session.accessToken;
+    return { accessToken: session.accessToken, siteUrl: firstSite.siteUrl };
   }
   const { accessToken } = await getAccessTokenFromRefreshToken({
     orgId,
@@ -20,5 +20,5 @@ export const getUserConfluenceAccessToken = async (orgId: string, userId: string
     confluenceAuth: firstSite,
     createNewSession: true,
   });
-  return accessToken;
+  return { accessToken, siteUrl: firstSite.siteUrl };
 };

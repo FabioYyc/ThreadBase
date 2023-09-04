@@ -1,4 +1,12 @@
-import { Action, App, BlockAction, CheckboxesAction, PlainTextInputAction } from "@slack/bolt";
+import {
+  Action,
+  App,
+  Block,
+  BlockAction,
+  CheckboxesAction,
+  KnownBlock,
+  PlainTextInputAction,
+} from "@slack/bolt";
 import {
   searchButtonActionId,
   searchConfluenceCheckedActionId,
@@ -9,6 +17,7 @@ import {
   confluenceAuthView,
   confluenceSiteDisplay,
   createSearchModal,
+  getConfluencePageBlocks,
   getThreadBlocks,
   searchConfluenceOption,
 } from "./views";
@@ -63,12 +72,16 @@ const searchModalHandler = async (app: App) => {
       teamIds,
       searchTerm: values,
     });
+    const appendBlocks: Block[] = [];
 
     if (confluenceEnabled) {
-      const accessToken = await getUserConfluenceAccessToken(orgId, userId);
+      const { accessToken, siteUrl } = await getUserConfluenceAccessToken(orgId, userId);
       if (accessToken) {
-        const results = await searchWithText(accessToken, values);
+        const searchResponse = await searchWithText(accessToken, values);
+        const results = searchResponse.results;
         console.log("results ", JSON.stringify(results));
+        const confluenceBlocks = getConfluencePageBlocks(results, siteUrl);
+        appendBlocks.push(...confluenceBlocks);
       }
     }
 
@@ -76,7 +89,9 @@ const searchModalHandler = async (app: App) => {
 
     const threadBlocks = getThreadBlocks(threadResults);
 
-    const updatedModal = createSearchModal().appendBlocksToBaseView(threadBlocks, viewId, viewHash);
+    appendBlocks.push(...threadBlocks);
+
+    const updatedModal = createSearchModal().appendBlocksToBaseView(appendBlocks, viewId, viewHash);
 
     client.views.update(updatedModal);
   });

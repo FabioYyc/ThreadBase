@@ -7,6 +7,7 @@ import {
   searchModalId,
 } from "./constants";
 import { ISavedThread } from "../../../../common/models/thread";
+import { joinUrls } from "../../../../common/utils/auth-url-utils";
 
 export const searchButton: Button = {
   type: "button",
@@ -110,18 +111,17 @@ export const createSearchModal = (initialConfig?: { [blockId: string]: any }) =>
   };
 };
 
-export const getThreadBlocks = (threads: ISavedThread[]) => {
+export const getThreadBlocks = (threads: ISavedThread[]): Block[] => {
+  const emptyResultBlock = {
+    type: "section",
+    text: {
+      type: "plain_text",
+      text: "No chats match the search term :cry:",
+      emoji: true,
+    },
+  };
   if (!threads.length) {
-    return [
-      {
-        type: "section",
-        text: {
-          type: "plain_text",
-          text: "No chats match the search term :cry:",
-          emoji: true,
-        },
-      },
-    ];
+    return [emptyResultBlock];
   }
 
   const blocks: Block[] = threads.map((thread): KnownBlock => {
@@ -136,6 +136,43 @@ export const getThreadBlocks = (threads: ISavedThread[]) => {
   blocks.unshift({
     type: "divider",
   });
+  return blocks;
+};
+
+export const getConfluencePageBlocks = (results: any[], siteUrl: string) => {
+  const blocks: Block[] = [];
+  results.forEach((result) => {
+    const domain = siteUrl.startsWith("https://") ? siteUrl : `https://${siteUrl}`;
+    if (!result.content._links) return;
+
+    if (result.content?.type !== "page") return;
+
+    const linkToPage = joinUrls(domain, "wiki", result.content._links.webui);
+    const title = result.title.replace(/@@@hl@@@|@@@endhl@@@/g, "");
+    const resultBlock = {
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: `*${title}* <${linkToPage}|:link:> \n `,
+      },
+    };
+
+    blocks.push(resultBlock);
+  });
+
+  blocks.unshift(
+    {
+      type: "divider",
+    },
+    {
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: "*Results from Confluence:*",
+      },
+    } as Block,
+  );
+
   return blocks;
 };
 
