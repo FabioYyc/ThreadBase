@@ -8,6 +8,7 @@ import {
 } from "./constants";
 import { ISavedThread } from "../../../../common/models/thread";
 import { joinUrls } from "../../../../common/utils/auth-url-utils";
+import { logoutActionId } from "../../save-confluence/constants";
 
 export const searchButton: Button = {
   type: "button",
@@ -211,6 +212,16 @@ export const confluenceSiteDisplay = (siteUrl: string) => [
     text: {
       type: "mrkdwn",
       text: `:white_check_mark: Your Confluence site is linked: ${siteUrl}`,
+    },
+    accessory: {
+      type: "button",
+      style: "primary",
+      action_id: logoutActionId,
+      text: {
+        type: "plain_text",
+        text: "Link Another Site",
+        emoji: true,
+      },
     },
   },
 ];

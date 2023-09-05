@@ -79,7 +79,6 @@ const searchModalHandler = async (app: App) => {
       if (accessToken) {
         const searchResponse = await searchWithText(accessToken, values);
         const results = searchResponse.results;
-        console.log("results ", JSON.stringify(results));
         const confluenceBlocks = getConfluencePageBlocks(results, siteUrl);
         appendBlocks.push(...confluenceBlocks);
       }

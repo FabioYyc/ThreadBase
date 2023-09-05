@@ -7,7 +7,10 @@ import { viewInputReader } from "../../utils";
 import { createNewPage } from "./apis";
 import { UserRepo } from "../../../common/models/user";
 import { sessionRepo } from "../../../common/models/session";
-import { getAccessTokenFromRefreshToken } from "../../shared/confluence/utils";
+import {
+  getAccessTokenFromRefreshToken,
+  getUserConfluenceAuth,
+} from "../../shared/confluence/utils";
 
 const saveConfluenceShortcutHandler = async (app: App) => {
   return app.shortcut("create-confluence", async ({ shortcut, ack, client }) => {
@@ -94,11 +97,21 @@ const logoutHandler = (app: App) => {
     //TODO: Make this a shared function between save-confluence and search with confluence
     const orgId = actionBody.team?.id;
     const userId = actionBody.user.id;
+
     const userRepo = UserRepo();
-    const confluenceSiteUrl = actionBody?.view?.private_metadata;
-    if (!orgId || !userId || !confluenceSiteUrl) {
+    if (!orgId || !userId) {
       throw new Error("Missing orgId or userId");
     }
+    let confluenceSiteUrl = actionBody?.view?.private_metadata;
+
+    if (!confluenceSiteUrl) {
+      const userConfluenceAuth = await getUserConfluenceAuth(orgId, userId);
+      if (!userConfluenceAuth || userConfluenceAuth.length < 1) {
+        throw new Error("Missing confluence auth");
+      }
+      confluenceSiteUrl = userConfluenceAuth[0].siteUrl;
+    }
+
     await userRepo.removeConfluenceAuth({ orgId, userId });
     await sessionRepo.removeSession(orgId, userId, confluenceSiteUrl);
     const confluenceViewCreator = SaveConfluenceViews();
