@@ -3,7 +3,7 @@ export const saveConfluenceCallbackId = "save_to_confluence";
 export const parentPageBlockId = "parent-page";
 export const pageTitleBlockId = "title";
 export const pageContentBlockId = "content";
-export const logoutActionId = "logout";
+export const saveConfluenceLogoutActionId = "logout";
 
 export interface IPage {
   id: string;

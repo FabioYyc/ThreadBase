@@ -1,7 +1,7 @@
 import { KnownBlock, ModalView, PlainTextOption, SectionBlock, View } from "@slack/bolt";
 import {
   IPage,
-  logoutActionId,
+  saveConfluenceLogoutActionId,
   pageContentBlockId,
   pageTitleBlockId,
   parentPageBlockId,
@@ -129,7 +129,7 @@ export const SaveConfluenceViews = () => {
           accessory: {
             type: "button",
             style: "primary",
-            action_id: logoutActionId,
+            action_id: saveConfluenceLogoutActionId,
             text: {
               type: "plain_text",
               text: "Link Another Site",

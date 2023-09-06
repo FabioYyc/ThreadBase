@@ -2,13 +2,14 @@ import { ActionsBlock, Block, Button, KnownBlock, Option, View } from "@slack/bo
 import {
   searchButtonActionId,
   searchConfluenceCheckedActionId,
-  searchConfluneceBlockId,
+  searchConfluenceLogoutActionId,
+  searchConfluneceCheckBlockId,
   searchDispatchActionId,
+  searchInputBlockId,
   searchModalId,
 } from "./constants";
 import { ISavedThread } from "../../../../common/models/thread";
 import { joinUrls } from "../../../../common/utils/auth-url-utils";
-import { logoutActionId } from "../../save-confluence/constants";
 
 export const searchButton: Button = {
   type: "button",
@@ -35,7 +36,10 @@ export const searchConfluenceOption: Option = {
   value: "true",
 };
 
-export const createSearchModal = (initialConfig?: { [blockId: string]: any }) => {
+export const createSearchModal = (initialConfig?: {
+  [searchInputBlockId]?: string;
+  [searchConfluneceCheckBlockId]?: Option[];
+}) => {
   const baseModal: View = {
     type: "modal",
     callback_id: searchModalId,
@@ -67,10 +71,11 @@ export const createSearchModal = (initialConfig?: { [blockId: string]: any }) =>
           text: ":left_speech_bubble:",
           emoji: true,
         },
+        block_id: searchInputBlockId,
       },
       {
         type: "actions",
-        block_id: searchConfluneceBlockId,
+        block_id: searchConfluneceCheckBlockId,
         elements: [
           {
             type: "checkboxes",
@@ -84,20 +89,24 @@ export const createSearchModal = (initialConfig?: { [blockId: string]: any }) =>
 
   // Apply initial_config if provided
   if (initialConfig) {
-    baseModal.blocks.forEach((block: KnownBlock | Block | ActionsBlock) => {
-      if (!block.block_id || !initialConfig[block.block_id]) return;
+    baseModal.blocks.forEach((block: any) => {
+      if (!block.block_id) return;
 
-      // Ensure the block is of type "actions" and has checkboxes
-      if (block.type === "actions") {
-        const actionBlock = block as ActionsBlock;
-        if (actionBlock.elements?.[0]?.type === "checkboxes") {
-          // TypeScript should now know that this is a checkboxes element
-          (actionBlock.elements[0] as any).initial_options = initialConfig[block.block_id];
+      if (block.block_id === searchConfluneceCheckBlockId) {
+        if (
+          initialConfig[searchConfluneceCheckBlockId] &&
+          initialConfig[searchConfluneceCheckBlockId].length > 0
+        ) {
+          block.elements[0].initial_options = initialConfig[searchConfluneceCheckBlockId];
         }
+      }
+
+      if (block.block_id === searchInputBlockId) {
+        block.element.initial_value = initialConfig[searchInputBlockId];
       }
     });
   }
-
+  console.log("baseModal", baseModal);
   return {
     getSearchInput: () => baseModal as View,
     appendBlocksToBaseView: (additionalBlocks: Block[], viewId: string, hash: string) => {
@@ -216,12 +225,14 @@ export const confluenceSiteDisplay = (siteUrl: string) => [
     accessory: {
       type: "button",
       style: "primary",
-      action_id: logoutActionId,
+      action_id: searchConfluenceLogoutActionId,
       text: {
         type: "plain_text",
         text: "Link Another Site",
         emoji: true,
       },
+      value: siteUrl,
     },
+    block_id: "confluence_site_url_display_block",
   },
 ];

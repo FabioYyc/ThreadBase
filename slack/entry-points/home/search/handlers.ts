@@ -3,6 +3,7 @@ import {
   App,
   Block,
   BlockAction,
+  ButtonAction,
   CheckboxesAction,
   KnownBlock,
   PlainTextInputAction,
@@ -10,8 +11,10 @@ import {
 import {
   searchButtonActionId,
   searchConfluenceCheckedActionId,
-  searchConfluneceBlockId,
+  searchConfluenceLogoutActionId,
+  searchConfluneceCheckBlockId,
   searchDispatchActionId,
+  searchInputBlockId,
 } from "./constants";
 import {
   confluenceAuthView,
@@ -27,6 +30,8 @@ import { getUserConfluenceAuth } from "../../../shared/confluence/utils";
 import { getAuthorizeUrl } from "../../../../common/utils/auth-url-utils";
 import { getUserConfluenceAccessToken } from "./utils";
 import { searchWithText } from "./apis";
+import { UserRepo } from "../../../../common/models/user";
+import { sessionRepo } from "../../../../common/models/session";
 
 const searchButtonHandler = (app: App) => {
   app.action(searchButtonActionId, async ({ ack, body, client }) => {
@@ -55,13 +60,13 @@ const searchModalHandler = async (app: App) => {
     const viewHash = payload.view?.hash;
     const viewId = payload.view?.id;
     const action = payload.actions[0] as PlainTextInputAction;
-    const values = action.value;
+    const searchTerm = action.value;
     const confluenceEnabledCheckbox =
-      payload.view?.state.values[searchConfluneceBlockId][searchConfluenceCheckedActionId]
+      payload.view?.state.values[searchConfluneceCheckBlockId][searchConfluenceCheckedActionId]
         .selected_options;
     const confluenceEnabled = confluenceEnabledCheckbox && confluenceEnabledCheckbox.length > 0;
 
-    if (!orgId || !userId || !values || !viewHash || !viewId) {
+    if (!orgId || !userId || !searchTerm || !viewHash || !viewId) {
       throw new Error("Missing orgId, userId, value or viewHash");
     }
     const teams = await getTeamsForUser(orgId, userId);
@@ -70,14 +75,14 @@ const searchModalHandler = async (app: App) => {
       orgId,
       userId,
       teamIds,
-      searchTerm: values,
+      searchTerm: searchTerm,
     });
     const appendBlocks: Block[] = [];
 
     if (confluenceEnabled) {
       const { accessToken, siteUrl } = await getUserConfluenceAccessToken(orgId, userId);
       if (accessToken) {
-        const searchResponse = await searchWithText(accessToken, values);
+        const searchResponse = await searchWithText(accessToken, searchTerm);
         const results = searchResponse.results;
         const confluenceBlocks = getConfluencePageBlocks(results, siteUrl);
         appendBlocks.push(...confluenceBlocks);
@@ -90,7 +95,16 @@ const searchModalHandler = async (app: App) => {
 
     appendBlocks.push(...threadBlocks);
 
-    const updatedModal = createSearchModal().appendBlocksToBaseView(appendBlocks, viewId, viewHash);
+    const initialConfig = {
+      [searchConfluneceCheckBlockId]: confluenceEnabled ? [searchConfluenceOption] : [],
+      [searchInputBlockId]: searchTerm,
+    };
+
+    const updatedModal = createSearchModal(initialConfig).appendBlocksToBaseView(
+      appendBlocks,
+      viewId,
+      viewHash,
+    );
 
     client.views.update(updatedModal);
   });
@@ -113,7 +127,7 @@ export const searchConfluenceCheckHandler = (app: App) => {
       //if unselected, option will be undefined
       if (option) {
         const initialConfig = {
-          [searchConfluneceBlockId]: [searchConfluenceOption],
+          [searchConfluneceCheckBlockId]: searchConfluenceOption,
         };
         const searchModalMaker = createSearchModal(initialConfig);
 
@@ -131,7 +145,6 @@ export const searchConfluenceCheckHandler = (app: App) => {
           view?.id,
           view?.hash,
         );
-        console.log("newModal view ", JSON.stringify(newModalView));
         await client.views.update(newModalView);
         return;
       }
@@ -147,8 +160,46 @@ export const searchConfluenceCheckHandler = (app: App) => {
   });
 };
 
+const logoutHandler = (app: App) => {
+  app.action(searchConfluenceLogoutActionId, async ({ ack, body, client, payload }) => {
+    ack();
+    const actionBody = body as BlockAction;
+    const userId = actionBody.user.id;
+    const orgId = actionBody.team?.id;
+    const siteUrl = (actionBody.actions[0] as ButtonAction).value;
+    if (!orgId || !userId || !siteUrl) {
+      throw new Error("Missing orgId, userId or siteUrl");
+    }
+    const userRepo = UserRepo();
+    await userRepo.removeConfluenceAuth({ orgId, userId });
+    await sessionRepo.removeSession(orgId, userId, siteUrl);
+
+    const initialConfig = {
+      [searchConfluneceCheckBlockId]: [searchConfluenceOption],
+    };
+
+    const searchModalMaker = createSearchModal(initialConfig);
+
+    const authorizeUrl = getAuthorizeUrl(orgId, userId);
+    const appendBlocks = confluenceAuthView(authorizeUrl);
+
+    if (!actionBody.view?.id || !actionBody.view?.hash) {
+      console.log(actionBody);
+      throw new Error("Missing view id or hash");
+    }
+    const newSearchView = searchModalMaker.appendBlocksToBaseView(
+      appendBlocks,
+      actionBody.view.id,
+      actionBody.view.hash,
+    );
+
+    client.views.update(newSearchView);
+  });
+};
+
 export const searchHandlers = (app: App) => {
   searchButtonHandler(app);
   searchModalHandler(app);
   searchConfluenceCheckHandler(app);
+  logoutHandler(app);
 };

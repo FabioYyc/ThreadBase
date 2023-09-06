@@ -1,7 +1,11 @@
 import { App, BlockAction, MessageShortcut } from "@slack/bolt";
 import { getAuthorizeUrl, joinUrls } from "../../../common/utils/auth-url-utils";
 import { SaveConfluenceViews } from "./view";
-import { SaveConfluencePayload, logoutActionId, saveConfluenceCallbackId } from "./constants";
+import {
+  SaveConfluencePayload,
+  saveConfluenceLogoutActionId,
+  saveConfluenceCallbackId,
+} from "./constants";
 import { getAuthView, getCorrectConfluenceViewByAuth, getSessionFromId } from "./utils";
 import { viewInputReader } from "../../utils";
 import { createNewPage } from "./apis";
@@ -91,7 +95,7 @@ export const saveConfluenceCallbackHandler = (app: App) => {
 };
 
 const logoutHandler = (app: App) => {
-  app.action(logoutActionId, async ({ ack, body, client, payload }) => {
+  app.action(saveConfluenceLogoutActionId, async ({ ack, body, client, payload }) => {
     ack();
     const actionBody = body as BlockAction;
     //TODO: Make this a shared function between save-confluence and search with confluence
