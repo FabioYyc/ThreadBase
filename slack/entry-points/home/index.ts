@@ -2,7 +2,7 @@ import { App } from "@slack/bolt";
 import { getSavedThreadViewByUser } from "./home-tab-view";
 import { editAndDeleteHandlers } from "./edit-and-delete-chat/handler";
 import { registerCreateTeamHandlers } from "./teams/handlers";
-import { searchButtonHandler, searchModalHandler } from "./search/handlers";
+import { searchButtonHandler, searchHandlers, searchModalHandler } from "./search/handlers";
 import { previewButtonHandler } from "./preview/handler";
 
 const homeOpenListener = (app: App) => {
@@ -26,8 +26,7 @@ const homeOpenListener = (app: App) => {
 export const registerHomeTabListeners = (app: App) => {
   homeOpenListener(app);
   registerCreateTeamHandlers(app);
-  searchButtonHandler(app);
-  searchModalHandler(app);
+  searchHandlers(app);
   previewButtonHandler(app);
   editAndDeleteHandlers(app);
 };

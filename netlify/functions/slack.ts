@@ -1,11 +1,11 @@
 import type { Handler, HandlerEvent, HandlerContext } from "@netlify/functions";
 import { App, ReceiverEvent } from "@slack/bolt";
 import { ExpressReceiver } from "@slack/bolt";
-import { registerHomeTabListeners } from "../../slack/listeners/home-saved-chat";
+import { registerHomeTabListeners } from "../../slack/entry-points/home";
 import { parseRequestBody } from "../../slack/utils";
-import { registerSaveChatHandler } from "../../slack/listeners/save-chat/handlers";
+import { registerSaveChatHandler } from "../../slack/entry-points/save-chat/handlers";
 import mongoose from "mongoose";
-import { registerConfluenceHandlers } from "../../slack/listeners/save-confluence/handlers";
+import { registerConfluenceHandlers } from "../../slack/entry-points/save-confluence/handlers";
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
