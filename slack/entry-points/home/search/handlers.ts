@@ -127,7 +127,7 @@ export const searchConfluenceCheckHandler = (app: App) => {
       //if unselected, option will be undefined
       if (option) {
         const initialConfig = {
-          [searchConfluneceCheckBlockId]: searchConfluenceOption,
+          [searchConfluneceCheckBlockId]: [searchConfluenceOption],
         };
         const searchModalMaker = createSearchModal(initialConfig);
 
