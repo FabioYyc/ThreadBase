@@ -210,7 +210,7 @@ export const confluenceAuthView = (authorizeUrl: string) => [
     type: "section",
     text: {
       type: "mrkdwn",
-      text: `:information_source: _Close this window and use the shortcut again after you've linked your site._`,
+      text: `:information_source: _Close this modal and use the button again after you've linked your site._`,
     },
   },
 ];
