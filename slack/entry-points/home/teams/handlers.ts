@@ -24,7 +24,8 @@ const createTeamButtonHandler = (app: App): void => {
     try {
       ack();
       const payload = body as BlockAction;
-      client.views.open({
+
+      await client.views.open({
         trigger_id: payload.trigger_id,
         view: generateTeamView({}),
       });
@@ -52,7 +53,7 @@ const editTeamButtonHandler = (app: App): void => {
       if (!isOwner) {
         return;
       }
-      client.views
+      await client.views
         .open({
           trigger_id: payload.trigger_id,
           view: generateTeamView({ teamId: `edit_team-${selectedTeamValue}`, team, isEdit: true }),
@@ -189,7 +190,7 @@ const switchTeamHandler = (app: App) => {
   });
 };
 
-const deleteTeamHandler =(app: App) => {
+const deleteTeamHandler = (app: App) => {
   app.action(deleteTeamButtonActionId, async ({ ack, body, client, payload }) => {
     try {
       ack();
@@ -197,18 +198,18 @@ const deleteTeamHandler =(app: App) => {
       const externalId = payload.view?.external_id;
       const teamId = externalId?.split("-")[1];
       const view = payload.view;
-      if(!view || !externalId || !teamId) {
+      if (!view || !externalId || !teamId) {
         console.log({
           teamId,
           externalId,
-        })
+        });
         throw new Error("Missing view or external id or team id");
       }
       const value = viewInputReader(view) as ITeamFormValues;
 
       const teamName = stringInputParser(value.team_name);
 
-      client.views.update({
+      await client.views.update({
         view_id: payload.view?.id,
         viewHash: payload.view?.hash,
         view: deleteTeamConfirmView(teamId, teamName),
@@ -217,7 +218,7 @@ const deleteTeamHandler =(app: App) => {
       throw new Error(`error in delete team: ${error}`);
     }
   });
-}
+};
 
 const deleteTeamConfirmHandler = (app: App) => {
   app.view(deleteTeamConfirmButtonActionId, async ({ ack, body, view, client }) => {
@@ -237,13 +238,12 @@ const deleteTeamConfirmHandler = (app: App) => {
   });
 };
 
-
 export const registerCreateTeamHandlers = (app: App): void => {
   createTeamButtonHandler(app);
   editTeamButtonHandler(app);
   createTeamFormHandler(app);
   editTeamFormHandler(app);
   switchTeamHandler(app);
-  deleteTeamHandler(app)
+  deleteTeamHandler(app);
   deleteTeamConfirmHandler(app);
 };
