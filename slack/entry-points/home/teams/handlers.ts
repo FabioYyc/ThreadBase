@@ -179,14 +179,14 @@ const switchTeamHandler = (app: App) => {
     const orgId = payload.team.id;
 
     if (selectedTeamValue === personalSpaceValue) {
-      getUserHomeView(orgId, userId, client, personalSpaceValue);
+      await getUserHomeView(orgId, userId, client, personalSpaceValue);
       await updateUserUILatestTeamId(orgId, userId, personalSpaceValue);
       return;
     }
     const selectedTeam = await teamRepo.getTeamById(selectedTeamValue);
     //update home tab view
     await updateUserUILatestTeamId(orgId, userId, selectedTeam.id);
-    getUserHomeView(orgId, payload.user.id, client, selectedTeam.id);
+    await getUserHomeView(orgId, payload.user.id, client, selectedTeam.id);
   });
 };
 
