@@ -18,7 +18,7 @@ export const deleteChatConfirm = (app: App) => {
     if (!deleteAction) {
       throw new Error("Delete action not found");
     }
-    client.views.open({
+    await client.views.open({
       trigger_id: payload.trigger_id as string,
       view: deleteChatConfirmView(deleteAction.value),
     });
@@ -61,7 +61,7 @@ const handleEditAction = async (threadId: string, payload: any, client: any) => 
 
 const handleDeleteAction = async (threadId: string, payload: BlockAction, client: any) => {
   console.log("opening delete view");
-  client.views.open({
+  await client.views.open({
     trigger_id: payload.trigger_id as string,
     view: deleteChatConfirmView(threadId),
   });

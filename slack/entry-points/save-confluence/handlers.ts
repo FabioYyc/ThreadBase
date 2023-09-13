@@ -125,7 +125,7 @@ const logoutHandler = (app: App) => {
       console.log(actionBody);
       throw new Error("Missing view id");
     }
-    client.views.update({
+    await client.views.update({
       view_id: actionBody.view.id,
       hash: actionBody.view.hash,
       view: authView,

@@ -106,7 +106,7 @@ const searchModalHandler = async (app: App) => {
       viewHash,
     );
 
-    client.views.update(updatedModal);
+    await client.views.update(updatedModal);
   });
 };
 
@@ -193,7 +193,7 @@ const logoutHandler = (app: App) => {
       actionBody.view.hash,
     );
 
-    client.views.update(newSearchView);
+    await client.views.update(newSearchView);
   });
 };
 

@@ -151,7 +151,7 @@ export const getUserHomeView = async (
   selectedTeamId?: string,
 ) => {
   const updatedHomeView = await getSavedThreadViewByUser(orgId, userId, selectedTeamId);
-  client.views.publish({
+  await client.views.publish({
     user_id: userId,
     view: updatedHomeView,
   });
