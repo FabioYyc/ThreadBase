@@ -6,19 +6,18 @@ export const getMessage = async ({
   channelId,
   senderId,
   isReply,
-  app,
+  client,
 }: {
   messageTs: string;
   channelId: string;
   senderId: string;
   isReply: boolean;
-  app: App;
+  client: WebClient;
 }) => {
   let result;
 
   if (!isReply) {
-    result = await app.client.conversations.history({
-      token: process.env.SLACK_BOT_TOKEN,
+    result = await client.conversations.history({
       channel: channelId,
       latest: messageTs,
       limit: 1,
@@ -26,8 +25,7 @@ export const getMessage = async ({
       inclusive: true,
     });
   } else {
-    result = await app.client.conversations.replies({
-      token: process.env.SLACK_BOT_TOKEN,
+    result = await client.conversations.replies({
       channel: channelId,
       ts: messageTs,
       limit: 1,

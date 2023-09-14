@@ -9,7 +9,7 @@ export const previewButtonHandler = (app: App) => {
     const payload = body as BlockAction;
     const action = payload.actions[0] as ButtonAction;
     const threadId = action.value;
-    const messages = await getMessagesFormThread({ threadId, app });
+    const messages = await getMessagesFormThread({ threadId, client });
     if (!messages.length) {
       throw new Error("Invalid number of messages");
     }

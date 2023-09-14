@@ -1,8 +1,8 @@
-import { App } from "@slack/bolt";
+import { WebClient } from "@slack/web-api";
 import { ISavedThread, threadRepo } from "../../../../common/models/thread";
 import { getMessage } from "../../../apis/messages";
 
-export const getMessagesFormThread = async ({ threadId, app }: { threadId: string; app: App }) => {
+export const getMessagesFormThread = async ({ threadId, client }: { threadId: string; client: WebClient }) => {
   const thread = (await threadRepo.getThreadById(threadId)) as ISavedThread;
   if (!thread) {
     console.log("No thread found with id: ", threadId);
@@ -14,7 +14,7 @@ export const getMessagesFormThread = async ({ threadId, app }: { threadId: strin
     channelId,
     senderId,
     isReply,
-    app,
+    client,
   });
 
   return message ? [message] : [];

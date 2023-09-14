@@ -23,7 +23,6 @@ const authorizeFn = async ({ teamId, enterpriseId }: any) => {
 };
 
 const app = new App({
-  // token: process.env.SLACK_BOT_TOKEN,
   signingSecret: process.env.SLACK_SIGNING_SECRET,
   receiver: new ExpressReceiver({
     signingSecret: process.env.SLACK_SIGNING_SECRET as string,
