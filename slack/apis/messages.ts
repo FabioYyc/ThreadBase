@@ -1,4 +1,3 @@
-import { App } from "@slack/bolt";
 import { WebClient } from "@slack/web-api";
 
 export const getMessage = async ({
