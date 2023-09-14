@@ -3,7 +3,7 @@ import { IConfluenceAuth } from "../../../common/models/user";
 import mongoose from "mongoose";
 import { parseAuthorizeUrlState } from "../../../common/utils/auth-url-utils";
 import { getAccessToken, getAccessibleResource } from "../../../common/services/confluence-service";
-import { returnBody, successMessageHTML } from "./response";
+import { returnBody, successConfluenceAuthMessageHTML } from "../../../common/utils/auth-redirect-response";
 import { UserRepo } from "../../../common/models/user";
 
 const handler: Handler = async (event: HandlerEvent) => {
@@ -50,7 +50,7 @@ const handler: Handler = async (event: HandlerEvent) => {
     await mongoose.connection.close();
     return {
       statusCode: 200,
-      body: returnBody(successMessageHTML),
+      body: returnBody(successConfluenceAuthMessageHTML),
     };
   } catch (error) {
     console.log(error);

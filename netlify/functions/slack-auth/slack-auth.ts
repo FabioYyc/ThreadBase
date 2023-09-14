@@ -9,6 +9,7 @@ import {
   slackInstallationRepo,
 } from "../../../common/models/slack-installation";
 import mongoose from "mongoose";
+import { returnBody } from "../../../common/utils/auth-redirect-response";
 
 // create SlackInstallation
 const handler: Handler = async (event: HandlerEvent) => {
@@ -19,10 +20,8 @@ const handler: Handler = async (event: HandlerEvent) => {
       throw new Error("No code provided");
     }
     const installationRes = await getInstallationFromCode(code);
-    console.log("installationRes", installationRes);
     const botId = await getBotId(installationRes.bot_user_id, installationRes.access_token);
 
-    console.log("bot res", botId);
 
     const installation: SlackInstallation = {
       teamId: installationRes.team.id,
@@ -32,11 +31,17 @@ const handler: Handler = async (event: HandlerEvent) => {
       botId,
     };
     await slackInstallationRepo.createOrUpdate(installation);
+    const successMessage = `
+    Successfully installed Slack app; 
+    <p> please 
+        <a href="slack://open?team=${installation.teamId}">click this link</a> 
+        to open the team in Slack
+    </p>`;
+
+    const response = returnBody(successMessage)
     return {
       statusCode: 200, // 302 is a standard HTTP status code for redirection
-      headers: {
-        Location: `slack://open?team=${installation.teamId}`,
-      },
+      body: response,
     };
   } catch (error) {
     console.log("error", error);
