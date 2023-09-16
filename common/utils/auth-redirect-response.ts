@@ -1,4 +1,4 @@
-export const successMessageHTML = `<p>Successfully linked to your Confluence <img src="https://cdn.icon-icons.com/icons2/2429/PNG/512/confluence_logo_icon_147305.png" alt="Confluence Icon" class="production-icon"> site!</p>
+export const successConfluenceAuthMessageHTML = `<p>Successfully linked to your Confluence <img src="https://cdn.icon-icons.com/icons2/2429/PNG/512/confluence_logo_icon_147305.png" alt="Confluence Icon" class="production-icon"> site!</p>
 <p>You can close this page, and use the <img src="https://cdn.icon-icons.com/icons2/2699/PNG/512/slack_tile_logo_icon_168820.png" alt="Slack Icon" class="production-icon"> shortcut or button again.</p>`;
 
 export const returnBody = (message: string) => {
