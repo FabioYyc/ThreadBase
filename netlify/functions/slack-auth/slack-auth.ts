@@ -22,7 +22,6 @@ const handler: Handler = async (event: HandlerEvent) => {
     const installationRes = await getInstallationFromCode(code);
     const botId = await getBotId(installationRes.bot_user_id, installationRes.access_token);
 
-
     const installation: SlackInstallation = {
       teamId: installationRes.team.id,
       botToken: installationRes.access_token,
@@ -32,13 +31,13 @@ const handler: Handler = async (event: HandlerEvent) => {
     };
     await slackInstallationRepo.createOrUpdate(installation);
     const successMessage = `
-    Successfully installed Slack app; 
+    Successfully installed Slack app <img src="https://cdn.icon-icons.com/icons2/1633/PNG/512/52707partypopper_109417.png" alt="Party Popper" class="production-icon">; 
     <p> please 
         <a href="slack://open?team=${installation.teamId}">click this link</a> 
         to open the team in Slack
     </p>`;
 
-    const response = returnBody(successMessage)
+    const response = returnBody(successMessage);
     return {
       statusCode: 200, // 302 is a standard HTTP status code for redirection
       body: response,
