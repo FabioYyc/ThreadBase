@@ -98,14 +98,7 @@ export const saveViewHandler = (app: App) => {
   return app.view(saveChatCallbackId, async ({ ack, view, client }) => {
     try {
       await ack();
-      const thread = await saveFromSaveChatView(view);
-
-      client.chat.postEphemeral({
-        channel: thread.channelId,
-        blocks: confirmationMessage(thread.userName),
-        thread_ts: thread.messageTs,
-        user: thread.userId,
-      });
+      await saveFromSaveChatView(view);
     } catch (error) {
       throw new Error(`error in save chat: ${error}`);
     }

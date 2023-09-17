@@ -53,7 +53,6 @@ const searchButtonHandler = (app: App) => {
 const searchModalHandler = async (app: App) => {
   app.action(searchDispatchActionId, async ({ ack, body, client }) => {
     await ack();
-    // use searchByTitle to get the results
     const payload = body as BlockAction;
     const userId = payload.user.id;
     const orgId = payload.team?.id;

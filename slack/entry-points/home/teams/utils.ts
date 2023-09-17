@@ -1,4 +1,5 @@
 import { App, SlackViewAction, ViewOutput } from "@slack/bolt";
+import { WebClient } from "@slack/web-api";
 import { ISavedTeam, ITeam, ITeamConversation, teamRepo } from "../../../../common/models/team";
 import { stringInputParser } from "../../../utils";
 import { ITeamFormValues } from "./types";
@@ -15,12 +16,12 @@ export const getRemovedMembers = (oldMembers: string[], newMembers: string[]): s
 };
 
 export const processTeamForm = async ({
-  app,
+  client,
   values,
   body,
   view,
 }: {
-  app: App;
+  client: WebClient;
   values: ITeamFormValues;
   body: SlackViewAction;
   view: ViewOutput;
@@ -38,7 +39,7 @@ export const processTeamForm = async ({
   const teamConversations: ITeamConversation[] = [];
 
   for (const conversation of conversations) {
-    const teamConversation = await createTeamConversations(app, conversation);
+    const teamConversation = await createTeamConversations(client, conversation);
     teamConversations.push(teamConversation);
   }
 
