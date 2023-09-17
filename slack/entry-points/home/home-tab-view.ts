@@ -93,7 +93,14 @@ export const threadsView = ({
   }
 
   const hasThreads = threads.length > 0;
-
+  const feedbackFormLink = `https://68h1lfczv6z.typeform.com/to/yV6Jmz56`;
+  const feedbackBlock = {
+    type: "section",
+    text: {
+      type: "mrkdwn",
+      text: `*Feedback?* We'd love to hear from you! :heart: Use this <${feedbackFormLink}|:link:> to send us your feedback, bug report or feature request.`,
+    },
+  };
   const blocks = [
     {
       type: "header",
@@ -102,6 +109,7 @@ export const threadsView = ({
         text: headerText,
       },
     },
+    feedbackBlock,
     homeTabActionRow({ selectedTeamId, isOwner, hasThreads }),
     teamSelector(teams, selectedTeamId),
     {
