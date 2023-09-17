@@ -1,9 +1,8 @@
-import { App } from "@slack/bolt";
+import { WebClient } from "@slack/web-api";
 import { ITeamConversation } from "../../../../common/models/team";
 
-export const conversationMembers = async (app: App, conversationId: string) => {
-  const res = await app.client.conversations.members({
-    token: process.env.SLACK_BOT_TOKEN,
+export const conversationMembers = async (client: WebClient, conversationId: string) => {
+  const res = await client.conversations.members({
     channel: conversationId,
   });
 
@@ -15,10 +14,10 @@ export const conversationMembers = async (app: App, conversationId: string) => {
 };
 
 export const createTeamConversations = async (
-  app: App,
+  client: WebClient,
   conversationId: string,
 ): Promise<ITeamConversation> => {
-  const members = await conversationMembers(app, conversationId);
+  const members = await conversationMembers(client, conversationId);
 
   if (!members) {
     throw new Error(`error in getting conversation members: ${members}`);

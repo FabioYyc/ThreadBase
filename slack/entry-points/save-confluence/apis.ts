@@ -20,17 +20,6 @@ export const getCfPages = async (accessToken: string) => {
   return pageRes.results as IPage[];
 };
 
-export const getCfSpaces = async (accessToken: string) => {
-  const resource = await getAccessibleResource(accessToken);
-  const spaces = await fetchCfUrl({
-    cloudId: resource.id,
-    accessToken,
-    path: "/wiki/api/v2/spaces",
-    method: "GET",
-  });
-  return spaces.results as ISpace[];
-};
-
 export const getSaveConfluenceViewData = async (accessToken: string) => {
   const pages = await getCfPages(accessToken);
 
