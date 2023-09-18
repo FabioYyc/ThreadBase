@@ -29,7 +29,7 @@ import { getTeamsForUser } from "../teams/utils";
 import { getUserConfluenceAuth } from "../../../shared/confluence/utils";
 import { getAuthorizeUrl } from "../../../../common/utils/auth-url-utils";
 import { getUserConfluenceAccessToken } from "./utils";
-import { searchWithText } from "./apis";
+import { searchConfluenceWithText } from "./apis";
 import { UserRepo } from "../../../../common/models/user";
 import { sessionRepo } from "../../../../common/models/session";
 
@@ -81,7 +81,7 @@ const searchModalHandler = async (app: App) => {
     if (confluenceEnabled) {
       const { accessToken, siteUrl } = await getUserConfluenceAccessToken(orgId, userId);
       if (accessToken) {
-        const searchResponse = await searchWithText(accessToken, searchTerm);
+        const searchResponse = await searchConfluenceWithText(accessToken, searchTerm);
         const results = searchResponse.results;
         const confluenceBlocks = getConfluencePageBlocks(results, siteUrl);
         appendBlocks.push(...confluenceBlocks);
