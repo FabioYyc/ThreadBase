@@ -60,7 +60,6 @@ const handleEditAction = async (threadId: string, payload: any, client: any) => 
 };
 
 const handleDeleteAction = async (threadId: string, payload: BlockAction, client: any) => {
-  console.log("opening delete view");
   await client.views.open({
     trigger_id: payload.trigger_id as string,
     view: deleteChatConfirmView(threadId),
@@ -80,14 +79,13 @@ export const overflowActionHandler = (app: App) => {
     const optionValue = overflowAction.selected_option.value;
     const [actionType, threadId] = optionValue.split("-");
 
-    console.log("overflow-action", optionValue);
 
     switch (actionType) {
       case ChatActions.EDIT:
-        handleEditAction(threadId, payload, client);
+        await handleEditAction(threadId, payload, client);
         break;
       case ChatActions.DELETE:
-        handleDeleteAction(threadId, payload, client);
+        await handleDeleteAction(threadId, payload, client);
         break;
       default:
         throw new Error("Unknown action type");
