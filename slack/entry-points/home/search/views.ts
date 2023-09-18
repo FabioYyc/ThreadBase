@@ -106,7 +106,6 @@ export const createSearchModal = (initialConfig?: {
       }
     });
   }
-  console.log("baseModal", baseModal);
   return {
     getSearchInput: () => baseModal as View,
     appendBlocksToBaseView: (additionalBlocks: Block[], viewId: string, hash: string) => {
@@ -143,14 +142,33 @@ export const getThreadBlocks = (threads: ISavedThread[]): Block[] => {
       },
     };
   });
-  blocks.unshift({
+  blocks.unshift(...[{
     type: "divider",
-  });
+  },
+  {
+    type: "section",
+    text: {
+      type: "mrkdwn",
+      text: "*Results from Saved Chats:*",
+    },
+  } as Block]);
+
+
   return blocks;
 };
 
 export const getConfluencePageBlocks = (results: any[], siteUrl: string) => {
   const blocks: Block[] = [];
+  
+  const emptyResultBlock = [{
+    type: "section",
+    text: {
+      type: "plain_text",
+      text: "No Confluence pages match the search term :cry:",
+      emoji: true,
+    },
+  }];
+  if(!results.length) return emptyResultBlock;
   results.forEach((result) => {
     const domain = siteUrl.startsWith("https://") ? siteUrl : `https://${siteUrl}`;
     if (!result.content._links) return;
