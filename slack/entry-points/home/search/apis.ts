@@ -16,7 +16,7 @@ export const searchConfluenceWithText = async (accessToken: string, text: string
       path: "/wiki/rest/api/search",
       method: "GET",
       queryParams: {
-        cql: `(type=page AND title ~ ${text} AND space in recentlyViewedSpaces(5))`,
+        cql: `(type=page AND title ~ "${text}")`,
         limit: 10
       },
     });
