@@ -45,6 +45,15 @@ const handler: Handler = async (event: HandlerEvent, context: HandlerContext) =>
       body: payload.challenge,
     };
   }
+
+  if(payload && payload.type && payload.type === "keep_warm") {
+    return {
+      statusCode: 200,
+      body: "ok",
+    };
+  }
+
+
   const slackEvent: ReceiverEvent = {
     body: payload,
     ack: async (response) => {
