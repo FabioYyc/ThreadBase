@@ -20,6 +20,6 @@ const myHandler: Handler = async (event: HandlerEvent, context: HandlerContext) 
     };
 };
 
-const handler = schedule("2-59/2 * * * 1-5", myHandler)
+const handler = schedule("*/5 * * * *", myHandler)
 
 export { handler };
