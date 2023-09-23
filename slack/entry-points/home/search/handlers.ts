@@ -50,7 +50,7 @@ const searchButtonHandler = (app: App) => {
   });
 };
 
-const searchModalHandler = async (app: App) => {
+const searchModalDispatchSearchHandler = async (app: App) => {
   app.action(searchDispatchActionId, async ({ ack, body, client }) => {
     await ack();
     const payload = body as BlockAction;
@@ -78,12 +78,18 @@ const searchModalHandler = async (app: App) => {
     });
     const appendBlocks: Block[] = [];
 
+    const initialConfig = {
+      [searchConfluneceCheckBlockId]: confluenceEnabled ? [searchConfluenceOption] : [],
+      [searchInputBlockId]: searchTerm,
+    };
+
     if (confluenceEnabled) {
       const { accessToken, siteUrl } = await getUserConfluenceAccessToken(orgId, userId);
       if (accessToken) {
         const searchResponse = await searchConfluenceWithText(accessToken, searchTerm);
         const results = searchResponse.results;
         const confluenceBlocks = getConfluencePageBlocks(results, siteUrl);
+        appendBlocks.push(...confluenceSiteDisplay(siteUrl));
         appendBlocks.push(...confluenceBlocks);
       }
     }
@@ -93,11 +99,6 @@ const searchModalHandler = async (app: App) => {
     const threadBlocks = getThreadBlocks(threadResults);
 
     appendBlocks.push(...threadBlocks);
-
-    const initialConfig = {
-      [searchConfluneceCheckBlockId]: confluenceEnabled ? [searchConfluenceOption] : [],
-      [searchInputBlockId]: searchTerm,
-    };
 
     const updatedModal = createSearchModal(initialConfig).appendBlocksToBaseView(
       appendBlocks,
@@ -119,14 +120,17 @@ export const searchConfluenceCheckHandler = (app: App) => {
       const view = payload.view;
       const actions = payload.actions;
       const action = actions[0] as CheckboxesAction;
-      const option = action.selected_options[0];
+
       if (!orgId || !userId || !view) {
         throw new Error("Missing orgId or userId");
       }
+
       //if unselected, option will be undefined
-      if (option) {
+      if (searchConfluenceOption) {
         const initialConfig = {
-          [searchConfluneceCheckBlockId]: [searchConfluenceOption],
+          [searchConfluneceCheckBlockId]: [
+            action.selected_options[0] ? searchConfluenceOption : undefined,
+          ],
         };
         const searchModalMaker = createSearchModal(initialConfig);
 
@@ -148,7 +152,8 @@ export const searchConfluenceCheckHandler = (app: App) => {
         return;
       }
       //if unselected, option will be undefined
-      if (!option) {
+      if (!searchConfluenceOption) {
+        console.log("push unselected view");
         const searchModalMaker = createSearchModal();
         const baseView = searchModalMaker.appendBlocksToBaseView([], view?.id, view?.hash);
         await client.views.update(baseView);
@@ -198,7 +203,7 @@ const logoutHandler = (app: App) => {
 
 export const searchHandlers = (app: App) => {
   searchButtonHandler(app);
-  searchModalHandler(app);
+  searchModalDispatchSearchHandler(app);
   searchConfluenceCheckHandler(app);
   logoutHandler(app);
 };
