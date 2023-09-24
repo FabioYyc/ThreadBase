@@ -16,22 +16,24 @@ export const previewButtonHandler = (app: App) => {
           throw new Error("Invalid number of messages");
         }
         const message = messages[0];
-  
+
         const previewModal = createPreviewModal(message);
         await client.views.open({
           trigger_id: payload.trigger_id,
           view: previewModal,
         });
       } catch (error) {
-        const errorMessage = `Unable to preview message. Please make sure the ThreadBase is in the channel, and the message is not deleted.`;
-        const previewModal = createPreviewModal({text: errorMessage}, 'error');
-        console.log('opening modal')
+        const errorMessage = `*Unable to preview message.* 
+Please ensure:
+• The *ThreadBase* app is added to the channel.
+• The message has not been deleted.
+• Private messages are *not* supported yet.`;
+        const previewModal = createPreviewModal({ text: errorMessage }, "error");
         await client.views.open({
           trigger_id: payload.trigger_id,
           view: previewModal,
         });
       }
-  
     } catch (error) {
       console.error(JSON.stringify(error));
     }
