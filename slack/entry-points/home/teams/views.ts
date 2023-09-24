@@ -35,7 +35,7 @@ export const generateTeamView = ({
     },
     title: {
       type: "plain_text",
-      text: isEdit ? "Edit :writing_hand:" : "Create a new team :tada:",
+      text: isEdit ? "Edit :writing_hand:" : "Create a new folder :tada:",
       emoji: true,
     },
     blocks: [
@@ -44,8 +44,8 @@ export const generateTeamView = ({
         text: {
           type: "plain_text",
           text: isEdit
-            ? "Edit your team details :construction_worker:"
-            : "Create a new team to share your saved chats with your teammates! :construction_worker:",
+            ? "Edit your folder details :construction_worker:"
+            : "Create a new folder to share your saved chats with your teammates! :construction_worker:",
           emoji: true,
         },
       },
@@ -57,7 +57,7 @@ export const generateTeamView = ({
         block_id: "team_name",
         label: {
           type: "plain_text",
-          text: "Team Name",
+          text: "Folder Name",
           emoji: true,
         },
         element: {
@@ -71,7 +71,7 @@ export const generateTeamView = ({
         block_id: "team_description",
         label: {
           type: "plain_text",
-          text: "Team Description",
+          text: "Folder Description",
           emoji: true,
         },
         element: {
@@ -88,7 +88,7 @@ export const generateTeamView = ({
           type: "multi_users_select",
           placeholder: {
             type: "plain_text",
-            text: "Select users",
+            text: "Select users to add to folder",
             emoji: true,
           },
           initial_users: isEdit && team?.teamUsers ? team.teamUsers : [],
@@ -96,7 +96,7 @@ export const generateTeamView = ({
         },
         label: {
           type: "plain_text",
-          text: "Add members",
+          text: "Folder Members",
           emoji: true,
         },
         optional: true,
@@ -128,7 +128,7 @@ export const generateTeamView = ({
             type: "button",
             text: {
               type: "plain_text",
-              text: "Delete Team",
+              text: "Delete Folder",
               emoji: true,
             },
             value: "click_me_123",
@@ -150,7 +150,7 @@ export const teamSelector = (teams: ISavedTeam[], selectedTeamId?: string) => {
     return {
       text: {
         type: "plain_text",
-        text: `:people_holding_hands:${team.teamName}`,
+        text: `:file_folder:${team.teamName}`,
         emoji: true,
       },
       value: team.id,
@@ -169,7 +169,7 @@ export const teamSelector = (teams: ISavedTeam[], selectedTeamId?: string) => {
   teamOptions.unshift(personalSpaceOption);
 
   const spaceText = selectedTeam
-    ? `*Current Team Space: ${selectedTeam.teamName}*`
+    ? `*Current Folder: ${selectedTeam.teamName}*`
     : `*Currently At Personal Space*`;
   const returnBlock: SectionBlock = {
     type: "section",
@@ -185,7 +185,7 @@ export const teamSelector = (teams: ISavedTeam[], selectedTeamId?: string) => {
       action_id: teamSwitchActionId,
       placeholder: {
         type: "plain_text",
-        text: "Select team",
+        text: "Select folder",
         emoji: true,
       },
       options: teamOptions,
@@ -212,7 +212,7 @@ export const deleteTeamConfirmView = (teamId: string, teamName: string): View =>
   },
   title: {
     type: "plain_text",
-    text: "Delete this team :broom:",
+    text: "Delete this folder :broom:",
     emoji: true,
   },
   blocks: [
@@ -220,7 +220,7 @@ export const deleteTeamConfirmView = (teamId: string, teamName: string): View =>
       type: "section",
       text: {
         type: "mrkdwn",
-        text: `Confirm you want to *DELETE* team: *${teamName}*`,
+        text: `Confirm you want to *DELETE* folder: *${teamName}*`,
       },
     },
   ],

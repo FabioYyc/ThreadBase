@@ -44,7 +44,7 @@ export const getTeamMultiSelect = (
   },
   label: {
     type: "plain_text",
-    text: "Select teams",
+    text: "Select folders",
     emoji: true,
   },
   optional: true,
