@@ -6,7 +6,10 @@ import { getTeamsForUser } from "../home/teams/utils";
 export const saveChatCallbackId = "save-chat-view";
 export const editChatCallbackId = "edit-chat-view";
 
-export const getTeamMultiSelect = (teams: ISavedTeam[]): Block | KnownBlock => ({
+export const getTeamMultiSelect = (
+  teams: ISavedTeam[],
+  initialOptionTeamIds?: string[],
+): Block | KnownBlock => ({
   type: "input",
   block_id: "teams",
   element: {
@@ -24,6 +27,19 @@ export const getTeamMultiSelect = (teams: ISavedTeam[]): Block | KnownBlock => (
       },
       value: team.id,
     })),
+    initial_options:
+      initialOptionTeamIds && initialOptionTeamIds.length > 0
+        ? teams
+            .filter((team) => initialOptionTeamIds?.includes(team.id))
+            .map((team) => ({
+              text: {
+                type: "plain_text",
+                text: team.teamName,
+                emoji: true,
+              },
+              value: team.id,
+            }))
+        : undefined,
     action_id: "chat_team_select_action",
   },
   label: {
@@ -125,7 +141,8 @@ export const createChatView = async ({
   ];
   let teamMultiSelect;
   if (teams && teams.length > 0) {
-    teamMultiSelect = getTeamMultiSelect(teams);
+    const initial_options = isEdit ? thread?.teams?.map((team) => team) : undefined;
+    teamMultiSelect = getTeamMultiSelect(teams, initial_options);
     blocks.push(teamMultiSelect);
   }
 

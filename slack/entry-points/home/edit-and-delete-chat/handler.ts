@@ -70,7 +70,6 @@ export const overflowActionHandler = (app: App) => {
   app.action(overflowActionId, async ({ ack, body, client }) => {
     await ack();
     const payload = body as BlockAction;
-    console.log("overflow-action", payload);
     const actions = payload.actions as OverflowAction[];
     const overflowAction = actions.find((action) => action.action_id === overflowActionId);
     if (!overflowAction) {
@@ -78,7 +77,6 @@ export const overflowActionHandler = (app: App) => {
     }
     const optionValue = overflowAction.selected_option.value;
     const [actionType, threadId] = optionValue.split("-");
-
 
     switch (actionType) {
       case ChatActions.EDIT:
