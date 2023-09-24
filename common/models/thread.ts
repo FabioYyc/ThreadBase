@@ -43,7 +43,7 @@ export interface IThread {
   domain: string;
   threadLink: string;
   channelId: string;
-  senderId: string;
+  senderId?: string;
   isSaved: boolean;
   isReply: boolean;
 }
