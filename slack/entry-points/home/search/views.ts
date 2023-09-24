@@ -38,7 +38,7 @@ export const searchConfluenceOption: Option = {
 
 export const createSearchModal = (initialConfig?: {
   [searchInputBlockId]?: string;
-  [searchConfluneceCheckBlockId]?: Option[];
+  [searchConfluneceCheckBlockId]?: (Option | undefined)[];
 }) => {
   const baseModal: View = {
     type: "modal",
@@ -142,33 +142,38 @@ export const getThreadBlocks = (threads: ISavedThread[]): Block[] => {
       },
     };
   });
-  blocks.unshift(...[{
-    type: "divider",
-  },
-  {
-    type: "section",
-    text: {
-      type: "mrkdwn",
-      text: "*Results from Saved Chats:*",
-    },
-  } as Block]);
-
+  blocks.unshift(
+    ...[
+      {
+        type: "divider",
+      },
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: "*Results from Saved Chats:*",
+        },
+      } as Block,
+    ],
+  );
 
   return blocks;
 };
 
 export const getConfluencePageBlocks = (results: any[], siteUrl: string) => {
   const blocks: Block[] = [];
-  
-  const emptyResultBlock = [{
-    type: "section",
-    text: {
-      type: "plain_text",
-      text: "No Confluence pages match the search term :cry:",
-      emoji: true,
+
+  const emptyResultBlock = [
+    {
+      type: "section",
+      text: {
+        type: "plain_text",
+        text: "No Confluence pages match the search term :cry:",
+        emoji: true,
+      },
     },
-  }];
-  if(!results.length) return emptyResultBlock;
+  ];
+  if (!results.length) return emptyResultBlock;
   results.forEach((result) => {
     const domain = siteUrl.startsWith("https://") ? siteUrl : `https://${siteUrl}`;
     if (!result.content._links) return;
