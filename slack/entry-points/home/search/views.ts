@@ -117,6 +117,15 @@ export const createSearchModal = (initialConfig?: {
         view: newModal,
       };
     },
+    replaceBlocksInBaseView: (newBlocks: Block[], viewId: string, hash: string) => {
+      const newModal = { ...baseModal };
+      newModal.blocks = newBlocks;
+      return {
+        view_id: viewId,
+        hash: hash,
+        view: newModal,
+      };
+    },
   };
 };
 

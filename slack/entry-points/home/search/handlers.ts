@@ -137,9 +137,8 @@ export const searchConfluenceCheckHandler = (app: App) => {
       if (!orgId || !userId || !view) {
         throw new Error("Missing orgId or userId");
       }
-
       //if unselected, option will be undefined
-      if (searchConfluenceOption) {
+      if (action.selected_options[0]) {
         const initialConfig = {
           [searchConfluneceCheckBlockId]: [
             action.selected_options[0] ? searchConfluenceOption : undefined,
@@ -169,7 +168,7 @@ export const searchConfluenceCheckHandler = (app: App) => {
         return;
       }
       //if unselected, option will be undefined
-      if (!searchConfluenceOption) {
+      else {
         const searchModalMaker = createSearchModal();
         const baseView = searchModalMaker.appendBlocksToBaseView([], view?.id, view?.hash);
         await client.views.update(baseView);
