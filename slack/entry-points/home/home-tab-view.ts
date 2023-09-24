@@ -33,7 +33,7 @@ export const homeTabActionRow = ({
       type: "button",
       text: {
         type: "plain_text",
-        text: "Create New Team",
+        text: "Create New Folder",
         emoji: true,
       },
       value: "create_team",
@@ -46,7 +46,7 @@ export const homeTabActionRow = ({
       type: "button",
       text: {
         type: "plain_text",
-        text: "Edit Current Team",
+        text: "Edit Current Folder",
         emoji: true,
       },
       value: selectedTeamId,
