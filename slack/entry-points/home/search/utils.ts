@@ -48,7 +48,7 @@ export const showLoading = async ({
       },
     },
   ];
-  const loadingModal = searchModal.appendBlocksToBaseView(loadingBlocks, viewId, viewHash);
+  const loadingModal = searchModal.replaceBlocksInBaseView(loadingBlocks, viewId, viewHash);
 
   const loadingRes = (await client.views.update(loadingModal)) as any;
 
