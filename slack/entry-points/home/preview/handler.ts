@@ -23,6 +23,7 @@ export const previewButtonHandler = (app: App) => {
           view: previewModal,
         });
       } catch (error) {
+        console.error(JSON.stringify(error));
         const errorMessage = `*Unable to preview message.* 
 Please ensure:
 • The *ThreadBase* app is added to the channel.

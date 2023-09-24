@@ -31,12 +31,7 @@ const saveShortcutHandler = (app: App) => {
       ) {
         throw new Error("Missing required properties");
       }
-
       const senderId = messageShortcut.message.user;
-
-      if (!senderId) {
-        throw new Error("Missing sender id");
-      }
 
       //TODO: if thread already exist, update it
       const thread = await threadRepo.create({
