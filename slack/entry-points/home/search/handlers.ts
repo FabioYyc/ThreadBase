@@ -8,6 +8,9 @@ import {
   KnownBlock,
   PlainTextInputAction,
 } from "@slack/bolt";
+
+import { WebClient } from "@slack/web-api";
+
 import {
   searchButtonActionId,
   searchConfluenceCheckedActionId,
@@ -28,7 +31,7 @@ import { threadRepo } from "../../../../common/models/thread";
 import { getTeamsForUser } from "../teams/utils";
 import { getUserConfluenceAuth } from "../../../shared/confluence/utils";
 import { getAuthorizeUrl } from "../../../../common/utils/auth-url-utils";
-import { getUserConfluenceAccessToken } from "./utils";
+import { getUserConfluenceAccessToken, showLoading } from "./utils";
 import { searchConfluenceWithText } from "./apis";
 import { UserRepo } from "../../../../common/models/user";
 import { sessionRepo } from "../../../../common/models/session";
@@ -83,6 +86,16 @@ const searchModalDispatchSearchHandler = async (app: App) => {
       [searchInputBlockId]: searchTerm,
     };
 
+    const searchModal = createSearchModal(initialConfig);
+
+    const newHash = await showLoading({
+      loadingMessage: "Searching...",
+      client,
+      viewId,
+      viewHash,
+      searchModal,
+    });
+
     if (confluenceEnabled) {
       const { accessToken, siteUrl } = await getUserConfluenceAccessToken(orgId, userId);
       if (accessToken) {
@@ -103,7 +116,7 @@ const searchModalDispatchSearchHandler = async (app: App) => {
     const updatedModal = createSearchModal(initialConfig).appendBlocksToBaseView(
       appendBlocks,
       viewId,
-      viewHash,
+      newHash,
     );
 
     await client.views.update(updatedModal);
@@ -132,7 +145,15 @@ export const searchConfluenceCheckHandler = (app: App) => {
             action.selected_options[0] ? searchConfluenceOption : undefined,
           ],
         };
-        const searchModalMaker = createSearchModal(initialConfig);
+        const searchModal = createSearchModal(initialConfig);
+
+        const newHash = await showLoading({
+          loadingMessage: "Finding Confluence Linked Site...",
+          client,
+          viewId: view.id,
+          viewHash: view.hash,
+          searchModal,
+        });
 
         const confluenceAuth = await getUserConfluenceAuth(orgId, userId);
         let appendBlocks;
@@ -143,17 +164,12 @@ export const searchConfluenceCheckHandler = (app: App) => {
           const siteUrl = confluenceAuth[0].siteUrl;
           appendBlocks = confluenceSiteDisplay(siteUrl);
         }
-        const newModalView = searchModalMaker.appendBlocksToBaseView(
-          appendBlocks,
-          view?.id,
-          view?.hash,
-        );
+        const newModalView = searchModal.appendBlocksToBaseView(appendBlocks, view?.id, newHash);
         await client.views.update(newModalView);
         return;
       }
       //if unselected, option will be undefined
       if (!searchConfluenceOption) {
-        console.log("push unselected view");
         const searchModalMaker = createSearchModal();
         const baseView = searchModalMaker.appendBlocksToBaseView([], view?.id, view?.hash);
         await client.views.update(baseView);
