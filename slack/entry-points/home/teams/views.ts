@@ -35,7 +35,7 @@ export const generateTeamView = ({
     },
     title: {
       type: "plain_text",
-      text: isEdit ? "Edit :writing_hand:" : "Create a new folder :tada:",
+      text: isEdit ? "Edit :writing_hand:" : "New folder :tada:",
       emoji: true,
     },
     blocks: [
@@ -63,7 +63,7 @@ export const generateTeamView = ({
         element: {
           type: "plain_text_input",
           multiline: false,
-          initial_value: isEdit ? team?.teamName : undefined,
+          initial_value: isEdit ? team?.teamName : "",
         },
       },
       {
@@ -77,7 +77,7 @@ export const generateTeamView = ({
         element: {
           type: "plain_text_input",
           multiline: true,
-          initial_value: isEdit ? team?.teamDescriptions : undefined,
+          initial_value: isEdit ? team?.teamDescriptions : "",
         },
         optional: true,
       },
