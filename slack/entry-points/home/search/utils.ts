@@ -5,7 +5,6 @@ import {
   getAccessTokenFromRefreshToken,
   getUserConfluenceAuth,
 } from "../../../shared/confluence/utils";
-import { createSearchModal } from "./views";
 
 export const getUserConfluenceAccessToken = async (orgId: string, userId: string) => {
   const confluenceAuth = await getUserConfluenceAuth(orgId, userId);
