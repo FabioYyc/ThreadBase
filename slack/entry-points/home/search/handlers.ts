@@ -35,6 +35,7 @@ import { getUserConfluenceAccessToken, showLoading } from "./utils";
 import { searchConfluenceWithText } from "./apis";
 import { UserRepo } from "../../../../common/models/user";
 import { sessionRepo } from "../../../../common/models/session";
+import { parseRequestBody, stringInputParser } from "../../../utils";
 
 const searchButtonHandler = (app: App) => {
   app.action(searchButtonActionId, async ({ ack, body, client }) => {
@@ -62,7 +63,7 @@ const searchModalDispatchSearchHandler = async (app: App) => {
     const viewHash = payload.view?.hash;
     const viewId = payload.view?.id;
     const action = payload.actions[0] as PlainTextInputAction;
-    const searchTerm = action.value;
+    const searchTerm = stringInputParser(action.value);
     const confluenceEnabledCheckbox =
       payload.view?.state.values[searchConfluneceCheckBlockId][searchConfluenceCheckedActionId]
         .selected_options;
