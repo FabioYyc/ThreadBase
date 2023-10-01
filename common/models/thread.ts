@@ -23,6 +23,7 @@ const threadSchema = new mongoose.Schema({
   isSaved: Boolean,
   textSearch: String,
   isReply: Boolean,
+  isNote: Boolean,
 });
 
 const Thread = mongoose.model("Thread", threadSchema);
@@ -46,6 +47,7 @@ export interface IThread {
   senderId?: string;
   isSaved: boolean;
   isReply: boolean;
+  isNote: boolean;
 }
 
 //Join thread and threadDetails as a new type

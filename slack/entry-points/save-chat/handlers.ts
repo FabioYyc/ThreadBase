@@ -8,7 +8,7 @@ import {
 } from "./views";
 import { saveFromSaveChatView } from "./utils";
 import { ButtonBlockAction } from "../../types";
-import { getSavedThreadViewByUser } from "../home/home-tab-view";
+import { getThreadsTabViewByUser } from "../home/home-tab-view";
 
 export const editChatActionId = "edit_saved_chat";
 
@@ -45,6 +45,7 @@ const saveShortcutHandler = (app: App) => {
         isSaved: false,
         isReply: messageShortcut.message.parent_user_id ? true : false,
         senderId,
+        isNote: false,
       });
       const returnView = await createChatView({
         externalId: thread.id as string,
@@ -107,7 +108,7 @@ export const editConfirmHandler = (app: App) => {
       await saveFromSaveChatView(view);
       const userId = body.user.id;
       const orgId = view.team_id;
-      const returnView = await getSavedThreadViewByUser(orgId, userId);
+      const returnView = await getThreadsTabViewByUser(orgId, userId);
 
       const result = await client.views.publish({
         /* the user that opened your app's app home */

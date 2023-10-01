@@ -1,4 +1,4 @@
-import { ActionsBlock, Button, View } from "@slack/bolt";
+import { ActionsBlock, Block, Button, KnownBlock, View } from "@slack/bolt";
 import { ISavedThread, threadRepo } from "../../../common/models/thread";
 import { teamSelector } from "./teams/views";
 import { savedThreadsViews } from "./chats";
@@ -13,6 +13,7 @@ import {
 import { checkIfUserIsTeamOwner, getTeamsForUser } from "./teams/utils";
 import { searchButton } from "./search/views";
 import { getLatestTeamIdForUser } from "../../../common/models/user";
+import { saveNoteButton } from "./save-note/view";
 
 const homeViewBase: View = {
   type: "home",
@@ -56,29 +57,33 @@ export const homeTabActionRow = ({
 
   elements.push(searchButton);
 
+  elements.push(saveNoteButton);
+
   return {
     type: "actions",
     elements: elements,
   };
 };
 
-export const threadsView = ({
+export const threadsTabView = ({
   threads,
   teams,
   selectedTeamId,
   isOwner = false,
+  additionalBlocks,
 }: {
   threads: ISavedThread[];
   teams: ISavedTeam[];
   selectedTeamId?: string;
   isOwner?: boolean;
+  additionalBlocks?: Block[] | KnownBlock[];
 }): View => {
   let headerText: string;
-  let additionalBlocks: any[];
+  let threadViewBlocks: any[];
 
   if (threads.length === 0) {
     headerText = "Looks like there is no chat saved in this space yet👆";
-    additionalBlocks = [
+    threadViewBlocks = [
       {
         type: "section",
         text: {
@@ -89,7 +94,7 @@ export const threadsView = ({
     ];
   } else {
     headerText = "Here's your saved chats :speech_balloon:";
-    additionalBlocks = savedThreadsViews(threads);
+    threadViewBlocks = savedThreadsViews(threads);
   }
 
   const hasThreads = threads.length > 0;
@@ -117,7 +122,11 @@ export const threadsView = ({
     },
   ];
 
-  blocks.push(...additionalBlocks);
+  blocks.push(...threadViewBlocks);
+
+  if (additionalBlocks) {
+    blocks.push(...additionalBlocks);
+  }
 
   return {
     ...homeViewBase,
@@ -128,7 +137,7 @@ export const threadsView = ({
   };
 };
 
-export const getSavedThreadViewByUser = async (
+export const getThreadsTabViewByUser = async (
   orgId: string,
   userId: string,
   selectedTeamId?: string,
@@ -148,8 +157,12 @@ export const getSavedThreadViewByUser = async (
   if (displayTeamId && displayTeamId !== personalSpaceValue) {
     isOwner = await checkIfUserIsTeamOwner({ orgId, userId, teamId: displayTeamId });
   }
-
-  return threadsView({ threads, teams, selectedTeamId: displayTeamId, isOwner });
+  return threadsTabView({
+    threads,
+    teams,
+    selectedTeamId: displayTeamId,
+    isOwner,
+  });
 };
 
 export const getUserHomeView = async (
@@ -158,7 +171,7 @@ export const getUserHomeView = async (
   client: WebClient,
   selectedTeamId?: string,
 ) => {
-  const updatedHomeView = await getSavedThreadViewByUser(orgId, userId, selectedTeamId);
+  const updatedHomeView = await getThreadsTabViewByUser(orgId, userId, selectedTeamId);
   await client.views.publish({
     user_id: userId,
     view: updatedHomeView,
