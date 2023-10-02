@@ -9,7 +9,7 @@ export const getMessage = async ({
 }: {
   messageTs: string;
   channelId: string;
-  senderId: string;
+  senderId?: string;
   isReply: boolean;
   client: WebClient;
 }) => {

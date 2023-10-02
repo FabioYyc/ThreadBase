@@ -6,6 +6,7 @@ import { previewButton } from "./preview/views";
 import { chatOverflowAccesoryView } from "./edit-and-delete-chat/view";
 
 const savedThreadBlock = (thread: ISavedThread): View["blocks"] => {
+  //TODO: deal with the case where the thread is a note
   return [
     {
       type: "section",
@@ -17,29 +18,7 @@ const savedThreadBlock = (thread: ISavedThread): View["blocks"] => {
     },
     {
       type: "actions",
-      elements: [
-        // {
-        //     "type": "button",
-        //     "text": {
-        //         "type": "plain_text",
-        //         "emoji": true,
-        //         "text": ":pencil: Edit"
-        //     },
-        //     "value": thread.id,
-        //     "action_id": editChatActionId
-        // },
-        // {
-        //     "type": "button",
-        //     "text": {
-        //         "type": "plain_text",
-        //         "emoji": true,
-        //         "text": ":x: Delete"
-        //     },
-        //     "value": thread.id,
-        //     "action_id": deleteChatActionId
-        // },
-        previewButton(thread.id),
-      ],
+      elements: [previewButton(thread.id)],
     },
     {
       type: "divider",

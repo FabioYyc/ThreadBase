@@ -13,9 +13,8 @@ export const previewButton = (threadId: string): Button => ({
   value: threadId,
 });
 
-export const createPreviewModal = (message: {text?:string}, status?: 'error') => {
+export const createPreviewModal = (message: { text?: string }, status?: "error") => {
   const text = message.text;
-
 
   const previewModal: ModalView = {
     type: "modal",
@@ -34,8 +33,8 @@ export const createPreviewModal = (message: {text?:string}, status?: 'error') =>
       },
     ],
   };
-  const errorTitle = 'Error Previewing Message'
-  if(status === 'error') {
+  const errorTitle = "Error Previewing Message";
+  if (status === "error") {
     previewModal.blocks = [
       {
         type: "section",
