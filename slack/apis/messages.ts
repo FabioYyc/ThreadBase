@@ -1,6 +1,6 @@
 import { WebClient } from "@slack/web-api";
 
-export const getMessage = async ({
+export const getMessageInfo = async ({
   messageTs,
   channelId,
   senderId,
@@ -9,7 +9,7 @@ export const getMessage = async ({
 }: {
   messageTs: string;
   channelId: string;
-  senderId: string;
+  senderId?: string;
   isReply: boolean;
   client: WebClient;
 }) => {
@@ -32,6 +32,29 @@ export const getMessage = async ({
       inclusive: true,
     });
   }
+  return result;
+};
+
+export const getMessageText = async ({
+  messageTs,
+  channelId,
+  senderId,
+  isReply,
+  client,
+}: {
+  messageTs: string;
+  channelId: string;
+  senderId?: string;
+  isReply: boolean;
+  client: WebClient;
+}) => {
+  const result = await getMessageInfo({
+    messageTs,
+    channelId,
+    senderId,
+    isReply,
+    client,
+  });
 
   return result.messages && result.messages[0] ? result.messages[0] : null;
 };

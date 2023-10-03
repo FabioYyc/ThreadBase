@@ -7,6 +7,7 @@ import { registerSaveChatHandler } from "../../../slack/entry-points/save-chat/h
 import mongoose from "mongoose";
 import { registerConfluenceHandlers } from "../../../slack/entry-points/save-confluence/handlers";
 import { slackInstallationRepo } from "../../../common/models/slack-installation";
+import { registerEventListeners } from "../../../slack/event-subscribe";
 
 mongoose.connect(process.env.MONGO_DB_URL as string);
 
@@ -35,6 +36,7 @@ const app = new App({
 registerHomeTabListeners(app);
 registerSaveChatHandler(app);
 registerConfluenceHandlers(app);
+registerEventListeners(app);
 
 const handler: Handler = async (event: HandlerEvent, context: HandlerContext) => {
   const payload = parseRequestBody(event.body, event.headers["content-type"]);
@@ -46,13 +48,12 @@ const handler: Handler = async (event: HandlerEvent, context: HandlerContext) =>
     };
   }
 
-  if(payload && payload.type && payload.type === "keep_warm") {
+  if (payload && payload.type && payload.type === "keep_warm") {
     return {
       statusCode: 200,
       body: "ok",
     };
   }
-
 
   const slackEvent: ReceiverEvent = {
     body: payload,
