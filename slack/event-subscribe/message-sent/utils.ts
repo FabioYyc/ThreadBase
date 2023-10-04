@@ -1,4 +1,7 @@
-import { slackConversationsRepo } from "../../../common/models/slack-conversation";
+import {
+  ISlackConversations,
+  slackConversationsRepo,
+} from "../../../common/models/slack-conversation";
 
 export const createOrUpdateConvoWithReplyCount = async ({
   threadTs,
@@ -13,16 +16,13 @@ export const createOrUpdateConvoWithReplyCount = async ({
   teamId: string;
   replyCount: number;
 }) => {
-  const existingConvo = await slackConversationsRepo.findOne({
+  const slackConvo: ISlackConversations = {
     channelId,
     threadTs,
     threadSenderId,
-  });
-  if (existingConvo) {
-    await slackConversationsRepo.updateOne(
-      { _id: new mongoose.Types.ObjectId(existingConvo._id) },
-      { $set: { replyCount } },
-    );
-    return existingConvo as SlackConversations;
-  }
+    teamId,
+    replyCount,
+    reminderSent: false,
+  };
+  await slackConversationsRepo.createOrUpdate(slackConvo);
 };

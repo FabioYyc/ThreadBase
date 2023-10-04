@@ -80,4 +80,16 @@ export const slackConversationsRepo = {
   removeConversation: async (channelId: string, threadTs: string) => {
     await SlackConversations.deleteOne({ channelId, threadTs });
   },
+
+  setReplyCount: async ({
+    channelId,
+    threadTs,
+    replyCount,
+  }: {
+    channelId: string;
+    threadTs: string;
+    replyCount: number;
+  }) => {
+    await SlackConversations.updateOne({ channelId, threadTs }, { $set: { replyCount } });
+  },
 };
