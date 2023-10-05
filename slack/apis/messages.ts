@@ -1,3 +1,4 @@
+import { Block, KnownBlock } from "@slack/bolt";
 import { WebClient } from "@slack/web-api";
 
 export const getMessageInfo = async ({
@@ -86,4 +87,27 @@ export const getPermalinkWithTimeout = async (
     console.warn("Error fetching thread permalink:", (error as any).message);
     return undefined;
   }
+};
+
+export const sendChannelMessage = async ({
+  client,
+  channelId,
+  text,
+  threadTs,
+  blocks,
+}: {
+  client: WebClient;
+  channelId: string;
+  text?: string;
+  blocks?: (KnownBlock | Block)[];
+  threadTs: string;
+}) => {
+  const result = await client.chat.postMessage({
+    channel: channelId,
+    text,
+    blocks,
+    thread_ts: threadTs,
+  });
+
+  return result;
 };
