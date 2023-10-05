@@ -4,5 +4,9 @@ import { App } from "@slack/bolt";
 import { messageSentHandler } from "./message-sent/handler";
 
 export const registerEventListeners = (app: App) => {
-  messageSentHandler(app);
+  try {
+    messageSentHandler(app);
+  } catch (error) {
+    console.error(error);
+  }
 };
