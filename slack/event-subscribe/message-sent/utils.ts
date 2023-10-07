@@ -1,4 +1,5 @@
 import {
+  IReminder,
   ISlackConversations,
   slackConversationsRepo,
 } from "../../../common/models/slack-conversation";
@@ -9,14 +10,12 @@ export const createOrUpdateConvoWithReplyCount = async ({
   threadSenderId,
   teamId,
   replyCount,
-  reminderSent = false,
 }: {
   threadTs: string;
   channelId: string;
   threadSenderId: string;
   teamId: string;
   replyCount: number;
-  reminderSent?: boolean;
 }) => {
   const slackConvo: ISlackConversations = {
     channelId,
@@ -24,9 +23,8 @@ export const createOrUpdateConvoWithReplyCount = async ({
     threadSenderId,
     teamId,
     replyCount,
-    reminderSent,
   };
-  await slackConversationsRepo.createOrUpdate(slackConvo);
+  return await slackConversationsRepo.createOrUpdate(slackConvo);
 };
 
 export const getReplyThresholdForChannel = (channelId: string) => {
@@ -34,7 +32,18 @@ export const getReplyThresholdForChannel = (channelId: string) => {
   return 10;
 };
 
-export const replyCountExceedsThreshold = (replyCount: number, channelId: string) => {
+const replyCountExceedsThreshold = (replyCount: number, channelId: string) => {
   const threshold = getReplyThresholdForChannel(channelId);
   return replyCount >= threshold;
+};
+
+const reminderHasSent = (slackConvo: ISlackConversations) => {
+  return slackConvo.reminderSent && slackConvo.reminderSent.length > 0;
+};
+
+export const shouldSendReminder = (slackConvo: ISlackConversations) => {
+  return (
+    replyCountExceedsThreshold(slackConvo.replyCount, slackConvo.channelId) &&
+    reminderHasSent(slackConvo)
+  );
 };

@@ -1,11 +1,16 @@
 import mongoose from "mongoose";
 
+export interface IReminder {
+  timestamp: Date;
+  replyCount: number;
+}
+
 export interface ISlackConversations {
   channelId: string;
   threadTs: string;
   threadSenderId: string;
   teamId: string;
-  reminderSent: boolean;
+  reminderSent?: IReminder[];
   replyCount: number;
 }
 
@@ -30,9 +35,9 @@ const slackConversationsSchema = new mongoose.Schema(
       required: true,
     },
     reminderSent: {
-      type: Boolean,
+      type: Array,
       required: true,
-      default: false,
+      default: [],
     },
     replyCount: {
       type: Number,
@@ -48,6 +53,22 @@ const slackConversationsSchema = new mongoose.Schema(
 const SlackConversations = mongoose.model("SlackConversations", slackConversationsSchema);
 
 export const slackConversationsRepo = {
+  addReminderSent: async ({
+    channelId,
+    threadTs,
+    timestamp,
+    replyCount,
+  }: {
+    channelId: string;
+    threadTs: string;
+    timestamp: Date;
+    replyCount: number;
+  }) => {
+    await SlackConversations.updateOne(
+      { channelId, threadTs },
+      { $push: { reminderSent: { timestamp, replyCount } } },
+    );
+  },
   createOrUpdate: async (slackConvo: ISlackConversations) => {
     const existingConvo = await SlackConversations.findOne({
       channelId: slackConvo.channelId,
@@ -57,7 +78,12 @@ export const slackConversationsRepo = {
     if (existingConvo) {
       await SlackConversations.updateOne(
         { _id: new mongoose.Types.ObjectId(existingConvo._id) },
-        { $set: slackConvo },
+        {
+          $set: {
+            ...existingConvo,
+            ...slackConvo,
+          },
+        },
       );
       return existingConvo as SlackConversations;
     }
