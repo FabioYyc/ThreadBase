@@ -9,6 +9,7 @@ export const messageSentHandler = (app: App) => {
     const eventPayload = event as GenericMessageEvent;
 
     if (!eventPayload.team) {
+      console.log("eventPayload", eventPayload);
       throw new Error("Team ID is not defined in message event payload");
     }
     const messageInfo = await getMessageInfo({
