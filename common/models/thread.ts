@@ -138,4 +138,14 @@ export const threadRepo = {
 
     return results as ISavedThread[];
   },
+
+  deleteThreadInTeam: async (teamId: string) => {
+    //Delete thread, which teams only contain 1 element and it is teamId
+    await Thread.deleteMany({
+      teams: {
+        $size: 1, // teams array has size of 1
+        $eq: [teamId], // teams array equals [teamId]
+      },
+    });
+  },
 };
