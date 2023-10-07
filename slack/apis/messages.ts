@@ -107,6 +107,8 @@ export const sendChannelMessage = async ({
     text,
     blocks,
     thread_ts: threadTs,
+    unfurl_links: false,
+    unfurl_media: false,
   });
 
   return result;
