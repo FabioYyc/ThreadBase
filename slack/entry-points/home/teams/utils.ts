@@ -124,5 +124,3 @@ export const checkIfUserIsTeamOwner = async ({
   }
   return team.userRole === UserRole.Owner;
 };
-
-export const deleteThreadsInTeam = async (teamId: string) => {};

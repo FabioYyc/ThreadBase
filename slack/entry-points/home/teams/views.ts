@@ -212,7 +212,7 @@ export const deleteTeamConfirmView = (teamId: string, teamName: string): View =>
   },
   title: {
     type: "plain_text",
-    text: "Delete folder :broom:",
+    text: "Delete this folder :broom:",
     emoji: true,
   },
   blocks: [

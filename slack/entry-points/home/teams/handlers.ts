@@ -18,7 +18,6 @@ import {
 } from "./constants";
 import { ITeamFormValues } from "./types";
 import { UserRepo, UserRole, updateUserUILatestTeamId } from "../../../../common/models/user";
-import { threadRepo } from "../../../../common/models/thread";
 
 const createTeamButtonHandler = (app: App): void => {
   app.action(createTeamButtonActionId, async ({ ack, body, client }) => {
@@ -232,8 +231,6 @@ const deleteTeamConfirmHandler = (app: App) => {
         throw new Error("Missing external id");
       }
       await teamRepo.archiveTeam(external_id);
-      //todo: remove all the threads and messages from the team
-      await threadRepo.deleteThreadInTeam(external_id);
       await getUserHomeView(orgId, userId, client, personalSpaceValue);
     } catch (error) {
       throw new Error(`error in delete team: ${error}`);

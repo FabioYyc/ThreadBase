@@ -8,6 +8,7 @@ import mongoose from "mongoose";
 import { registerConfluenceHandlers } from "../../../slack/entry-points/save-confluence/handlers";
 import { slackInstallationRepo } from "../../../common/models/slack-installation";
 import { configReminderHandler } from "../../../slack/entry-points/ commands/reminder-setting/handler";
+import { registerEventListeners } from "../../../slack/event-subscribe";
 
 mongoose.connect(process.env.MONGO_DB_URL as string);
 
@@ -36,6 +37,7 @@ const app = new App({
 registerHomeTabListeners(app);
 registerSaveChatHandler(app);
 registerConfluenceHandlers(app);
+registerEventListeners(app);
 
 configReminderHandler(app);
 
