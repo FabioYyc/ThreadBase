@@ -1,6 +1,7 @@
+import { Block, KnownBlock } from "@slack/bolt";
 import { WebClient } from "@slack/web-api";
 
-export const getMessage = async ({
+export const getMessageInfo = async ({
   messageTs,
   channelId,
   senderId,
@@ -9,7 +10,7 @@ export const getMessage = async ({
 }: {
   messageTs: string;
   channelId: string;
-  senderId: string;
+  senderId?: string;
   isReply: boolean;
   client: WebClient;
 }) => {
@@ -32,6 +33,29 @@ export const getMessage = async ({
       inclusive: true,
     });
   }
+  return result;
+};
+
+export const getMessageText = async ({
+  messageTs,
+  channelId,
+  senderId,
+  isReply,
+  client,
+}: {
+  messageTs: string;
+  channelId: string;
+  senderId?: string;
+  isReply: boolean;
+  client: WebClient;
+}) => {
+  const result = await getMessageInfo({
+    messageTs,
+    channelId,
+    senderId,
+    isReply,
+    client,
+  });
 
   return result.messages && result.messages[0] ? result.messages[0] : null;
 };
@@ -63,4 +87,29 @@ export const getPermalinkWithTimeout = async (
     console.warn("Error fetching thread permalink:", (error as any).message);
     return undefined;
   }
+};
+
+export const sendChannelMessage = async ({
+  client,
+  channelId,
+  text,
+  threadTs,
+  blocks,
+}: {
+  client: WebClient;
+  channelId: string;
+  text?: string;
+  blocks?: (KnownBlock | Block)[];
+  threadTs: string;
+}) => {
+  const result = await client.chat.postMessage({
+    channel: channelId,
+    text,
+    blocks,
+    thread_ts: threadTs,
+    unfurl_links: false,
+    unfurl_media: false,
+  });
+
+  return result;
 };
