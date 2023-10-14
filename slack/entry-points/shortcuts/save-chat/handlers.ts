@@ -1,5 +1,5 @@
 import { App, MessageShortcut } from "@slack/bolt";
-import { ISavedThread, threadRepo } from "../../../common/models/thread";
+import { ISavedThread, threadRepo } from "../../../../common/models/thread";
 import {
   confirmationMessage,
   createChatView,
@@ -7,8 +7,8 @@ import {
   saveChatCallbackId,
 } from "./views";
 import { saveFromSaveChatView } from "./utils";
-import { ButtonBlockAction } from "../../types";
-import { getSavedThreadViewByUser } from "../home/home-tab-view";
+import { ButtonBlockAction } from "../../../types";
+import { getSavedThreadViewByUser } from "../../home/home-tab-view";
 
 export const editChatActionId = "edit_saved_chat";
 

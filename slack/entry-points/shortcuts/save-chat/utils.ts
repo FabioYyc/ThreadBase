@@ -1,6 +1,6 @@
 import { ViewOutput } from "@slack/bolt";
-import { threadRepo } from "../../../common/models/thread";
-import { stringInputParser, viewInputReader } from "../../utils";
+import { threadRepo } from "../../../../common/models/thread";
+import { stringInputParser, viewInputReader } from "../../../utils";
 
 export const keywordsParser = (keywords: string | null | undefined) => {
   if (!keywords) {

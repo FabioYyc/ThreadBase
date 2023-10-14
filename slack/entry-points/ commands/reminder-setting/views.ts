@@ -7,52 +7,66 @@ import {
   StaticSelectAction,
 } from "@slack/bolt";
 import { IReminderSetting } from "../../../../common/models/reminder-settings";
-import { scopeSelectAction } from "./constant";
+import {
+  replyCountInputBlockId,
+  scopeSelectAction,
+  threadCharacterLengthInputBlockId,
+} from "./constant";
+import { ModalBuilder } from "../../../shared/view/modal-builder";
 
 type Channel = { label: string; id: string };
 
-export const createConfigurationModal = (options?: {
-  initialOption?: PlainTextOption;
-  channels?: Channel[];
-  existingSelectionBlock?: Block | KnownBlock;
-  //TODO: allow pass in a viewModal object to be default get view
-}) => {
-  const channelOptions: PlainTextOption[] =
-    options?.channels?.map((channel) => ({
-      text: {
-        type: "plain_text",
-        text: channel.label,
-      },
-      value: channel.id,
-    })) || [];
+export class ConfigurationModal implements ModalBuilder {
+  private blocks: (Block | KnownBlock)[];
 
-  const selectionBlock = options?.existingSelectionBlock
-    ? options?.existingSelectionBlock
-    : {
-        type: "input",
-        dispatch_action: true,
-        block_id: "channel_select",
-        element: {
-          type: "static_select",
-          placeholder: {
-            type: "plain_text",
-            text: "Configure channel or workspace level reminder setting",
-          },
-          options: channelOptions,
-          action_id: scopeSelectAction,
-          initial_option: options?.initialOption,
-        },
-        label: {
+  constructor(
+    private options: {
+      initialOption?: PlainTextOption;
+      channels?: Channel[];
+      existingSelectionBlock?: Block | KnownBlock;
+    },
+  ) {
+    this.blocks = [this.createSelectionBlock()];
+  }
+
+  private createSelectionBlock(): Block | KnownBlock {
+    if (this.options.existingSelectionBlock) {
+      return this.options.existingSelectionBlock;
+    }
+
+    const channelOptions =
+      this.options.channels?.map((channel) => ({
+        text: { type: "plain_text", text: channel.label },
+        value: channel.id,
+      })) || [];
+
+    return {
+      type: "input",
+      dispatch_action: true,
+      block_id: "channel_select",
+      element: {
+        type: "static_select",
+        placeholder: {
           type: "plain_text",
-          text: "Scope",
+          text: "Configure channel or workspace level reminder setting",
         },
-      };
+        options: channelOptions,
+        action_id: scopeSelectAction,
+        initial_option: this.options.initialOption,
+      },
+      label: {
+        type: "plain_text",
+        text: "Scope",
+      },
+    } as InputBlock;
+  }
 
-  let blocks: (Block | KnownBlock)[] = [selectionBlock];
+  addBlock(newBlocks: KnownBlock[]): void {
+    this.blocks.push(...newBlocks);
+  }
 
-  // Exposed methods
-  return {
-    getView: (): ModalView => ({
+  build(): ModalView {
+    return {
       type: "modal",
       callback_id: "reminder_setting_modal",
       title: {
@@ -63,13 +77,10 @@ export const createConfigurationModal = (options?: {
         type: "plain_text",
         text: "Save",
       },
-      blocks: blocks,
-    }),
-    addBlock: (newBlocks: KnownBlock[]) => {
-      blocks.push(...newBlocks);
-    },
-  };
-};
+      blocks: this.blocks,
+    };
+  }
+}
 export const configurationBlocks = (reminderSetting: IReminderSetting): KnownBlock[] => {
   return [
     {
@@ -81,7 +92,7 @@ export const configurationBlocks = (reminderSetting: IReminderSetting): KnownBlo
     },
     {
       type: "input",
-      block_id: "reply_count_input",
+      block_id: replyCountInputBlockId,
       label: {
         type: "plain_text",
         text: "Reply count",
@@ -98,10 +109,10 @@ export const configurationBlocks = (reminderSetting: IReminderSetting): KnownBlo
     },
     {
       type: "input",
-      block_id: "thread_char_input",
+      block_id: threadCharacterLengthInputBlockId,
       label: {
         type: "plain_text",
-        text: "Thread character",
+        text: "Thread characters",
       },
       element: {
         type: "plain_text_input",

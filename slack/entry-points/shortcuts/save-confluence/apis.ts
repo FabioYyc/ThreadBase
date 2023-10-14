@@ -1,5 +1,5 @@
-import { getAccessibleResource, fetchCfUrl } from "../../../common/services/confluence-service";
-import { stringInputParser } from "../../utils";
+import { getAccessibleResource, fetchCfUrl } from "../../../../common/services/confluence-service";
+import { stringInputParser } from "../../../utils";
 import {
   ICreateCfPageRequestPayload,
   ICreateCfPageResponse,

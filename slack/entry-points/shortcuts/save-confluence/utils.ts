@@ -1,7 +1,7 @@
 import { MessageShortcut } from "@slack/bolt";
-import { sessionRepo } from "../../../common/models/session";
-import { getAuthorizeUrl } from "../../../common/utils/auth-url-utils";
-import { getPermalinkWithTimeout } from "../../apis/messages";
+import { sessionRepo } from "../../../../common/models/session";
+import { getAuthorizeUrl } from "../../../../common/utils/auth-url-utils";
+import { getPermalinkWithTimeout } from "../../../apis/messages";
 import { getSaveConfluenceViewData } from "./apis";
 import { IPage } from "./constants";
 import { SaveConfluenceViews } from "./view";
@@ -9,7 +9,7 @@ import { WebClient } from "@slack/web-api";
 import {
   getAccessTokenFromRefreshToken,
   getUserConfluenceAuth,
-} from "../../shared/confluence/utils";
+} from "../../../shared/confluence/utils";
 
 export const formatPageValue = (page: IPage) => {
   return `${page.id}-${page.spaceId}`;
