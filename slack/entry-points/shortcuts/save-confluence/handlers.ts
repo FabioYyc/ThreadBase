@@ -1,5 +1,5 @@
 import { App, BlockAction, MessageShortcut } from "@slack/bolt";
-import { getAuthorizeUrl, joinUrls } from "../../../common/utils/auth-url-utils";
+import { getAuthorizeUrl, joinUrls } from "../../../../common/utils/auth-url-utils";
 import { SaveConfluenceViews } from "./view";
 import {
   SaveConfluencePayload,
@@ -7,14 +7,14 @@ import {
   saveConfluenceCallbackId,
 } from "./constants";
 import { getAuthView, getCorrectConfluenceViewByAuth, getSessionFromId } from "./utils";
-import { viewInputReader } from "../../utils";
+import { viewInputReader } from "../../../utils";
 import { createNewPage } from "./apis";
-import { UserRepo } from "../../../common/models/user";
-import { sessionRepo } from "../../../common/models/session";
+import { UserRepo } from "../../../../common/models/user";
+import { sessionRepo } from "../../../../common/models/session";
 import {
   getAccessTokenFromRefreshToken,
   getUserConfluenceAuth,
-} from "../../shared/confluence/utils";
+} from "../../../shared/confluence/utils";
 
 const saveConfluenceShortcutHandler = async (app: App) => {
   return app.shortcut("create-confluence", async ({ shortcut, ack, client }) => {

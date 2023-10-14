@@ -3,10 +3,11 @@ import { App, ReceiverEvent } from "@slack/bolt";
 import { ExpressReceiver } from "@slack/bolt";
 import { registerHomeTabListeners } from "../../../slack/entry-points/home";
 import { parseRequestBody } from "../../../slack/utils";
-import { registerSaveChatHandler } from "../../../slack/entry-points/save-chat/handlers";
+import { registerSaveChatHandler } from "../../../slack/entry-points/shortcuts/save-chat/handlers";
 import mongoose from "mongoose";
-import { registerConfluenceHandlers } from "../../../slack/entry-points/save-confluence/handlers";
+import { registerConfluenceHandlers } from "../../../slack/entry-points/shortcuts/save-confluence/handlers";
 import { slackInstallationRepo } from "../../../common/models/slack-installation";
+import { reminderSettingHandler } from "../../../slack/entry-points/ commands/reminder-setting/handler";
 import { registerEventListeners } from "../../../slack/event-subscribe";
 
 mongoose.connect(process.env.MONGO_DB_URL as string);
@@ -37,6 +38,8 @@ registerHomeTabListeners(app);
 registerSaveChatHandler(app);
 registerConfluenceHandlers(app);
 registerEventListeners(app);
+
+reminderSettingHandler(app);
 
 const handler: Handler = async (event: HandlerEvent, context: HandlerContext) => {
   const payload = parseRequestBody(event.body, event.headers["content-type"]);
