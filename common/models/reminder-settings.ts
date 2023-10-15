@@ -2,10 +2,14 @@ import mongoose from "mongoose";
 
 //reminder setting should contain channelId, teamId, replyCountThreshold, reNotifyInterval, reNotifyEnabled, escapeWords
 
-export type ReminderSettingLevel = "default" | "workspace" | "channel";
+export enum ReminderSettingLevel {
+  DEFAULT = "default",
+  WORKSPACE = "workspace",
+  CHANNEL = "channel",
+}
 
 export interface IReminderSetting {
-  channelId: string;
+  channelId?: string;
   teamId: string;
   replyCountThreshold?: number;
   threadCharLengthThreshold?: number;
@@ -66,9 +70,13 @@ export const reminderSettingRepo = {
   create: async (reminderSetting: IReminderSetting) => {
     return await ReminderSetting.create(reminderSetting);
   },
-  update: async (reminderSetting: IReminderSetting) => {
+  updateOrCreate: async (reminderSetting: IReminderSetting) => {
     return await ReminderSetting.updateOne(
-      { channelId: reminderSetting.channelId, teamId: reminderSetting.teamId },
+      {
+        channelId: reminderSetting.channelId,
+        teamId: reminderSetting.teamId,
+        level: reminderSetting.level,
+      },
       reminderSetting,
       { upsert: true },
     );
@@ -79,8 +87,8 @@ export const reminderSettingRepo = {
   getAll: async (teamId: string) => {
     return await ReminderSetting.find({ teamId });
   },
-  getByLevel: async (teamId: string, level: ReminderSettingLevel) => {
-    return await ReminderSetting.findOne({ teamId, level });
+  getWorkspace: async (teamId: string) => {
+    return await ReminderSetting.findOne({ teamId, level: ReminderSettingLevel.WORKSPACE });
   },
   delete: async (channelId: string, teamId: string) => {
     return await ReminderSetting.deleteOne({ channelId, teamId });

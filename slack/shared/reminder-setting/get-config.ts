@@ -1,6 +1,7 @@
 import {
   IReminderSetting,
   ReminderSetting,
+  ReminderSettingLevel,
   reminderSettingRepo,
 } from "../../../common/models/reminder-settings";
 import { defaultReminderSetting } from "./default-config";
@@ -20,13 +21,13 @@ export const getChannelConfiguration = async ({
   }
 
   if (config) {
-    return { ...defaultReminderSetting, ...config } as IReminderSetting;
+    return config as IReminderSetting;
   }
 
-  config = await reminderSettingRepo.getByLevel(teamId, "workspace");
+  config = await reminderSettingRepo.getWorkspace(teamId);
 
   if (config) {
-    return { ...defaultReminderSetting, ...config } as IReminderSetting;
+    return config as IReminderSetting;
   }
 
   return { channelId, teamId, ...defaultReminderSetting } as IReminderSetting;

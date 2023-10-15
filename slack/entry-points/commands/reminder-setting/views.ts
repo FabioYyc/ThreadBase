@@ -1,16 +1,19 @@
 import {
   Block,
+  ContextBlock,
   InputBlock,
   KnownBlock,
   ModalView,
   PlainTextOption,
-  StaticSelectAction,
+  SectionBlock,
 } from "@slack/bolt";
 import { IReminderSetting } from "../../../../common/models/reminder-settings";
 import {
   replyCountInputBlockId,
   scopeSelectAction,
   threadCharacterLengthInputBlockId,
+  reminderConfigViewCallbackId,
+  channelSelectBlockId,
 } from "./constant";
 import { ModalBuilder } from "../../../shared/view/modal-builder";
 
@@ -40,10 +43,17 @@ export class ConfigurationModal implements ModalBuilder {
         value: channel.id,
       })) || [];
 
+    const workspaceOption = {
+      text: { type: "plain_text", text: "Workspace-Setting" },
+      value: "workspace",
+    };
+
+    channelOptions.unshift(workspaceOption);
+
     return {
       type: "input",
       dispatch_action: true,
-      block_id: "channel_select",
+      block_id: channelSelectBlockId,
       element: {
         type: "static_select",
         placeholder: {
@@ -68,7 +78,7 @@ export class ConfigurationModal implements ModalBuilder {
   build(): ModalView {
     return {
       type: "modal",
-      callback_id: "reminder_setting_modal",
+      callback_id: reminderConfigViewCallbackId,
       title: {
         type: "plain_text",
         text: "Reminder Config",
@@ -81,15 +91,44 @@ export class ConfigurationModal implements ModalBuilder {
     };
   }
 }
-export const configurationBlocks = (reminderSetting: IReminderSetting): KnownBlock[] => {
+
+export const infoBlock = (
+  channelName: string,
+  channelId: string,
+): (SectionBlock | ContextBlock)[] => {
+  if (channelId === "workspace") {
+    return [
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: `*Reminder Trigger Setting for the Workspace*`,
+        },
+      },
+      {
+        type: "context",
+        elements: [
+          {
+            type: "mrkdwn",
+            text: `:warning: This setting will be applied to all channels in the workspace, unless a channel has its own setting.`,
+          },
+        ],
+      },
+    ];
+  }
   return [
     {
       type: "section",
       text: {
         type: "mrkdwn",
-        text: "*Reminder Trigger Setting*",
+        text: `*Reminder Trigger Setting for ${channelName}*`,
       },
     },
+  ];
+};
+
+export const configurationBlocks = (reminderSetting: IReminderSetting): KnownBlock[] => {
+  return [
     {
       type: "input",
       block_id: replyCountInputBlockId,
@@ -99,7 +138,6 @@ export const configurationBlocks = (reminderSetting: IReminderSetting): KnownBlo
       },
       element: {
         type: "plain_text_input",
-        action_id: "reply_count_value",
         placeholder: {
           type: "plain_text",
           text: "Enter reply count threshold",
@@ -116,7 +154,6 @@ export const configurationBlocks = (reminderSetting: IReminderSetting): KnownBlo
       },
       element: {
         type: "plain_text_input",
-        action_id: "thread_char_value",
         placeholder: {
           type: "plain_text",
           text: "Enter thread character length threshold",
