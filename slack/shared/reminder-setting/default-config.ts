@@ -1,4 +1,4 @@
-import { IReminderSetting } from "../../../common/models/reminder-settings";
+import { IReminderSetting, ReminderSettingLevel } from "../../../common/models/reminder-settings";
 
 export const defaultReminderSetting: Partial<IReminderSetting> = {
   replyCountThreshold: 5,
@@ -6,5 +6,5 @@ export const defaultReminderSetting: Partial<IReminderSetting> = {
   threadCharLengthThreshold: 500,
   reNotifyEnabled: false,
   escapeWords: [],
-  level: "default",
+  level: ReminderSettingLevel.DEFAULT,
 };
