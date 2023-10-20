@@ -85,7 +85,7 @@ export const slackConversationsRepo = {
           },
         },
       );
-      return existingConvo as SlackConversations;
+      return slackConvo as SlackConversations;
     }
     const newConvo = new SlackConversations(slackConvo);
     const convoDoc = await newConvo.save();

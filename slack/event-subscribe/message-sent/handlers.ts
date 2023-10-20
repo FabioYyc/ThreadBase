@@ -32,8 +32,8 @@ export const messageSentHandler = (app: App) => {
       teamId: eventPayload.team,
       replyCount: replyCount,
     });
-
-    if (shouldSendReminder(slackConvo)) {
+    const latestMessage = eventPayload.text;
+    if (await shouldSendReminder({ slackConvo, latestMessage })) {
       await sendChannelMessage({
         client,
         channelId: eventPayload.channel,

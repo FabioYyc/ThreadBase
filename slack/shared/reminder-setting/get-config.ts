@@ -1,9 +1,4 @@
-import {
-  IReminderSetting,
-  ReminderSetting,
-  ReminderSettingLevel,
-  reminderSettingRepo,
-} from "../../../common/models/reminder-settings";
+import { IReminderSetting, reminderSettingRepo } from "../../../common/models/reminder-settings";
 import { defaultReminderSetting } from "./default-config";
 
 //TODO: create tests for this function
