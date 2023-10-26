@@ -33,9 +33,9 @@ const app = new App({
 });
 
 //Legacy App
-// registerHomeTabListeners(app);
-// registerSaveChatHandler(app);
-// registerConfluenceHandlers(app);
+registerHomeTabListeners(app);
+registerSaveChatHandler(app);
+registerConfluenceHandlers(app);
 
 const handler: Handler = async (event: HandlerEvent, context: HandlerContext) => {
   const payload = parseRequestBody(event.body, event.headers["content-type"]);
