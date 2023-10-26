@@ -1,7 +1,7 @@
 //Mongodb typescrpit schema for thread, properties: userId, threadId, threadLink. Collection will be threads
 
 import mongoose, { Document } from "mongoose";
-import { searchTextLimit } from "../../slack/types";
+import { searchTextLimit } from "../../slack-legacy-app/types";
 
 /// connect to mongodb use env var MONGODB_URL
 const threadSchema = new mongoose.Schema({
