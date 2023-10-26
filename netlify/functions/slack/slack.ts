@@ -1,11 +1,11 @@
 import type { Handler, HandlerEvent, HandlerContext } from "@netlify/functions";
 import { App, ReceiverEvent } from "@slack/bolt";
 import { ExpressReceiver } from "@slack/bolt";
-import { registerHomeTabListeners } from "../../../slack/entry-points/home";
-import { parseRequestBody } from "../../../slack/utils";
-import { registerSaveChatHandler } from "../../../slack/entry-points/save-chat/handlers";
+import { registerHomeTabListeners } from "../../../slack-legacy-app/entry-points/home";
+import { parseRequestBody } from "../../../slack-legacy-app/utils";
+import { registerSaveChatHandler } from "../../../slack-legacy-app/entry-points/save-chat/handlers";
 import mongoose from "mongoose";
-import { registerConfluenceHandlers } from "../../../slack/entry-points/save-confluence/handlers";
+import { registerConfluenceHandlers } from "../../../slack-legacy-app/entry-points/save-confluence/handlers";
 import { slackInstallationRepo } from "../../../common/models/slack-installation";
 
 mongoose.connect(process.env.MONGO_DB_URL as string);
@@ -46,13 +46,12 @@ const handler: Handler = async (event: HandlerEvent, context: HandlerContext) =>
     };
   }
 
-  if(payload && payload.type && payload.type === "keep_warm") {
+  if (payload && payload.type && payload.type === "keep_warm") {
     return {
       statusCode: 200,
       body: "ok",
     };
   }
-
 
   const slackEvent: ReceiverEvent = {
     body: payload,
