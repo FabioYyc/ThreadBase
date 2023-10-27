@@ -1,34 +1,33 @@
 import { KnownBlock } from "@slack/bolt";
 import { addCategoryAction, getCategoryOptionBlock } from "../../../views/home/category.view";
+import { Category } from "../../../types/Category";
 
 const getCurrentCategories = () => {
-  const currentCategories = [
+  const currentCategories: Category[] = [
     {
-      category: "General",
+      id: "1",
+      name: "General",
       linkedChannel: "general",
     },
     {
-      category: "Engineering Q&A",
+      id: "2",
+      name: "Engineering Q&A",
       linkedChannel: "engineering-questions",
     },
   ];
   return [...currentCategories];
 };
 
-const getCategoryBlocks = () => {
-  const currentCategories = getCurrentCategories();
-  const categoryBlocks: KnownBlock[] = currentCategories.reduce(
+const getCategoryBlocks = (categories: Category[]) => {
+  const categoryBlocks: KnownBlock[] = categories.reduce(
     (blocks, category, index) => {
-      const currentCategoryBlock: KnownBlock = getCategoryOptionBlock({
-        category: category.category,
-        linkedChannel: category.linkedChannel,
-      });
+      const currentCategoryBlock: KnownBlock = getCategoryOptionBlock(category);
 
       // Add the current block to the accumulator
       blocks.push(currentCategoryBlock);
 
       // If it's not the last category, also add a divider
-      if (index !== currentCategories.length - 1) {
+      if (index !== categories.length - 1) {
         blocks.push({ type: "divider" });
       }
 
@@ -40,7 +39,8 @@ const getCategoryBlocks = () => {
 };
 
 export const getCategoryManagementBlocks = (): KnownBlock[] => {
-  const categoryBlocks = getCategoryBlocks();
+  const currentCategories = getCurrentCategories();
+  const categoryBlocks = getCategoryBlocks(currentCategories);
   const categoryManagementBlocks = [...categoryBlocks, ...addCategoryAction];
   return categoryManagementBlocks;
 };

@@ -1,4 +1,5 @@
-import { KnownBlock } from "@slack/bolt";
+import { KnownBlock, ModalView } from "@slack/bolt";
+import { Category } from "../../types/Category";
 
 export const addCategoryAction: KnownBlock[] = [
   {
@@ -20,13 +21,8 @@ export const addCategoryAction: KnownBlock[] = [
   },
 ];
 
-export const getCategoryOptionBlock = ({
-  category,
-  linkedChannel,
-}: {
-  category: string;
-  linkedChannel?: string;
-}): KnownBlock => {
+export const getCategoryOptionBlock = (category: Category): KnownBlock => {
+  const { linkedChannel, name, id } = category;
   const linkChannelMessage = linkedChannel
     ? "this category is linked to the " + linkedChannel + " channel"
     : "this category is not linked to a channel";
@@ -34,7 +30,7 @@ export const getCategoryOptionBlock = ({
     type: "section",
     text: {
       type: "mrkdwn",
-      text: `*${category}* \n ${linkChannelMessage}`,
+      text: `*${name}* \n ${linkChannelMessage}`,
     },
     accessory: {
       type: "button",
@@ -44,7 +40,62 @@ export const getCategoryOptionBlock = ({
         emoji: true,
       },
       action_id: "edit-category",
-      value: category,
+      value: id,
     },
+  };
+};
+
+export const editModalView = (category: {
+  name: string;
+  id: string;
+  linkedChannel?: string;
+}): ModalView => {
+  return {
+    type: "modal",
+    title: {
+      type: "plain_text",
+      text: "Edit Category",
+      emoji: true,
+    },
+    close: {
+      type: "plain_text",
+      text: "Cancel",
+      emoji: true,
+    },
+    submit: {
+      type: "plain_text",
+      text: "Save",
+      emoji: true,
+    },
+    blocks: [
+      {
+        type: "input",
+        block_id: "category_name",
+        element: {
+          type: "plain_text_input",
+          action_id: "category_name",
+          initial_value: category.name,
+        },
+        label: {
+          type: "plain_text",
+          text: "Category Name",
+          emoji: true,
+        },
+      },
+      {
+        type: "input",
+        block_id: "channel",
+        element: {
+          type: "channels_select",
+          action_id: "channel",
+          initial_channel: category.linkedChannel,
+        },
+        label: {
+          type: "plain_text",
+          text: "Channel",
+          emoji: true,
+        },
+      },
+    ],
   };
 };
