@@ -1,7 +1,10 @@
 {
   "scripts": {
     "dev": "netlify dev",
-    "lint": "eslint --ext .js,.ts ."
+    "lint": "eslint --ext .js,.ts .",
+    "start-ngrok": "ngrok http --domain=ca204c9e0fba-1574181592710778495.ngrok-free.app 9000",
+    "start-dev": "netlify dev",
+    "start-dev-local": "concurrently \"yarn start-ngrok\" \"yarn dev\""
   },
   "dependencies": {
     "@netlify/functions": "^1.6.0",
@@ -15,6 +18,7 @@
     "@types/lodash": "^4.14.195",
     "@typescript-eslint/eslint-plugin": "^5.60.1",
     "@typescript-eslint/parser": "^5.60.1",
+    "concurrently": "^8.2.2",
     "eslint": "^8.44.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.0",
