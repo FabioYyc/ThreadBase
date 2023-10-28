@@ -7,6 +7,7 @@ import { registerSaveChatHandler } from "../../../slack-legacy-app/entry-points/
 import mongoose from "mongoose";
 import { registerConfluenceHandlers } from "../../../slack-legacy-app/entry-points/save-confluence/handlers";
 import { slackInstallationRepo } from "../../../common/models/slack-installation";
+import { slackForumApp } from "../../../src/slack-forum";
 
 mongoose.connect(process.env.MONGO_DB_URL as string);
 
@@ -33,9 +34,12 @@ const app = new App({
 });
 
 //Legacy App
-registerHomeTabListeners(app);
+// registerHomeTabListeners(app);
 registerSaveChatHandler(app);
 registerConfluenceHandlers(app);
+
+//Forum app
+slackForumApp(app);
 
 const handler: Handler = async (event: HandlerEvent, context: HandlerContext) => {
   const payload = parseRequestBody(event.body, event.headers["content-type"]);
