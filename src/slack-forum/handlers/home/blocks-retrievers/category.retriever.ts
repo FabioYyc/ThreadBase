@@ -9,12 +9,22 @@ export class CategoryBlockRetriever extends AbstractHomeBlocks {
       {
         id: "1",
         name: "General",
-        linkedChannel: "general",
+        linkedChannel: [
+          {
+            name: "general",
+            id: "1",
+          },
+        ],
       },
       {
         id: "2",
         name: "Engineering Q&A",
-        linkedChannel: "engineering-questions",
+        linkedChannel: [
+          {
+            name: "engineering",
+            id: "2",
+          },
+        ],
       },
     ];
     return [...currentCategories];

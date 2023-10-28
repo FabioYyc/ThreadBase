@@ -11,6 +11,7 @@ export const addCategoryAction: KnownBlock[] = [
     elements: [
       {
         type: "button",
+        action_id: CategoryActionIds.AddCategory,
         text: {
           type: "plain_text",
           text: "Add Category",
@@ -22,16 +23,24 @@ export const addCategoryAction: KnownBlock[] = [
   },
 ];
 
+export const getChannelMessage = (linkedChannel: Category["linkedChannel"]): string => {
+  if (!linkedChannel || linkedChannel.length === 0) {
+    return "this category is not linked to a channel";
+  }
+  const channelNames = linkedChannel.map((channel) => channel.name);
+  const channelMessage = `this category is linked to the following channels: ${channelNames.join(
+    ", ",
+  )}`;
+  return channelMessage;
+};
+
 export const getCategoryOptionBlock = (category: Category): KnownBlock => {
   const { linkedChannel, name, id } = category;
-  const linkChannelMessage = linkedChannel
-    ? "this category is linked to the " + linkedChannel + " channel"
-    : "this category is not linked to a channel";
   return {
     type: "section",
     text: {
       type: "mrkdwn",
-      text: `*${name}* \n ${linkChannelMessage}`,
+      text: `*${name}* \n ${getChannelMessage(linkedChannel)}`,
     },
     accessory: {
       type: "button",
@@ -46,57 +55,59 @@ export const getCategoryOptionBlock = (category: Category): KnownBlock => {
   };
 };
 
-export const editModalView = (category: {
-  name: string;
-  id: string;
-  linkedChannel?: string;
-}): ModalView => {
-  return {
-    type: "modal",
-    title: {
-      type: "plain_text",
-      text: "Edit Category",
-      emoji: true,
-    },
-    close: {
-      type: "plain_text",
-      text: "Cancel",
-      emoji: true,
-    },
-    submit: {
-      type: "plain_text",
-      text: "Save",
-      emoji: true,
-    },
-    blocks: [
-      {
-        type: "input",
-        block_id: CategoryFieldIds.Name,
-        element: {
-          type: "plain_text_input",
-          action_id: "category_name",
-          initial_value: category.name,
-        },
-        label: {
-          type: "plain_text",
-          text: "Category Name",
-          emoji: true,
-        },
+export const categoryBaseModalView: ModalView = {
+  type: "modal",
+  title: {
+    type: "plain_text",
+    text: "Edit Category",
+    emoji: true,
+  },
+  close: {
+    type: "plain_text",
+    text: "Cancel",
+    emoji: true,
+  },
+  submit: {
+    type: "plain_text",
+    text: "Save",
+    emoji: true,
+  },
+  blocks: [],
+};
+
+export const editOrCreateViewBlocks = (category: {
+  name?: string;
+  id?: string;
+  linkedChannelId?: string;
+}): KnownBlock[] => {
+  return [
+    {
+      type: "input",
+      block_id: CategoryFieldIds.Name,
+      element: {
+        type: "plain_text_input",
+        action_id: "category_name",
+        initial_value: category.name,
       },
-      {
-        type: "input",
-        block_id: CategoryFieldIds.Channel,
-        element: {
-          type: "channels_select",
-          action_id: "channel",
-          initial_channel: category.linkedChannel,
-        },
-        label: {
-          type: "plain_text",
-          text: "Channel",
-          emoji: true,
-        },
+      label: {
+        type: "plain_text",
+        text: "Category Name",
+        emoji: true,
       },
-    ],
-  };
+    },
+    {
+      type: "input",
+      block_id: CategoryFieldIds.Channel,
+      element: {
+        type: "channels_select",
+        action_id: "channel",
+        initial_channel: category.linkedChannelId,
+      },
+      label: {
+        type: "plain_text",
+        text: "Link to Channel",
+        emoji: true,
+      },
+    },
+  ];
 };
