@@ -103,7 +103,7 @@ export const editOrCreateViewBlocks = (category?: Category): KnownBlock[] => {
         type: "plain_text_input",
         action_id: CategoryFieldIds.Description,
         multiline: true,
-        initial_value: category?.name,
+        initial_value: category?.description,
         placeholder: {
           type: "plain_text",
           text: "Description of the category",

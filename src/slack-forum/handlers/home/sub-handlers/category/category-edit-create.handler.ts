@@ -20,7 +20,7 @@ const editOrCreateCategoryButtonHandler = async (app: App) => {
 
     body = body as BlockAction;
     render.setTitle("Add Category");
-    render.appendBlocks(editOrCreateViewBlocks({}));
+    render.appendBlocks(editOrCreateViewBlocks());
     render.setCallbackId(CategoryActionIds.AddOrCreateCategoryCallback);
     const view = render.getView();
     try {
@@ -49,6 +49,8 @@ const editOrCreateCategoryButtonHandler = async (app: App) => {
     }
     render.setTitle("Edit Category");
     render.appendBlocks(editOrCreateViewBlocks(category));
+    render.setCallbackId(CategoryActionIds.AddOrCreateCategoryCallback);
+    render.setExternalId(category.id);
     const view = render.getView();
     try {
       await client.views.open({
@@ -81,7 +83,13 @@ export const categorySubmitHandler = async (app: App) => {
         linkedChannel: parsedCategoryValue[CategoryFieldIds.Channel],
       };
 
-      await categoryService.createCategory(newCategory, orgId);
+      if (body.view.external_id) {
+        const categoryId = body.view.external_id;
+        await categoryService.updateCategory(categoryId, newCategory);
+      } else {
+        await categoryService.createCategory(newCategory, orgId);
+      }
+
       const view = await generateHomeView(orgId, "category");
       await client.views.publish({
         user_id: body.user.id,

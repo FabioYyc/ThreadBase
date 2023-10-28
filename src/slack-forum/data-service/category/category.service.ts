@@ -18,7 +18,7 @@ export class CategoryService {
   }
 
   async updateCategory(id: string, category: Category): Promise<Category | null> {
-    return await CategoryModel.findByIdAndUpdate(id, category, { new: true }).exec();
+    return await CategoryModel.findOneAndUpdate({ id }, category, { new: true }).exec();
   }
 
   async deleteCategory(id: string): Promise<Category | null> {
