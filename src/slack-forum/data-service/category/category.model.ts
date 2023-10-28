@@ -5,10 +5,12 @@ export type CategoryDocument = mongoose.Document & {
   id: string;
   linkedChannel?: string;
   description?: string;
+  orgId: string;
 };
 
 const categorySchema = new mongoose.Schema(
   {
+    orgId: { type: String, required: true },
     name: { type: String, required: true },
     id: { type: String, required: true, unique: true },
     linkedChannel: { type: String },

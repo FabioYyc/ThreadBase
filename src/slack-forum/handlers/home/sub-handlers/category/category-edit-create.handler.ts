@@ -64,17 +64,20 @@ export const categorySubmitHandler = async (app: App) => {
   app.view(CategoryActionIds.AddCategoryCallback, async ({ ack, body, context, client }) => {
     await ack();
     body = body as ViewWorkflowStepSubmitAction;
+    const orgId = body.team?.id;
+    if (!orgId) {
+      throw new Error("No team found");
+    }
     const parsedCategoryValue = parseEditOrCreateCategoryValue(body.view);
 
     const newCategory: Category = {
-      id: generateId(),
+      id: generateId(orgId),
       name: parsedCategoryValue[CategoryFieldIds.Name],
       description: parsedCategoryValue[CategoryFieldIds.Description],
       linkedChannel: parsedCategoryValue[CategoryFieldIds.Channel],
     };
 
-    const createdCategory = await categoryService.createCategory(newCategory);
-    console.log(createdCategory);
+    const createdCategory = await categoryService.createCategory(newCategory, orgId);
   });
 };
 

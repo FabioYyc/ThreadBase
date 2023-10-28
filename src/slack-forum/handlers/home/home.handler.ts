@@ -6,11 +6,12 @@ import HomeTabViewRender from "../../shared/view-render/home-tab-view-render";
 import { registerCategoryHandlers } from "./sub-handlers/category";
 
 const homeTabHandler = (app: App) => {
-  app.event("app_home_opened", async ({ event, client }) => {
+  app.event("app_home_opened", async ({ body, event, client }) => {
     try {
       const blockRetriever: AbstractHomeBlocks = getBlockRetriever();
       const render = new HomeTabViewRender(homeBaseView);
-      const categoryBlocks = blockRetriever.getBlocks();
+      const orgId = body.team_id;
+      const categoryBlocks = await blockRetriever.getBlocks(orgId);
       render.appendBlocks(categoryBlocks);
 
       const view = render.getView();

@@ -2,8 +2,8 @@ import { Category } from "../../types/Category";
 import { CategoryModel } from "./category.model";
 
 export class CategoryService {
-  async createCategory(category: Category): Promise<Category> {
-    const newCategory = new CategoryModel(category);
+  async createCategory(category: Category, orgId: string): Promise<Category> {
+    const newCategory = new CategoryModel({ ...category, orgId });
     return await newCategory.save();
   }
 
@@ -11,7 +11,7 @@ export class CategoryService {
     return await CategoryModel.findById(id).exec();
   }
 
-  async getAllCategories(): Promise<Category[]> {
+  async getAllCategories(orgId: string): Promise<Category[]> {
     return await CategoryModel.find().exec();
   }
 

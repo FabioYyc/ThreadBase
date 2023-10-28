@@ -2,9 +2,12 @@ import { KnownBlock } from "@slack/bolt";
 import { addCategoryAction, getCategoryOptionBlock } from "../../../views/home/category.view";
 import { Category } from "../../../types/Category";
 import { AbstractHomeBlocks } from "./abstract-home-blocks-retriever";
+import { CategoryService } from "../../../data-service/category/category.service";
 
 export class CategoryBlockRetriever extends AbstractHomeBlocks {
-  private getCurrentCategories(): Category[] {
+  private dataService: CategoryService = new CategoryService();
+  private async getCurrentCategories(orgId: string): Promise<Category[]> {
+    const categories = await this.dataService.getAllCategories(orgId);
     const currentCategories: Category[] = [
       {
         id: "1",
@@ -17,7 +20,7 @@ export class CategoryBlockRetriever extends AbstractHomeBlocks {
         name: "Engineering Q&A",
       },
     ];
-    return [...currentCategories];
+    return [...categories];
   }
 
   private getCategoryBlocks(categories: Category[]): KnownBlock[] {
@@ -35,8 +38,8 @@ export class CategoryBlockRetriever extends AbstractHomeBlocks {
     return [...categoryBlocks];
   }
 
-  public getBlocks(): KnownBlock[] {
-    const currentCategories = this.getCurrentCategories();
+  public async getBlocks(orgId: string): Promise<KnownBlock[]> {
+    const currentCategories = await this.getCurrentCategories(orgId);
     const categoryBlocks = this.getCategoryBlocks(currentCategories);
     const categoryManagementBlocks = [...categoryBlocks, ...addCategoryAction];
     return categoryManagementBlocks;

@@ -16,9 +16,10 @@ export const parseEditOrCreateCategoryValue = (view: ViewOutput) => {
   return parsedValues;
 };
 
-export const generateId = () => {
+export const generateId = (orgId: string) => {
+  const idPrefix = `${orgId}_${categoryIdPrefix}`;
   const options: UuidOptions = {
-    prefix: categoryIdPrefix,
+    prefix: idPrefix,
   };
   return Uuid.generate(options);
 };
