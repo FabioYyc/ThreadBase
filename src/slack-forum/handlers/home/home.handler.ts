@@ -1,14 +1,16 @@
 import { App } from "@slack/bolt";
 import SlackView from "../../slack-view-render";
 import { homeBaseView } from "../../views/home/home.view";
-import { getCategoryManagementBlocks } from "./category/category.helper";
-import { editCategoryButtonHandler } from "./category/category.handler";
+import { editCategoryButtonHandler } from "./sub-handlers/category/category.handler";
+import { AbstractHomeBlocks } from "./blocks-retrievers/abstract-home-blocks-retriever";
+import { getBlockRetriever } from "./utils";
 
 const homeTabHandler = (app: App) => {
   app.event("app_home_opened", async ({ event, client }) => {
     try {
+      const blockRetriever: AbstractHomeBlocks = getBlockRetriever();
       const render = new SlackView(homeBaseView);
-      const categoryBlocks = getCategoryManagementBlocks();
+      const categoryBlocks = blockRetriever.getBlocks();
       render.appendBlocks(categoryBlocks);
 
       const view = render.getView();

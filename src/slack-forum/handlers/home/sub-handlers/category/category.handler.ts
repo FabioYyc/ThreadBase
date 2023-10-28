@@ -1,6 +1,6 @@
-import { App, BlockAction, ButtonAction, ButtonClick, SlackAction } from "@slack/bolt";
-import { CategoryActionIds } from "../../../shared/constants/category.constants";
-import { editModalView } from "../../../views/home/category.view";
+import { App, BlockAction } from "@slack/bolt";
+import { CategoryActionIds } from "../../../../shared/constants/category.constants";
+import { editModalView } from "../../../../views/home/category.view";
 
 //action ids
 export const editCategoryButtonHandler = async (app: App) => {
