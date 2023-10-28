@@ -4,7 +4,8 @@
     "lint": "eslint --ext .js,.ts .",
     "start-ngrok": "ngrok http --domain=ca204c9e0fba-1574181592710778495.ngrok-free.app 9000",
     "start-dev": "netlify dev",
-    "start-dev-local": "concurrently \"yarn start-ngrok\" \"yarn dev\""
+    "start-dev-local": "concurrently \"yarn start-ngrok\" \"yarn dev\"",
+    "test": "jest"
   },
   "dependencies": {
     "@netlify/functions": "^1.6.0",
