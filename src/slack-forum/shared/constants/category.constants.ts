@@ -9,3 +9,5 @@ export const CategoryFieldIds = {
   Channel: "channel",
   Description: "description",
 };
+
+export const categoryIdPrefix = "category_";

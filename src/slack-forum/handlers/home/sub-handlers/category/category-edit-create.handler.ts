@@ -2,6 +2,7 @@ import { App, BlockAction, DialogSubmitAction, ViewWorkflowStepSubmitAction } fr
 import {
   CategoryActionIds,
   CategoryFieldIds,
+  categoryIdPrefix,
 } from "../../../../shared/constants/category.constants";
 import {
   categoryBaseModalView,
@@ -10,6 +11,9 @@ import {
 import SlackModalView from "../../../../shared/view-render/modal-view-render";
 import { valueParser } from "../../../../shared/utils/value-parser";
 import { parseEditOrCreateCategoryValue } from "./utils";
+import { Category } from "../../../../types/Category";
+import { uniqueId } from "lodash";
+import { CategoryService } from "../../../../data-service/category/category.service";
 
 const editOrCreateCategoryButtonHandler = async (app: App) => {
   app.action(CategoryActionIds.AddCategory, async ({ ack, body, context, client }) => {
@@ -56,12 +60,21 @@ const editOrCreateCategoryButtonHandler = async (app: App) => {
 };
 
 export const categorySubmitHandler = async (app: App) => {
+  const categoryService = new CategoryService();
   app.view(CategoryActionIds.AddCategoryCallback, async ({ ack, body, context, client }) => {
     await ack();
     body = body as ViewWorkflowStepSubmitAction;
     const parsedCategoryValue = parseEditOrCreateCategoryValue(body.view);
 
-    console.log(parsedCategoryValue);
+    const newCategory: Category = {
+      id: uniqueId(categoryIdPrefix),
+      name: parsedCategoryValue[CategoryFieldIds.Name],
+      description: parsedCategoryValue[CategoryFieldIds.Description],
+      linkedChannel: parsedCategoryValue[CategoryFieldIds.Channel],
+    };
+
+    const createdCategory = await categoryService.createCategory(newCategory);
+    console.log(createdCategory);
   });
 };
 
