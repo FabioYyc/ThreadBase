@@ -34,7 +34,7 @@ export const getCategoryText = (category: Category): string => {
 };
 
 export const getCategoryOptionBlock = (category: Category): KnownBlock => {
-  const { linkedChannel, name, id } = category;
+  const { id } = category;
   return {
     type: "section",
     text: {
@@ -74,11 +74,7 @@ export const categoryBaseModalView: ModalView = {
   blocks: [],
 };
 
-export const editOrCreateViewBlocks = (category: {
-  name?: string;
-  id?: string;
-  linkedChannelId?: string;
-}): KnownBlock[] => {
+export const editOrCreateViewBlocks = (category?: Category): KnownBlock[] => {
   return [
     {
       type: "input",
@@ -86,7 +82,7 @@ export const editOrCreateViewBlocks = (category: {
       element: {
         type: "plain_text_input",
         action_id: CategoryFieldIds.Name,
-        initial_value: category.name,
+        initial_value: category?.name,
         placeholder: {
           type: "plain_text",
           text: "Name of the category",
@@ -107,7 +103,7 @@ export const editOrCreateViewBlocks = (category: {
         type: "plain_text_input",
         action_id: CategoryFieldIds.Description,
         multiline: true,
-        initial_value: category.name,
+        initial_value: category?.name,
         placeholder: {
           type: "plain_text",
           text: "Description of the category",
@@ -127,7 +123,7 @@ export const editOrCreateViewBlocks = (category: {
       element: {
         type: "channels_select",
         action_id: CategoryFieldIds.Channel,
-        initial_channel: category.linkedChannelId,
+        initial_channel: category?.linkedChannel,
         placeholder: {
           type: "plain_text",
           text: "Link to a channel to enable posting in this category",

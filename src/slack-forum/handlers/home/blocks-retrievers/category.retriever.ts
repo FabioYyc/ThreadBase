@@ -6,20 +6,9 @@ import { CategoryService } from "../../../data-service/category/category.service
 
 export class CategoryBlockRetriever extends AbstractHomeBlocks {
   private dataService: CategoryService = new CategoryService();
+
   private async getCurrentCategories(orgId: string): Promise<Category[]> {
     const categories = await this.dataService.getAllCategories(orgId);
-    const currentCategories: Category[] = [
-      {
-        id: "1",
-        name: "General",
-        linkedChannel: "test1",
-        description: "General discussion for everything",
-      },
-      {
-        id: "2",
-        name: "Engineering Q&A",
-      },
-    ];
     return [...categories];
   }
 

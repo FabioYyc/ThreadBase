@@ -8,7 +8,9 @@ export class CategoryService {
   }
 
   async getCategoryById(id: string): Promise<Category | null> {
-    return await CategoryModel.findById(id).exec();
+    return await CategoryModel.findOne({
+      id,
+    }).exec();
   }
 
   async getAllCategories(orgId: string): Promise<Category[]> {

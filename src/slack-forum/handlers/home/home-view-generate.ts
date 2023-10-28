@@ -1,4 +1,3 @@
-import { WebClient } from "@slack/web-api";
 import HomeTabViewRender from "../../shared/view-render/home-tab-view-render";
 import { homeBaseView } from "../../views/home/home.view";
 import { AbstractHomeBlocks } from "./blocks-retrievers/abstract-home-blocks-retriever";
