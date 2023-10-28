@@ -1,6 +1,6 @@
 import { KnownBlock, ModalView } from "@slack/bolt";
-import { Category } from "../../types/Category";
-import { CategoryActionIds, CategoryFieldIds } from "../../shared/constants/category.constants";
+import { Category } from "../../../types/Category";
+import { CategoryActionIds, CategoryFieldIds } from "../../../shared/constants/category.constants";
 
 export const addCategoryAction: KnownBlock[] = [
   {

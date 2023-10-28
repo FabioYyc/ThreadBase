@@ -1,5 +1,5 @@
-import { CategoryActionIds } from "../../shared/constants/category.constants";
-import { Category } from "../../types/Category";
+import { CategoryActionIds } from "../../../shared/constants/category.constants";
+import { Category } from "../../../types/Category";
 import { getCategoryOptionBlock, getCategoryText } from "./category.view";
 
 describe("CategoryView", () => {
