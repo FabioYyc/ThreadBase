@@ -1,6 +1,6 @@
 import { View, KnownBlock } from "@slack/bolt";
 
-class SlackView {
+abstract class ViewRender {
   protected view: View;
 
   constructor(view: View) {
@@ -22,4 +22,4 @@ class SlackView {
   }
 }
 
-export default SlackView;
+export default ViewRender;

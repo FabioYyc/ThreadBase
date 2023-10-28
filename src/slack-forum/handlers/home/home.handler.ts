@@ -1,19 +1,13 @@
 import { App } from "@slack/bolt";
-import SlackView from "../../slack-view-render";
-import { homeBaseView } from "../../views/home/home.view";
-import { editCategoryButtonHandler } from "./sub-handlers/category/category.handler";
-import { AbstractHomeBlocks } from "./blocks-retrievers/abstract-home-blocks-retriever";
-import { getBlockRetriever } from "./utils";
+import { registerCategoryHandlers } from "./sub-handlers/category";
+import { generateHomeView } from "./home-view-generate";
 
 const homeTabHandler = (app: App) => {
-  app.event("app_home_opened", async ({ event, client }) => {
+  app.event("app_home_opened", async ({ body, event, client }) => {
     try {
-      const blockRetriever: AbstractHomeBlocks = getBlockRetriever();
-      const render = new SlackView(homeBaseView);
-      const categoryBlocks = blockRetriever.getBlocks();
-      render.appendBlocks(categoryBlocks);
+      const orgId = body.team_id;
 
-      const view = render.getView();
+      const view = await generateHomeView(orgId, "category");
 
       await client.views.publish({
         user_id: event.user,
@@ -25,5 +19,5 @@ const homeTabHandler = (app: App) => {
 
 export const registerHomeTabListeners = (app: App) => {
   homeTabHandler(app);
-  editCategoryButtonHandler(app);
+  registerCategoryHandlers(app);
 };
