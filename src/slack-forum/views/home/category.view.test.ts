@@ -1,41 +1,46 @@
 import { CategoryActionIds } from "../../shared/constants/category.constants";
 import { Category } from "../../types/Category";
-import { getCategoryOptionBlock, getChannelMessage } from "./category.view";
+import { getCategoryOptionBlock, getCategoryText } from "./category.view";
 
 describe("CategoryView", () => {
-  describe("get channelMessage", () => {
-    it("should return an empty string if linkedChannel is undefined", () => {
+  describe("get categoryText", () => {
+    it("should return show warning if no empty string is undefined", () => {
       const category: Category = {
-        name: "name",
+        name: "test-name",
         id: "id",
       };
-      const result = getChannelMessage(category.linkedChannel);
-      expect(result).toBe("this category is not linked to a channel");
+      const result = getCategoryText(category);
+      expect(result).toContain("No description found about this category");
+      expect(result).toContain(category.name);
+      expect(result).toContain("this category is not linked to a channel");
     });
 
-    it("should return a string with the linkedChannel if it is defined", () => {
+    it("should not show warning with the linkedChannel if it is defined", () => {
       const category: Category = {
-        name: "name",
+        name: "test-name",
         id: "id",
-        linkedChannel: [
-          {
-            name: "channelName",
-            id: "channelId",
-          },
-          {
-            name: "channelName2",
-            id: "channelId2",
-          },
-        ],
+        linkedChannel: "channelId",
       };
-      const result = getChannelMessage(category.linkedChannel);
-      expect(result).toBe(
-        `this category is linked to the following channels: channelName, channelName2`,
-      );
+      const result = getCategoryText(category);
+      expect(result).toContain("No description found about this category");
+      expect(result).toContain(category.name);
+      expect(result).not.toContain("this category is not linked to a channel");
+    });
+
+    it("should show description", () => {
+      const category: Category = {
+        name: "test-name",
+        id: "id",
+        linkedChannel: "channelId",
+        description: "test-description",
+      };
+      const result = getCategoryText(category);
+      expect(result).toContain(category.description);
+      expect(result).toContain(category.name);
     });
   });
   describe("getCategoryOptionBlock", () => {
-    it("should return a block with the category name and the channel message", () => {
+    it("should return a block with the category name and the channel message, without description", () => {
       const category: Category = {
         name: "name",
         id: "id",
@@ -45,13 +50,13 @@ describe("CategoryView", () => {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: `*${category.name}* \n ${getChannelMessage(category.linkedChannel)}`,
+          text: getCategoryText(category),
         },
         accessory: {
           type: "button",
           text: {
             type: "plain_text",
-            text: "Edit",
+            text: "Edit :pencil2:",
             emoji: true,
           },
           action_id: CategoryActionIds.EditCategory,

@@ -12,6 +12,9 @@ class SlackModalView extends ViewRender {
   public setTitle(titleText: string): void {
     this.view.title.text = titleText;
   }
+  public setCallbackId(callbackId: string): void {
+    this.view.callback_id = callbackId;
+  }
 }
 
 export default SlackModalView;
