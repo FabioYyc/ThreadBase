@@ -2,18 +2,16 @@ import { App, BlockAction, ViewWorkflowStepSubmitAction } from "@slack/bolt";
 import {
   CategoryActionIds,
   CategoryFieldIds,
-  categoryIdPrefix,
 } from "../../../../shared/constants/category.constants";
 import {
   categoryBaseModalView,
   editOrCreateViewBlocks,
 } from "../../../../views/home/category.view";
 import SlackModalView from "../../../../shared/view-render/modal-view-render";
-import { valueParser } from "../../../../shared/utils/value-parser";
 import { generateId, parseEditOrCreateCategoryValue } from "./utils";
 import { Category } from "../../../../types/Category";
-import { uniqueId } from "lodash";
 import { CategoryService } from "../../../../data-service/category/category.service";
+import { generateHomeView } from "../../home-view-generate";
 
 const editOrCreateCategoryButtonHandler = async (app: App) => {
   app.action(CategoryActionIds.AddCategory, async ({ ack, body, context, client }) => {
@@ -77,7 +75,12 @@ export const categorySubmitHandler = async (app: App) => {
       linkedChannel: parsedCategoryValue[CategoryFieldIds.Channel],
     };
 
-    const createdCategory = await categoryService.createCategory(newCategory, orgId);
+    await categoryService.createCategory(newCategory, orgId);
+    const view = await generateHomeView(orgId, "category");
+    await client.views.publish({
+      user_id: body.user.id,
+      view: view,
+    });
   });
 };
 
