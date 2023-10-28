@@ -1,5 +1,6 @@
 import { KnownBlock, ModalView } from "@slack/bolt";
 import { Category } from "../../types/Category";
+import { CategoryActionIds, CategoryFieldIds } from "../../shared/constants/category.constants";
 
 export const addCategoryAction: KnownBlock[] = [
   {
@@ -39,7 +40,7 @@ export const getCategoryOptionBlock = (category: Category): KnownBlock => {
         text: "Edit",
         emoji: true,
       },
-      action_id: "edit-category",
+      action_id: CategoryActionIds.EditCategory,
       value: id,
     },
   };
@@ -70,7 +71,7 @@ export const editModalView = (category: {
     blocks: [
       {
         type: "input",
-        block_id: "category_name",
+        block_id: CategoryFieldIds.Name,
         element: {
           type: "plain_text_input",
           action_id: "category_name",
@@ -84,7 +85,7 @@ export const editModalView = (category: {
       },
       {
         type: "input",
-        block_id: "channel",
+        block_id: CategoryFieldIds.Channel,
         element: {
           type: "channels_select",
           action_id: "channel",
