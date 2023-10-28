@@ -6,12 +6,13 @@ import {
 import {
   categoryBaseModalView,
   editOrCreateViewBlocks,
-} from "../../../../views/home/category.view";
+} from "../../../../views/home/category/category.view";
 import SlackModalView from "../../../../shared/view-render/modal-view-render";
 import { generateId, parseEditOrCreateCategoryValue } from "./utils";
 import { Category } from "../../../../types/Category";
 import { CategoryService } from "../../../../data-service/category/category.service";
 import { generateHomeView } from "../../home-view-generate";
+import { deleteCategoryBlocks } from "../../../../views/home/category/category.delete.view";
 
 const editOrCreateCategoryButtonHandler = async (app: App) => {
   app.action(CategoryActionIds.AddCategory, async ({ ack, body, context, client }) => {
@@ -49,6 +50,7 @@ const editOrCreateCategoryButtonHandler = async (app: App) => {
     }
     render.setTitle("Edit Category");
     render.appendBlocks(editOrCreateViewBlocks(category));
+    render.appendBlocks(deleteCategoryBlocks(category.id));
     render.setCallbackId(CategoryActionIds.AddOrCreateCategoryCallback);
     render.setExternalId(category.id);
     const view = render.getView();

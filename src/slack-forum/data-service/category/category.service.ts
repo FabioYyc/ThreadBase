@@ -22,6 +22,6 @@ export class CategoryService {
   }
 
   async deleteCategory(id: string): Promise<Category | null> {
-    return await CategoryModel.findByIdAndDelete(id).exec();
+    return await CategoryModel.findOneAndDelete({ id }).exec();
   }
 }

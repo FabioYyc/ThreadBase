@@ -1,5 +1,8 @@
 import { KnownBlock } from "@slack/bolt";
-import { addCategoryAction, getCategoryOptionBlock } from "../../../views/home/category.view";
+import {
+  addCategoryAction,
+  getCategoryOptionBlock,
+} from "../../../views/home/category/category.view";
 import { Category } from "../../../types/Category";
 import { AbstractHomeBlocks } from "./abstract-home-blocks-retriever";
 import { CategoryService } from "../../../data-service/category/category.service";
