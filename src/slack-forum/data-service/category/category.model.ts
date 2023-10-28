@@ -7,11 +7,16 @@ export type CategoryDocument = mongoose.Document & {
   description?: string;
 };
 
-const categorySchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  id: { type: String, required: true, unique: true },
-  linkedChannel: { type: String },
-  description: { type: String },
-});
+const categorySchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true },
+    id: { type: String, required: true, unique: true },
+    linkedChannel: { type: String },
+    description: { type: String },
+  },
+  {
+    timestamps: true,
+  },
+);
 
 export const CategoryModel = mongoose.model<CategoryDocument>("Category", categorySchema);

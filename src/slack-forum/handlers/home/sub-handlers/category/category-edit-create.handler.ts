@@ -1,4 +1,4 @@
-import { App, BlockAction, DialogSubmitAction, ViewWorkflowStepSubmitAction } from "@slack/bolt";
+import { App, BlockAction, ViewWorkflowStepSubmitAction } from "@slack/bolt";
 import {
   CategoryActionIds,
   CategoryFieldIds,
@@ -10,7 +10,7 @@ import {
 } from "../../../../views/home/category.view";
 import SlackModalView from "../../../../shared/view-render/modal-view-render";
 import { valueParser } from "../../../../shared/utils/value-parser";
-import { parseEditOrCreateCategoryValue } from "./utils";
+import { generateId, parseEditOrCreateCategoryValue } from "./utils";
 import { Category } from "../../../../types/Category";
 import { uniqueId } from "lodash";
 import { CategoryService } from "../../../../data-service/category/category.service";
@@ -67,7 +67,7 @@ export const categorySubmitHandler = async (app: App) => {
     const parsedCategoryValue = parseEditOrCreateCategoryValue(body.view);
 
     const newCategory: Category = {
-      id: uniqueId(categoryIdPrefix),
+      id: generateId(),
       name: parsedCategoryValue[CategoryFieldIds.Name],
       description: parsedCategoryValue[CategoryFieldIds.Description],
       linkedChannel: parsedCategoryValue[CategoryFieldIds.Channel],
