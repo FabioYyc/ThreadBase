@@ -1,4 +1,9 @@
 import { HomeView, KnownBlock } from "@slack/bolt";
+import {
+  HomeActionBlockId,
+  HomeActionIds,
+  HomeActionTitleBlockId,
+} from "../../shared/constants/home.constants";
 
 export const homeBaseView: HomeView = {
   type: "home",
@@ -15,6 +20,7 @@ export const homeBaseView: HomeView = {
     },
     {
       type: "actions",
+      block_id: HomeActionBlockId,
       elements: [
         {
           type: "button",
@@ -25,6 +31,18 @@ export const homeBaseView: HomeView = {
           },
           style: "primary",
           value: "manage_categories",
+          action_id: HomeActionIds.ManageCategoryActionId,
+        },
+        {
+          type: "button",
+          text: {
+            type: "plain_text",
+            text: "Manage Topics",
+            emoji: true,
+          },
+          style: "primary",
+          value: "manage_topics",
+          action_id: HomeActionIds.ManageTopicActionId,
         },
       ],
     },
@@ -37,6 +55,14 @@ export const homeBaseView: HomeView = {
           alt_text: "placeholder",
         },
       ],
+    },
+    {
+      type: "section",
+      block_id: HomeActionTitleBlockId,
+      text: {
+        type: "mrkdwn",
+        text: "Manage Categories",
+      },
     },
   ],
 };
